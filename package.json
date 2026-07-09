@@ -1,0 +1,28 @@
+{
+  "name": "flexg-docs-template",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "기획 문서(HY Docs) 표준 템플릿 — 3분할 레이아웃 · 라이트/다크 테마 · 화면 위 번호 마커 · 피그마식 핀 코멘트",
+  "author": "김희연",
+  "//": "docs 시스템 개발 : 김희연 / 2026.06.01",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^3.35.0",
+    "@emotion/react": "^11.14.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.12"
+  }
+}
