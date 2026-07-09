@@ -8,6 +8,37 @@
 
 ---
 
+## 🧭 세션 연속성 — 새 세션은 여기부터 (마지막 갱신 2026-07-09)
+
+> ⚠️ **이 폴더에서 Claude Code를 새로 열면 이전 세션 메모리는 안 보인다**(예전 개발은 다른 경로 `~/projects/flexg_live_2` 세션에서 진행됨). **이 CLAUDE.md가 유일한 컨텍스트다.** 작업 상태가 바뀌면 이 절을 반드시 갱신할 것.
+
+### 저장소 유래 · 위치 · 원격
+- 원래 개인 로컬 `~/projects/flexg-docs-template`(로컬전용)에서 개발 → **2026-07-09 회사 org로 이관.**
+- **작업 폴더(현재)**: `~/weed_projects_heeyeon/convergence-docs-template-heeyeon-2026-07`
+- **원격**: `git@github-company:WEED-Convergence/convergence-docs-template-heeyeon-2026-07.git` (private)
+- **회사 push 방법**: SSH 별칭 `github-company`(키 `~/.ssh/id_ed25519_company`, 인증 신원 `WEED-Convergence`)로만 됨. 개인 `gh`(yeonying-smile)는 이 org 접근 불가 → org 레포 생성은 회사계정 웹, push는 이 SSH 리모트.
+- 원본은 `~/projects/_ARCHIVED-flexg-docs-template--migrated-to-weed-2026-07` 로 아카이브(**사용 금지**).
+
+### git 규칙
+- **커밋·push·PR은 사용자가 명시 지시할 때만.** 작업 마무리라는 이유로 알아서 커밋하지 않는다. 기본은 "수정만 하고 보고".
+- 관련 변경은 한 번에 모아서(기능마다 쪼개지 말 것). 커밋 위생: `node_modules`·`tsconfig.tsbuildinfo` 커밋 금지(`.gitignore` 반영됨).
+
+### 현재 진행 상태 (작업 로그)
+- ✅ **샘플 대시보드(홈)** Figma 정밀 구현 완료 — `/docs/dashboard`(=`/preview/dashboard`, `src/demo/DemoScreens.tsx`의 `Dashboard`). Figma file `1pTvqSYmvdYcNTyAnXRdfy`. 6영역: ①프로모배너 ②오늘의할일 ③CRM현황·지표 ④쇼핑몰현황(DatAI 실시간표 + 신규가입/리워드 표 + 매출카드 + 배너) ⑤유료서비스현황 ⑥구매후기·상품문의·공지. `data-doc-mark`: promo/todo/crm/shop/paid/reviews.
+- ✅ **표준 컴포넌트 확장**(모두 `/components` 갤러리 등록): `KVColumns`(열 타입 4종 rows/center/lines/nodes), `SectionHead`(`more`=더보기 링크), `Stars`(`size`), `NoticeList`(흰 박스+상하 회색선·첫 줄 bold·항목 사이 선 없음). DatAI 표는 헤더/본문을 **공용 grid 컬럼**(`DATAI_COLS`, `minmax(0,…)`)으로 정렬(세로선 편차 0).
+- 🔄 **진행중(#40): `/components` 갤러리 shadcn식 개편** — `src/docs/ComponentGallery.tsx` 리팩터 중.
+  - 목표: 좌측 **알파벳순 평면 목록**(+검색, area 태그, 중복이름 Toggle×2는 slug로 유일화) / 중앙 **개별 컴포넌트 페이지**(미리보기→Props표→사용법) / 우측 **On This Page** / **`/components/<slug>` 라우팅**(pushState+popstate).
+  - `CompEntry`에 `props?: PropRow[]` 필드 추가함. `ALL`(평면 정렬 목록)·`byId`·`PAGE_SECTIONS` 추가함.
+  - **미완일 수 있음** — 리팩터 도중이면 `CompRow`/구 목록 JSX 제거와 새 마스터-디테일 뷰 연결이 남아 tsc 에러가 있을 수 있으니 이어서 완성할 것.
+- ⏭ **남은 일**: (1) Props 데이터 채우기(대시보드·어드민 표준부터) (2) tsc+로컬 검증.
+
+### 검증 방법
+- 타입: `npx tsc --noEmit`
+- 로컬: `npm run dev` → http://localhost:3000 · 문서 `/docs` · 대시보드 `/docs/dashboard` · 컴포넌트 `/components`
+- Figma 대조: `get_design_context`/`get_screenshot`로 노드 받아 픽셀 비교(헤더/본문 정렬·셀 여백 꼼꼼히).
+
+---
+
 ## 🧑‍💻 Claude Code로 작업할 때 — 필독 (작업 규칙)
 
 이 저장소에서 Claude Code로 작업할 땐 아래를 **매번** 지킨다.

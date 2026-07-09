@@ -119,7 +119,9 @@ function BottomSheetDemo() {
 }
 
 // ── 갤러리 데이터(어드민 원자) ──
-interface CompEntry { name: string; source: string; desc: string; tags: string[]; render: () => React.ReactNode; code: string }
+interface PropRow { name: string; type: string; def?: string; desc: string }
+// code=React(.tsx), html=퍼블리셔·.NET용 순수 HTML(인라인 스타일 + Figma 토큰 var(--Fg…))
+interface CompEntry { name: string; source: string; desc: string; tags: string[]; render: () => React.ReactNode; code: string; html?: string; props?: PropRow[] }
 interface AreaGroup { area: string; note?: string; items: CompEntry[] }
 
 const GROUPS: AreaGroup[] = [
@@ -129,7 +131,11 @@ const GROUPS: AreaGroup[] = [
     items: [
       { name: 'FilledButton', source: 'admin/parts', desc: '3-레이어 베벨 채움 버튼. bg로 semantic 색 지정(기본/포인트/서브/등록=초록/삭제=빨강)', tags: ['label', 'bg', 'onClick', 'iconLeft/Right'],
         render: () => (<Flex gap="6px" wrap="wrap"><FilledButton label="생성" bg={colors.bcDefault} /><FilledButton label="검색" bg={colors.bcPoint} /><FilledButton label="초기화" bg={colors.bcSub} /><FilledButton label="등록" bg={colors.green} /><FilledButton label="강제종료" bg={colors.red} /></Flex>),
-        code: `<FilledButton label="생성" bg={colors.bcDefault} />   {/* 기본 */}\n<FilledButton label="검색" bg={colors.bcPoint} />     {/* 포인트 */}\n<FilledButton label="등록" bg={colors.green} />       {/* 등록 */}\n<FilledButton label="강제종료" bg={colors.red} />     {/* 삭제/경고 */}` },
+        code: `<FilledButton label="생성" bg={colors.bcDefault} />   {/* 기본 */}\n<FilledButton label="검색" bg={colors.bcPoint} />     {/* 포인트 */}\n<FilledButton label="등록" bg={colors.green} />       {/* 등록 */}\n<FilledButton label="강제종료" bg={colors.red} />     {/* 삭제/경고 */}`,
+        html: `<!-- 등록(초록)·강제종료(빨강)는 토큰 사용. 기본/포인트/서브는 버튼 전용 브랜드색(리터럴) -->
+<button style="font-family:'Nanum Gothic',sans-serif;font-weight:700;font-size:13px;color:var(--FgWh);background:var(--FgGreenX);border:0;border-radius:6px;padding:8px 16px;cursor:pointer;">등록</button>
+<button style="font-family:'Nanum Gothic',sans-serif;font-weight:700;font-size:13px;color:var(--FgWh);background:var(--FgRed);border:0;border-radius:6px;padding:8px 16px;cursor:pointer;">강제종료</button>
+<button style="font-family:'Nanum Gothic',sans-serif;font-weight:700;font-size:13px;color:var(--FgWh);background:#3F3F46;border:0;border-radius:6px;padding:8px 16px;cursor:pointer;">생성</button>` },
       { name: 'OutlineButton', source: 'admin/parts', desc: '흰 배경 보조 버튼(행 액션)', tags: ['label', 'onClick'],
         render: () => (<Flex gap="6px"><OutlineButton label="지급" /><OutlineButton label="차감" /></Flex>),
         code: `<OutlineButton label="지급" onClick={handleGrant} />` },
@@ -174,7 +180,9 @@ const GROUPS: AreaGroup[] = [
         code: `<RequiredLabel label="방송명" />\n<RequiredLabel label="메모" required={false} />` },
       { name: 'HelperText', source: 'admin/formParts', desc: '도움말/경고 문구', tags: ['danger'],
         render: () => (<Flex direction="column" gap="4px"><HelperText>기본 안내 문구입니다.</HelperText><HelperText danger>필수값을 입력하세요.</HelperText></Flex>),
-        code: `<HelperText>기본 안내 문구입니다.</HelperText>\n<HelperText danger>필수값을 입력하세요.</HelperText>` },
+        code: `<HelperText>기본 안내 문구입니다.</HelperText>\n<HelperText danger>필수값을 입력하세요.</HelperText>`,
+        html: `<p style="margin:0;font-family:'Nanum Gothic',sans-serif;font-size:12px;color:var(--FgGr72);">기본 안내 문구입니다.</p>
+<p style="margin:0;font-family:'Nanum Gothic',sans-serif;font-size:12px;color:var(--FgRed);">필수값을 입력하세요.</p>` },
       { name: 'Pagination', source: 'admin/parts', desc: '정적 페이지네이션(표시용)', tags: [],
         render: () => <Pagination />,
         code: `<Pagination />` },
@@ -192,7 +200,13 @@ const GROUPS: AreaGroup[] = [
         code: `const [tab, setTab] = useState('라이브 상품');\n<TabStrip tabs={['라이브 상품', '라이브 배너', ...]} active={tab} onChange={setTab} />` },
       { name: 'StatusBadge', source: 'admin/atoms', desc: '라이브 진행 상태 배지(진행중/대기중/종료)', tags: ['status: live|waiting|ended'],
         render: () => (<Flex gap="28px" align="center"><StatusBadge status="live" /><StatusBadge status="waiting" /><StatusBadge status="ended" /></Flex>),
-        code: `<StatusBadge status="live" />     {/* LIVE 빨강 + 진행중 */}\n<StatusBadge status="waiting" />  {/* 대기중 초록 */}\n<StatusBadge status="ended" />` },
+        code: `<StatusBadge status="live" />     {/* LIVE 빨강 + 진행중 */}\n<StatusBadge status="waiting" />  {/* 대기중 초록 */}\n<StatusBadge status="ended" />`,
+        html: `<span style="display:inline-flex;align-items:center;gap:6px;font-family:'Nanum Gothic',sans-serif;">
+  <span style="font-weight:700;font-size:11px;color:var(--FgWh);background:var(--FgRed);border-radius:3px;padding:1px 5px;">LIVE</span>
+  <span style="font-weight:700;font-size:12px;color:var(--FgRed);">진행중</span>
+</span>
+<!-- 대기중: <span style="font-weight:700;font-size:12px;color:var(--FgGreenX);">대기중</span> -->
+<!-- 종료:   <span style="font-weight:700;font-size:12px;color:var(--FgGr92);">종료</span> -->` },
       { name: 'DataTable', source: 'admin/atoms', desc: '2줄 헤더 + 행/셀 테이블(방송 목록 패턴)', tags: ['columns', 'rows'],
         render: () => (
           <DataTable
@@ -214,40 +228,112 @@ const GROUPS: AreaGroup[] = [
       // ── 대시보드(홈) 구성 컴포넌트 ──
       { name: 'SectionHead', source: 'admin/dashboardAtoms', desc: '섹션 제목(18px) + 인라인 안내문(ⓘ …) + more=우측 "더보기 ›" 링크', tags: ['title', 'helper', 'more'],
         render: () => (<Box w="100%"><SectionHead title="구매후기" helper="ⓘ 최근 30일 기준 집계" more /></Box>),
-        code: `<SectionHead title="구매후기" helper="ⓘ 최근 30일 기준 집계" more />` },
+        code: `<SectionHead title="구매후기" helper="ⓘ 최근 30일 기준 집계" more />`,
+        html: `<div style="display:flex;align-items:center;gap:12px;padding-bottom:10px;font-family:'Nanum Gothic',sans-serif;">
+  <span style="font-weight:700;font-size:18px;color:var(--FgGr42);letter-spacing:-0.36px;">구매후기</span>
+  <span style="font-size:12px;color:var(--FgGr92);">ⓘ 최근 30일 기준 집계</span>
+  <span style="flex:1;"></span>
+  <button style="font-size:12px;color:var(--FgGr92);background:none;border:0;cursor:pointer;">더보기 ›</button>
+</div>` },
       { name: 'StatCard', source: 'admin/dashboardAtoms', desc: '지표 카드(라벨 + 회색 박스 안 큰 숫자 Arial). danger면 숫자 빨강', tags: ['label', 'value', 'danger'],
         render: () => (<Flex gap="8px"><StatCard label="신규주문" value="1,920" w="130px" /><StatCard label="취소요청" value="17" danger w="130px" /></Flex>),
-        code: `<StatCard label="신규주문" value="1,920" />\n<StatCard label="취소요청" value="17" danger />` },
+        code: `<StatCard label="신규주문" value="1,920" />\n<StatCard label="취소요청" value="17" danger />`,
+        html: `<div style="background:var(--FgWh);border:1px solid var(--FgGrE8);border-radius:16px;padding:16px;width:130px;font-family:'Nanum Gothic',sans-serif;">
+  <div style="font-weight:700;font-size:12px;color:var(--FgGr72);text-align:center;letter-spacing:-0.24px;padding-bottom:12px;">신규주문</div>
+  <div style="background:var(--FgGrF8);border-radius:12px;padding:17px 0;text-align:center;">
+    <span style="font-family:Arial,sans-serif;font-weight:700;font-size:20px;letter-spacing:-0.4px;color:var(--FgGr42);">1,920</span>
+  </div>
+</div>
+<!-- 취소·반품 등 감소 지표: 숫자 색을 var(--FgRed) 으로 -->` },
       { name: 'StatusPill', source: 'admin/dashboardAtoms', desc: '상태 알약(진행중 초록/종료 회색/중지 빨강)', tags: ['tone: active|ended|stopped'],
         render: () => (<Flex gap="8px"><StatusPill tone="active">진행중</StatusPill><StatusPill tone="ended">종료</StatusPill><StatusPill tone="stopped">중지</StatusPill></Flex>),
-        code: `<StatusPill tone="active">진행중</StatusPill>` },
+        code: `<StatusPill tone="active">진행중</StatusPill>`,
+        html: `<span style="display:inline-flex;align-items:center;justify-content:center;background:var(--FgGreenX);border-radius:24px;padding:4px 10px;font-family:'Nanum Gothic',sans-serif;font-weight:700;font-size:12px;color:var(--FgWh);">진행중</span>
+<!-- 종료: background:var(--FgGrB8) · 중지: background:var(--FgRed) -->` },
       { name: 'PillStatCard', source: 'admin/dashboardAtoms', desc: '상태 알약 + 숫자 카드(상태별 건수). InfoCard 안에 넣어 씀', tags: ['tone', 'label', 'value'],
         render: () => (<Flex gap="16px" w="280px"><PillStatCard tone="active" label="진행중" value="8" /><PillStatCard tone="ended" label="종료" value="3" /><PillStatCard tone="stopped" label="중지" value="0" /></Flex>),
         code: `<InfoCard title="캠페인 진행 현황">\n  <Flex gap="16px">\n    <PillStatCard tone="active" label="진행중" value="8" />\n    <PillStatCard tone="ended" label="종료" value="3" />\n  </Flex>\n</InfoCard>` },
       { name: 'SubBox', source: 'admin/dashboardAtoms', desc: '회색 서브 박스(제목? + · 라벨-값 행). 매출 카드 세부 지표', tags: ['title', 'rows', 'tone'],
         render: () => (<Box w="280px"><SubBox rows={[{ label: '· 이번 달 충전', value: '20,000,000c' }, { label: '· 마진 24.89%', value: '5,124,901원', tone: 'green' }]} /></Box>),
-        code: `<SubBox rows={[{ label: '· 이번 달 충전', value: '20,000,000c' }, ...]} />` },
+        code: `<SubBox rows={[{ label: '· 이번 달 충전', value: '20,000,000c' }, ...]} />`,
+        html: `<div style="background:var(--FgGrF8);border-radius:10px;padding:14px;width:280px;font-family:'Nanum Gothic',sans-serif;">
+  <div style="display:flex;justify-content:space-between;gap:8px;padding-bottom:6px;">
+    <span style="font-size:12px;color:var(--FgGr72);">· 이번 달 충전</span>
+    <span style="font-weight:700;font-size:14px;color:var(--FgGr92);">20,000,000c</span>
+  </div>
+  <div style="display:flex;justify-content:space-between;gap:8px;">
+    <span style="font-size:12px;color:var(--FgGr72);">· 마진 24.89%</span>
+    <span style="font-weight:700;font-size:14px;color:var(--FgGreenX);">5,124,901원</span>
+  </div>
+</div>` },
       { name: 'KVColumns', source: 'admin/dashboardAtoms', desc: '다중 열 요약표. 열 타입 4종: rows=[라벨,값,danger?] 행 · center=단일 중앙값 · lines=중앙 여러 줄(b=굵게) · nodes=임의 노드 스택(별점 등, 옆 열과 행 정렬)', tags: ['columns', 'rows', 'center', 'lines', 'nodes', 'danger'],
         render: () => (<Box w="100%"><KVColumns columns={[{ header: '회원탈퇴', rows: [['어제', '11', true], ['이번달', '32', true]] }, { header: '총 회원 수', center: '234,902' }, { header: 'SMS', lines: [{ t: '353건', b: true }, { t: '4,589원', b: true }, { t: '(건/13원)' }] }, { header: '별점', nodes: [<Stars key="a" n={5} size={16} />, <Stars key="b" n={3} size={16} />] }, { header: '구매후기 수', lines: [{ t: '2,152', b: true }, { t: '220', b: true }] }]} /></Box>),
-        code: `<KVColumns columns={[\n  { header: '회원탈퇴', rows: [['어제', '11', true]] },   // danger=빨강\n  { header: '총 회원 수', center: '234,902' },            // 단일 중앙값\n  { header: 'SMS', lines: [{ t: '353건', b: true }, { t: '(건/13원)' }] }, // 중앙 여러 줄\n  { header: '별점', nodes: [<Stars n={5} size={18} />, <Stars n={3} size={18} />] }, // 임의 노드 스택\n]} />` },
+        code: `<KVColumns columns={[\n  { header: '회원탈퇴', rows: [['어제', '11', true]] },   // danger=빨강\n  { header: '총 회원 수', center: '234,902' },            // 단일 중앙값\n  { header: 'SMS', lines: [{ t: '353건', b: true }, { t: '(건/13원)' }] }, // 중앙 여러 줄\n  { header: '별점', nodes: [<Stars n={5} size={18} />, <Stars n={3} size={18} />] }, // 임의 노드 스택\n]} />`,
+        html: `<!-- 상하 #ddd 선 + 셀 사이 1px 회색(바탕 var(--FgGrE8) 이 gap으로 비침) -->
+<div style="display:flex;flex-direction:column;background:var(--FgGrE8);border-top:1px solid #ddd;border-bottom:1px solid #ddd;font-family:'Nanum Gothic',sans-serif;">
+  <div style="display:flex;gap:1px;padding-bottom:1px;">
+    <div style="flex:1;background:var(--FgGrF8);padding:8px 16px;text-align:center;font-weight:700;font-size:12px;color:var(--FgGr72);">신규가입</div>
+    <div style="flex:1;background:var(--FgGrF8);padding:8px 16px;text-align:center;font-weight:700;font-size:12px;color:var(--FgGr72);">회원탈퇴</div>
+    <div style="flex:1;background:var(--FgGrF8);padding:8px 16px;text-align:center;font-weight:700;font-size:12px;color:var(--FgGr72);">총 회원 수</div>
+  </div>
+  <div style="display:flex;gap:1px;">
+    <div style="flex:1;background:var(--FgWh);padding:12px 16px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--FgGr72);"><span>어제</span><b>1,453</b></div>
+    </div>
+    <div style="flex:1;background:var(--FgWh);padding:12px 16px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--FgGr72);"><span>어제</span><b style="color:var(--FgRed);">11</b></div>
+    </div>
+    <div style="flex:1;background:var(--FgWh);padding:12px 16px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--FgGr42);">234,902</div>
+  </div>
+</div>` },
       { name: 'InfoCard', source: 'admin/dashboardAtoms', desc: '카드 컨테이너(제목 + 우측 액션 + 본문)', tags: ['title', 'action', 'children'],
         render: () => (<Box w="280px"><InfoCard title="캐시 현황" action={<Text fontFamily="monospace" fontSize="11px" color="#29BC25">충전하기 ›</Text>}><Text fontSize="18px" fontWeight="700">18,000,000c</Text></InfoCard></Box>),
-        code: `<InfoCard title="캐시 현황" action={<Link>충전하기 ›</Link>}>\n  <Text>18,000,000c</Text>\n</InfoCard>` },
+        code: `<InfoCard title="캐시 현황" action={<Link>충전하기 ›</Link>}>\n  <Text>18,000,000c</Text>\n</InfoCard>`,
+        html: `<div style="display:flex;flex-direction:column;background:var(--FgWh);border:1px solid var(--FgGrE8);border-radius:16px;padding:16px;width:280px;font-family:'Nanum Gothic',sans-serif;">
+  <div style="display:flex;align-items:center;padding-bottom:8px;">
+    <span style="font-weight:700;font-size:14px;color:var(--FgGr42);">캐시 현황</span>
+    <span style="flex:1;"></span>
+    <span style="font-size:11px;color:var(--FgGreenX);cursor:pointer;">충전하기 ›</span>
+  </div>
+  <div style="font-size:18px;font-weight:700;color:var(--FgGr42);">18,000,000c</div>
+</div>` },
       { name: 'LabelValueTable', source: 'admin/dashboardAtoms', desc: '라벨-값 표(헤더 + 행, 값 색상 지정)', tags: ['header', 'rows', 'tone'],
         render: () => (<Box w="240px"><LabelValueTable header="구매 목적 캠페인" rows={[{ label: 'ROAS', value: '500%', tone: 'point' }, { label: '구매 금액', value: '1,000,000원' }]} /></Box>),
         code: `<LabelValueTable header="구매 목적 캠페인" rows={[{ label: 'ROAS', value: '500%', tone: 'point' }, ...]} />` },
       { name: 'AdBanner', source: 'admin/dashboardAtoms', desc: '광고/홍보 이미지 배너(이미지 + 선택 AD 마크). 대시보드 상단 배너 행', tags: ['src', 'ad', 'alt'],
         render: () => (<Flex gap="8px" w="100%"><AdBanner w="200px" src={adminAsset('dashboard/banner-1.png')} /><AdBanner w="200px" src={adminAsset('dashboard/banner-4.png')} ad /></Flex>),
-        code: `<AdBanner src={asset('dashboard/banner-4.png')} ad />` },
+        code: `<AdBanner src={asset('dashboard/banner-4.png')} ad />`,
+        html: `<div style="position:relative;border-radius:8px;overflow:hidden;width:200px;">
+  <img src="/figma-assets/dashboard/banner-4.png" alt="" style="display:block;width:100%;height:auto;" />
+  <!-- ad 마크(선택) -->
+  <img src="/figma-assets/dashboard/ad-mark.svg" alt="AD" style="position:absolute;top:0;right:0;width:27px;height:20px;" />
+</div>` },
       { name: 'PromoBanner', source: 'admin/dashboardAtoms', desc: '프로모 배너 카드(컬러 배경 + 문구 + 뱃지). 이미지 없이 텍스트 배너용', tags: ['bg', 'badge', 'h'],
         render: () => (<Flex gap="8px"><DashPromoBanner w="150px" bg="#E23C34"><Text fontFamily="'Nanum Gothic', sans-serif" fontSize="12px" fontWeight="700" color="#fff">오픈 준비 끝!</Text></DashPromoBanner><DashPromoBanner w="150px" bg="#6D3BD1" badge="AD"><Text fontFamily="'Nanum Gothic', sans-serif" fontSize="12px" fontWeight="700" color="#fff">SNS활용패키지</Text></DashPromoBanner></Flex>),
         code: `<PromoBanner bg="#E23C34" badge="AD"><Text>...</Text></PromoBanner>` },
       { name: 'NoticeList', source: 'admin/dashboardAtoms', desc: '공지 목록 — 흰 박스(상하 회색선) 안 [제목 … 날짜] 행. bold=true면 그 줄 제목 굵게(항목 사이 구분선 없음)', tags: ['items', 'bold'],
         render: () => (<Box w="360px"><NoticeList items={[{ title: '9월 정기 업데이트 소식', date: '2024-09-24', bold: true }, { title: '추석 연휴 휴무 안내', date: '2024-09-06' }, { title: '네이버 단축 URL 서비스 정상화 완료', date: '2024-08-01' }]} /></Box>),
-        code: `<NoticeList items={[\n  { title: '9월 정기 업데이트', date: '2024-09-24', bold: true },\n  { title: '추석 연휴 휴무 안내', date: '2024-09-06' },\n]} />` },
+        code: `<NoticeList items={[\n  { title: '9월 정기 업데이트', date: '2024-09-24', bold: true },\n  { title: '추석 연휴 휴무 안내', date: '2024-09-06' },\n]} />`,
+        html: `<div style="background:var(--FgGrE8);padding:1px 0;font-family:'Nanum Gothic',sans-serif;">
+  <div style="background:var(--FgWh);padding:16px;display:flex;flex-direction:column;gap:6px;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span style="flex:1;min-width:0;font-weight:700;font-size:12px;color:var(--FgGr72);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">9월 정기 업데이트 소식</span>
+      <span style="font-size:12px;color:var(--FgGr72);white-space:nowrap;">2024-09-24</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span style="flex:1;min-width:0;font-size:12px;color:var(--FgGr72);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">추석 연휴 휴무 안내</span>
+      <span style="font-size:12px;color:var(--FgGr72);white-space:nowrap;">2024-09-06</span>
+    </div>
+  </div>
+</div>` },
       { name: 'Stars', source: 'admin/dashboardAtoms', desc: '별점(채운 별 n개, 금색). size로 크기 지정(기본 14px)', tags: ['n', 'size'],
         render: () => (<Flex direction="column" gap="4px"><Stars n={5} size={18} /><Stars n={3} size={18} /><Stars n={1} size={18} /></Flex>),
-        code: `<Stars n={5} size={18} />` },
+        code: `<Stars n={5} size={18} />`,
+        html: `<div style="display:flex;gap:1px;font-size:18px;line-height:1;">
+  <span style="color:#FFB800;">★</span><span style="color:#FFB800;">★</span><span style="color:#FFB800;">★</span>
+  <span style="color:#D8D8D8;">★</span><span style="color:#D8D8D8;">★</span>
+</div>
+<!-- 채운 별 #FFB800, 빈 별 #D8D8D8 (별점 색은 브랜드 고정색) -->` },
     ],
   },
   {
@@ -299,23 +385,61 @@ const GROUPS: AreaGroup[] = [
 
 const TOTAL = GROUPS.reduce((n, g) => n + g.items.length, 0);
 
-// 앵커 id — 그룹/컴포넌트로 스크롤
-const areaId = (area: string) => `area-${area}`;
-const compId = (name: string) => `comp-${name.replace(/[^a-zA-Z0-9가-힣]+/g, '-')}`;
-// 그룹 경계를 넘어 이어지는 연속 번호
-const numberOf = (gi: number, ii: number) => GROUPS.slice(0, gi).reduce((n, g) => n + g.items.length, 0) + ii + 1;
+// ── 평면(알파벳순) 컴포넌트 목록 — area 라벨 유지, /components/<slug> 라우팅용 유일 id ──
+type FlatEntry = CompEntry & { area: string; id: string };
+const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+// area별 색(작은 태그) — 목록에서 출처 구분
+const AREA_TONE: Record<string, { bg: string; fg: string }> = {
+  '어드민': { bg: '#EEF2FF', fg: '#4338CA' },
+  '송출앱': { bg: '#FEF2F2', fg: '#B91C1C' },
+  '고객뷰어 · 샵': { bg: '#ECFDF5', fg: '#047857' },
+};
+const ALL: FlatEntry[] = (() => {
+  const flat = GROUPS.flatMap((g) => g.items.map((e) => ({ ...e, area: g.area })));
+  flat.sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
+  const seen = new Map<string, number>();
+  return flat.map((e) => {
+    const base = slugify(e.name) || 'comp';
+    const c = seen.get(base) ?? 0;
+    seen.set(base, c + 1);
+    // 중복 이름(예: Toggle ×2)은 두 번째부터 소스 파일명으로 유일화
+    const id = c === 0 ? base : `${base}-${slugify(e.source.split('/').pop() || String(c))}`;
+    return { ...e, id };
+  });
+})();
+const byId = (id: string) => ALL.find((e) => e.id === id);
+// area(화면)별 그룹 — 그룹 안에서만 알파벳순(전체를 한 덩어리로 섞지 않음)
+const GROUPED: { area: string; items: FlatEntry[] }[] = GROUPS.map((g) => ({
+  area: g.area,
+  items: ALL.filter((e) => e.area === g.area),
+}));
 
-// 번호 배지
-function NumBadge({ n, size = 22 }: { n: number; size?: number }) {
-  return (
-    <Flex w={`${size}px`} h={`${size}px`} flexShrink={0} align="center" justify="center" borderRadius="50%" bg="#3F3F46">
-      <Text fontFamily={CHROME} fontSize="11px" fontWeight="800" color="#fff" lineHeight="1">{n}</Text>
-    </Flex>
-  );
-}
+// 컴포넌트 상세 페이지의 섹션(우측 On This Page 앵커와 동일)
+const PAGE_SECTIONS = [
+  { id: 'sec-preview', label: '미리보기' },
+  { id: 'sec-props', label: 'Props' },
+  { id: 'sec-usage', label: '사용법' },
+] as const;
+
+// ── 디자인 토큰 — Figma 변수(get_variable_defs) 이름 그대로 CSS 변수로 ──
+// HTML 스니펫은 색을 하드코딩하지 않고 var(--FgGreenX) 처럼 이 토큰을 참조한다.
+const TOKENS: { name: string; value: string; use: string }[] = [
+  { name: 'FgWh', value: '#FFFFFF', use: '흰색 배경/글자' },
+  { name: 'FgGreenX', value: '#29BC25', use: '포인트 초록(등록·활성·강조·마진%)' },
+  { name: 'FgRed', value: '#FF2F2F', use: '경고·삭제·취소·감소' },
+  { name: 'FgGr22', value: '#222222', use: '가장 진한 텍스트' },
+  { name: 'FgGr42', value: '#424242', use: '기본 텍스트/제목' },
+  { name: 'FgGr72', value: '#727272', use: '보조 텍스트/라벨' },
+  { name: 'FgGr92', value: '#929292', use: '옅은 텍스트/도움말' },
+  { name: 'FgGrB8', value: '#B8B8B8', use: '비활성/플레이스홀더/종료' },
+  { name: 'FgGrE8', value: '#E8E8E8', use: '테두리/구분선' },
+  { name: 'FgGrF8', value: '#F8F8F8', use: '옅은 배경(회색 박스)' },
+];
+const TOKEN_ID = 'design-tokens';
+const TOKEN_CSS = ':root{\n' + TOKENS.map((t) => `  --${t.name}: ${t.value};`).join('\n') + '\n}';
 
 // 코드 스니펫 블록(복사) — HeroUI식. 가로 스크롤 없이 줄바꿈, 복사 버튼은 헤더로 분리.
-function CodeBlock({ code }: { code: string }) {
+function CodeBlock({ code, lang = 'tsx' }: { code: string; lang?: string }) {
   const [copied, setCopied] = useState(false);
   const copy = () => {
     navigator.clipboard?.writeText(code).then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1200); }).catch(() => {});
@@ -323,7 +447,7 @@ function CodeBlock({ code }: { code: string }) {
   return (
     <Box bg="#0F1117" borderRadius="9px" overflow="hidden" mt="10px">
       <Flex align="center" px="12px" h="30px" borderBottom="1px solid rgba(255,255,255,0.08)">
-        <Text fontFamily="monospace" fontSize="10.5px" fontWeight="700" color="#6B7280">tsx</Text>
+        <Text fontFamily="monospace" fontSize="10.5px" fontWeight="700" color="#6B7280">{lang}</Text>
         <Box flex="1" />
         <Box as="button" onClick={copy} px="8px" py="3px" borderRadius="6px" bg="rgba(255,255,255,0.08)" cursor="pointer" _hover={{ bg: 'rgba(255,255,255,0.16)' }}>
           <Text fontFamily={CHROME} fontSize="10.5px" fontWeight="700" color={copied ? '#4ADE80' : '#C7CCD4'}>{copied ? '복사됨' : '복사'}</Text>
@@ -336,36 +460,167 @@ function CodeBlock({ code }: { code: string }) {
   );
 }
 
-// 컴포넌트 한 줄 — 상단 헤더[번호 + 이름 + 소스] · 본문[미리보기 | 설명+코드]
-function CompRow({ e, num }: { e: CompEntry; num: number }) {
+// area 태그 칩
+function AreaTag({ area }: { area: string }) {
+  const t = AREA_TONE[area] ?? { bg: '#F1F1F4', fg: '#6B7280' };
+  return <Text fontFamily={CHROME} fontSize="10px" fontWeight="700" color={t.fg} bg={t.bg} px="7px" py="2px" borderRadius="100px" flexShrink={0}>{area}</Text>;
+}
+
+// 섹션 제목(상세 페이지 내부 앵커)
+function SecHead({ id, children }: { id: string; children: React.ReactNode }) {
+  return <Text id={id} data-anchor={id} scrollMarginTop="12px" fontFamily={CHROME} fontSize="14px" fontWeight="800" color="#111827" pt="8px" pb="10px">{children}</Text>;
+}
+
+// Props 표 — props 있으면 표, 없으면 tags를 prop 이름 목록으로 대체(honest fallback)
+function PropsTable({ e }: { e: FlatEntry }) {
+  if (e.props && e.props.length) {
+    return (
+      <Box border="1px solid #E5E7EB" borderRadius="9px" overflow="hidden">
+        <Flex bg="#F4F5F7">
+          {['Prop', 'Type', '기본값', '설명'].map((h, i) => (
+            <Box key={h} flex={['0 0 150px', '0 0 190px', '0 0 100px', '1'][i]} minW="0" px="12px" py="8px" borderLeft={i ? '1px solid #EAECEF' : undefined}>
+              <Text fontFamily={CHROME} fontSize="11.5px" fontWeight="800" color="#374151">{h}</Text>
+            </Box>
+          ))}
+        </Flex>
+        {e.props.map((p) => (
+          <Flex key={p.name} borderTop="1px solid #F0F1F3" align="stretch">
+            <Box flex="0 0 150px" minW="0" px="12px" py="8px">
+              <Text fontFamily="monospace" fontSize="12px" fontWeight="700" color="#111827" wordBreak="break-word">{p.name}</Text>
+            </Box>
+            <Box flex="0 0 190px" minW="0" px="12px" py="8px" borderLeft="1px solid #F0F1F3">
+              <Text fontFamily="monospace" fontSize="11.5px" color="#7C3AED" wordBreak="break-word">{p.type}</Text>
+            </Box>
+            <Box flex="0 0 100px" minW="0" px="12px" py="8px" borderLeft="1px solid #F0F1F3">
+              <Text fontFamily="monospace" fontSize="11.5px" color={p.def ? '#6B7280' : '#C7CCD4'} wordBreak="break-word">{p.def ?? '—'}</Text>
+            </Box>
+            <Box flex="1" minW="0" px="12px" py="8px" borderLeft="1px solid #F0F1F3">
+              <Text fontFamily={CHROME} fontSize="12px" color="#4B5563" lineHeight="1.55" whiteSpace="pre-line">{p.desc}</Text>
+            </Box>
+          </Flex>
+        ))}
+      </Box>
+    );
+  }
+  // fallback — tags를 prop 이름 칩으로
+  return e.tags.length ? (
+    <Flex gap="5px" wrap="wrap">
+      {e.tags.map((tg) => (
+        <Text key={tg} fontFamily="monospace" fontSize="11px" color="#6B7280" bg="#F1F1F4" px="8px" py="3px" borderRadius="6px">{tg}</Text>
+      ))}
+      <Text fontFamily={CHROME} fontSize="11.5px" color="#B0B4BB" alignSelf="center" pl="2px">· 상세 props 준비중</Text>
+    </Flex>
+  ) : (
+    <Text fontFamily={CHROME} fontSize="12px" color="#B0B4BB">props 없음</Text>
+  );
+}
+
+// 사용법 — React(.tsx) | HTML 탭. HTML은 인라인 스타일 + Figma 토큰 var(--Fg…)
+function UsageTabs({ e }: { e: FlatEntry }) {
+  const [lang, setLang] = useState<'react' | 'html'>('react');
+  const hasHtml = !!e.html;
+  const cur = lang === 'html' ? 'html' : 'react';
   return (
-    <Box id={compId(e.name)} data-anchor={compId(e.name)} scrollMarginTop="16px"
-      border="1px solid #E5E7EB" borderRadius="12px" overflow="hidden" bg="#fff">
-      {/* 헤더: 번호 + 이름 + 소스 */}
-      <Flex align="center" gap="10px" px="16px" py="11px" borderBottom="1px solid #F0F1F3">
-        <NumBadge n={num} />
-        <Text fontFamily={CHROME} fontSize="15px" fontWeight="800" color="#111827">{e.name}</Text>
-        <Text fontFamily="monospace" fontSize="11px" color="#9CA3AF">{e.source}</Text>
+    <Box>
+      <Flex bg="#F1F1F4" borderRadius="8px" p="3px" gap="2px" w="fit-content" mb="2px">
+        {([['react', 'React (.tsx)'], ['html', 'HTML']] as const).map(([k, label]) => {
+          const on = cur === k;
+          return (
+            <Box as="button" key={k} onClick={() => setLang(k)} px="12px" py="5px" borderRadius="6px" cursor="pointer"
+              bg={on ? '#fff' : 'transparent'} boxShadow={on ? '0 1px 2px rgba(0,0,0,0.1)' : 'none'}>
+              <Text fontFamily={CHROME} fontSize="11.5px" fontWeight="700" color={on ? '#111827' : '#9CA3AF'}>{label}</Text>
+            </Box>
+          );
+        })}
       </Flex>
-      {/* 본문 */}
-      <Flex align="stretch">
-        {/* 왼쪽: 미리보기 */}
-        <Flex flex="1" minW="0" bg="#FBFBFC" px="24px" py="22px" align="center" gap="10px" wrap="wrap">
+      {cur === 'html'
+        ? (hasHtml
+            ? <CodeBlock code={e.html as string} lang="html" />
+            : <Box mt="10px" p="14px 16px" bg="#FFF7ED" border="1px solid #FED7AA" borderRadius="9px"><Text fontFamily={CHROME} fontSize="12px" color="#9A3412">이 컴포넌트의 HTML 예시는 준비중입니다. (React 탭 참고 · 색상은 <Box as="span" fontFamily="monospace">var(--Fg…)</Box> 토큰 사용 예정)</Text></Box>)
+        : <CodeBlock code={e.code} lang="tsx" />}
+      {cur === 'html' && hasHtml && (
+        <Text fontFamily={CHROME} fontSize="11.5px" color="#9CA3AF" pt="8px">색상은 디자인 토큰 <Box as="span" fontFamily="monospace" color="#6B7280">var(--Fg…)</Box> 참조 — 토큰 CSS는 좌측 <Box as="span" fontWeight="700" color="#6B7280">디자인 토큰</Box> 페이지에서 복사.</Text>
+      )}
+    </Box>
+  );
+}
+
+// 디자인 토큰 페이지 — 색 스와치 + 복사용 :root CSS
+function TokenPage({ scrollRef }: { scrollRef: React.RefObject<HTMLDivElement | null> }) {
+  return (
+    <Box ref={scrollRef} flex="1" minW="0" overflowY="auto">
+      <Box maxW="900px" mx="auto" px="32px" py="26px">
+        <Flex align="center" gap="9px" pb="6px" wrap="wrap">
+          <Text fontFamily={CHROME} fontSize="22px" fontWeight="800" color="#111827">디자인 토큰</Text>
+          <Text fontFamily="monospace" fontSize="12px" color="#9CA3AF">Figma variables → CSS 변수</Text>
+        </Flex>
+        <Text fontFamily={CHROME} fontSize="13.5px" color="#4B5563" lineHeight="1.7" pb="8px">
+          Figma 변수명 그대로 CSS 변수(<Box as="span" fontFamily="monospace">--FgGreenX</Box> 등)로 제공. HTML 코드는 색을 하드코딩하지 말고 이 토큰을 <Box as="span" fontFamily="monospace">var(--…)</Box> 로 참조한다. 아래 <Box as="span" fontFamily="monospace">:root</Box> CSS를 프로젝트에 한 번 포함하면 됨.
+        </Text>
+
+        <SecHead id="sec-preview">색상 토큰</SecHead>
+        <Box border="1px solid #E5E7EB" borderRadius="9px" overflow="hidden">
+          <Flex bg="#F4F5F7">
+            {['', '토큰(CSS 변수)', 'HEX', '용도'].map((h, i) => (
+              <Box key={i} flex={['0 0 52px', '0 0 180px', '0 0 100px', '1'][i]} px="12px" py="8px" borderLeft={i ? '1px solid #EAECEF' : undefined}>
+                <Text fontFamily={CHROME} fontSize="11.5px" fontWeight="800" color="#374151">{h}</Text>
+              </Box>
+            ))}
+          </Flex>
+          {TOKENS.map((t) => (
+            <Flex key={t.name} borderTop="1px solid #F0F1F3" align="center">
+              <Box flex="0 0 52px" px="12px" py="8px">
+                <Box w="26px" h="26px" borderRadius="6px" bg={t.value} border="1px solid #E5E7EB" />
+              </Box>
+              <Box flex="0 0 180px" px="12px" py="8px" borderLeft="1px solid #F0F1F3">
+                <Text fontFamily="monospace" fontSize="12px" fontWeight="700" color="#111827">--{t.name}</Text>
+              </Box>
+              <Box flex="0 0 100px" px="12px" py="8px" borderLeft="1px solid #F0F1F3">
+                <Text fontFamily="monospace" fontSize="12px" color="#6B7280">{t.value}</Text>
+              </Box>
+              <Box flex="1" minW="0" px="12px" py="8px" borderLeft="1px solid #F0F1F3">
+                <Text fontFamily={CHROME} fontSize="12px" color="#4B5563">{t.use}</Text>
+              </Box>
+            </Flex>
+          ))}
+        </Box>
+
+        <SecHead id="sec-usage">토큰 CSS (복사해서 한 번 포함)</SecHead>
+        <CodeBlock code={TOKEN_CSS} lang="css" />
+        <Box h="40px" />
+      </Box>
+    </Box>
+  );
+}
+
+// 컴포넌트 상세 페이지 — 헤더 + 미리보기 + Props + 사용법
+function ComponentPage({ e, scrollRef }: { e: FlatEntry; scrollRef: React.RefObject<HTMLDivElement | null> }) {
+  return (
+    <Box ref={scrollRef} flex="1" minW="0" overflowY="auto">
+      <Box maxW="900px" mx="auto" px="32px" py="26px">
+        {/* 헤더 */}
+        <Flex align="center" gap="9px" pb="6px" wrap="wrap">
+          <Text fontFamily={CHROME} fontSize="22px" fontWeight="800" color="#111827">{e.name}</Text>
+          <AreaTag area={e.area} />
+          <Text fontFamily="monospace" fontSize="12px" color="#9CA3AF">{e.source}</Text>
+        </Flex>
+        <Text fontFamily={CHROME} fontSize="13.5px" color="#4B5563" lineHeight="1.7" pb="8px">{e.desc}</Text>
+
+        {/* 미리보기 */}
+        <SecHead id="sec-preview">미리보기</SecHead>
+        <Flex bg="#FBFBFC" border="1px solid #E5E7EB" borderRadius="12px" px="24px" py="26px" align="center" gap="12px" wrap="wrap" minH="120px">
           {e.render()}
         </Flex>
-        {/* 오른쪽: 설명 + 코드 */}
-        <Box w="460px" flexShrink={0} borderLeft="1px solid #EEF0F3" p="16px 18px">
-          <Text fontFamily={CHROME} fontSize="12.5px" color="#4B5563" lineHeight="1.65" pb={e.tags.length ? '10px' : '0'}>{e.desc}</Text>
-          {e.tags.length > 0 && (
-            <Flex gap="4px" wrap="wrap">
-              {e.tags.map((tg) => (
-                <Text key={tg} fontFamily="monospace" fontSize="10.5px" color="#6B7280" bg="#F1F1F4" px="6px" py="2px" borderRadius="5px">{tg}</Text>
-              ))}
-            </Flex>
-          )}
-          <CodeBlock code={e.code} />
-        </Box>
-      </Flex>
+
+        {/* Props */}
+        <SecHead id="sec-props">Props</SecHead>
+        <PropsTable e={e} />
+
+        {/* 사용법 — React | HTML 탭 */}
+        <SecHead id="sec-usage">사용법</SecHead>
+        <UsageTabs e={e} />
+        <Box h="40px" />
+      </Box>
     </Box>
   );
 }
@@ -581,31 +836,61 @@ function LayoutDoc() {
   );
 }
 
+// URL(/components/<slug>)에서 현재 컴포넌트 id 파싱(없거나 무효면 첫 항목)
+function currentIdFromPath(): string {
+  const m = window.location.pathname.match(/^\/components\/([^/?#]+)/);
+  const id = m ? decodeURIComponent(m[1]) : '';
+  return (id === TOKEN_ID || byId(id)) ? id : (ALL[0]?.id ?? '');
+}
+
 export function ComponentGallery() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const [active, setActive] = useState<string>('');
   const [tab, setTab] = useState<'components' | 'layout'>('components');
+  const [selectedId, setSelectedId] = useState<string>(() => currentIdFromPath());
+  const [active, setActive] = useState<string>('sec-preview');
+  const [query, setQuery] = useState('');
 
-  // 스크롤 위치에 따라 활성 컴포넌트 추적(목차 하이라이트)
+  // 뒤로/앞으로 가기 → URL의 컴포넌트로 동기화
   useEffect(() => {
+    const onPop = () => { setSelectedId(currentIdFromPath()); setTab('components'); };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  // 상세 페이지 섹션 스크롤스파이(선택 바뀔 때 재관찰)
+  useEffect(() => {
+    if (tab !== 'components') return;
     const root = scrollRef.current;
     if (!root) return;
     const targets = Array.from(root.querySelectorAll<HTMLElement>('[data-anchor]'));
     const io = new IntersectionObserver(
       (entries) => {
-        const vis = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        const vis = entries.filter((en) => en.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
         if (vis[0]) setActive(vis[0].target.getAttribute('data-anchor') || '');
       },
       { root, rootMargin: '0px 0px -70% 0px', threshold: 0 },
     );
     targets.forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, []);
+  }, [selectedId, tab]);
 
-  const goTo = (id: string) => {
-    const root = scrollRef.current;
-    root?.querySelector(`#${CSS.escape(id)}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const select = (id: string) => {
+    setSelectedId(id);
+    setActive('sec-preview');
+    if (window.location.pathname !== `/components/${id}`) window.history.pushState({}, '', `/components/${id}`);
+    scrollRef.current?.scrollTo({ top: 0 });
   };
+  const goSec = (id: string) => scrollRef.current?.querySelector(`#${CSS.escape(id)}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  const isToken = selectedId === TOKEN_ID;
+  const selected = byId(selectedId) ?? ALL[0];
+  const q = query.trim().toLowerCase();
+  const match = (e: FlatEntry) => !q || e.name.toLowerCase().includes(q) || e.area.toLowerCase().includes(q) || e.tags.some((t) => t.toLowerCase().includes(q));
+  const groups = GROUPED.map((g) => ({ ...g, items: g.items.filter(match) })).filter((g) => g.items.length);
+  const tokenMatches = !q || '디자인 토큰 design tokens'.includes(q);
+  const pageSections: readonly { id: string; label: string }[] = isToken
+    ? [{ id: 'sec-preview', label: '색상 토큰' }, { id: 'sec-usage', label: '토큰 CSS' }]
+    : PAGE_SECTIONS;
 
   return (
     <Flex direction="column" h="100dvh" bg="#EEF0F3" fontFamily={CHROME}>
@@ -632,45 +917,65 @@ export function ComponentGallery() {
         <Box flex="1" minH="0"><LayoutDoc /></Box>
       ) : (
       <Flex flex="1" minH="0">
-        {/* 좌측 그룹 목차 */}
-        <Box w="240px" flexShrink={0} bg="#fff" borderRight="1px solid #E5E7EB" overflowY="auto" py="16px">
-          {GROUPS.map((g, gi) => (
-            <Box key={g.area} pb="10px">
-              <Box as="button" w="100%" textAlign="left" px="18px" py="6px" onClick={() => goTo(areaId(g.area))} cursor="pointer">
-                <Text fontSize="13px" fontWeight="800" color="#111827">{g.area} <Box as="span" fontWeight="600" color="#B0B4BB">· {g.items.length}</Box></Text>
+        {/* 좌측: 검색 + 알파벳순 평면 목록 */}
+        <Flex direction="column" w="248px" flexShrink={0} bg="#fff" borderRight="1px solid #E5E7EB" minH="0">
+          <Box p="12px 12px 8px" flexShrink={0}>
+            <LInput value={query} onChange={setQuery} placeholder="컴포넌트 검색…" width="100%" />
+          </Box>
+          <Box flex="1" overflowY="auto" pb="16px">
+            {/* 디자인 토큰 — 고정 항목(맨 위) */}
+            {tokenMatches && (
+              <Box pt="4px" pb="6px">
+                <Flex as="button" w="100%" align="center" gap="7px" pl="16px" pr="10px" py="6px" textAlign="left"
+                  onClick={() => select(TOKEN_ID)} cursor="pointer" position="relative" _hover={{ bg: '#F4F5F7' }} bg={isToken ? '#F1F1F4' : 'transparent'}>
+                  {isToken && <Box position="absolute" left="0" top="4px" bottom="4px" w="3px" borderRadius="2px" bg="#3F3F46" />}
+                  <Box w="12px" h="12px" borderRadius="3px" flexShrink={0} style={{ background: 'linear-gradient(135deg,#29BC25,#FF2F2F)' }} />
+                  <Text fontSize="12.5px" fontWeight={isToken ? '700' : '600'} color={isToken ? '#111827' : '#374151'} flex="1" minW="0" truncate>디자인 토큰</Text>
+                </Flex>
               </Box>
-              {g.items.map((e, ii) => {
-                const on = active === compId(e.name);
-                const num = numberOf(gi, ii);
-                return (
-                  <Flex as="button" key={e.name} w="100%" align="center" gap="7px" pl="16px" pr="10px" py="5px" textAlign="left"
-                    onClick={() => goTo(compId(e.name))} cursor="pointer" position="relative" _hover={{ bg: '#F4F5F7' }} bg={on ? '#F1F1F4' : 'transparent'}>
-                    {on && <Box position="absolute" left="0" top="4px" bottom="4px" w="3px" borderRadius="2px" bg="#3F3F46" />}
-                    <Text fontFamily="monospace" fontSize="10.5px" fontWeight="700" color={on ? '#3F3F46' : '#B0B4BB'} w="16px" flexShrink={0} textAlign="right">{num}</Text>
-                    <Text fontSize="12.5px" fontWeight={on ? '700' : '500'} color={on ? '#111827' : '#6B7280'} truncate>{e.name}</Text>
-                  </Flex>
-                );
-              })}
-            </Box>
-          ))}
-        </Box>
-
-        {/* 우측 콘텐츠(스크롤 컨테이너) */}
-        <Box ref={scrollRef} flex="1" minW="0" overflowY="auto">
-          <Box maxW="1400px" mx="auto" px="28px" py="24px">
-            {GROUPS.map((g, gi) => (
-              <Box key={g.area} pb="34px">
-                <Flex id={areaId(g.area)} scrollMarginTop="12px" align="baseline" gap="10px" pb="14px">
-                  <Text fontSize="16px" fontWeight="800" color="#111827">{g.area}</Text>
-                  {g.note && <Text fontFamily="monospace" fontSize="12px" color="#9CA3AF">{g.note}</Text>}
-                  <Text fontSize="12px" color="#9CA3AF">· {g.items.length}개</Text>
+            )}
+            {groups.map((g) => (
+              <Box key={g.area} pb="8px">
+                {/* 그룹(화면) 헤더 */}
+                <Flex align="center" gap="6px" px="16px" pt="12px" pb="4px">
+                  <Text fontFamily={CHROME} fontSize="11px" fontWeight="800" color="#9CA3AF" letterSpacing="0.03em" textTransform="uppercase">{g.area}</Text>
+                  <Text fontFamily={CHROME} fontSize="11px" fontWeight="700" color="#CDD1D8">{g.items.length}</Text>
                 </Flex>
-                <Flex direction="column" gap="12px">
-                  {g.items.map((e, ii) => <CompRow key={e.name} e={e} num={numberOf(gi, ii)} />)}
-                </Flex>
+                {g.items.map((e) => {
+                  const on = e.id === selectedId;
+                  return (
+                    <Flex as="button" key={e.id} w="100%" align="center" gap="7px" pl="16px" pr="10px" py="6px" textAlign="left"
+                      onClick={() => select(e.id)} cursor="pointer" position="relative" _hover={{ bg: '#F4F5F7' }} bg={on ? '#F1F1F4' : 'transparent'}>
+                      {on && <Box position="absolute" left="0" top="4px" bottom="4px" w="3px" borderRadius="2px" bg="#3F3F46" />}
+                      <Text fontSize="12.5px" fontWeight={on ? '700' : '500'} color={on ? '#111827' : '#6B7280'} flex="1" minW="0" truncate>{e.name}</Text>
+                    </Flex>
+                  );
+                })}
               </Box>
             ))}
+            {groups.length === 0 && !tokenMatches && <Text px="16px" py="10px" fontSize="12px" color="#B0B4BB">검색 결과 없음</Text>}
           </Box>
+        </Flex>
+
+        {/* 중앙: 디자인 토큰 페이지 또는 선택 컴포넌트 상세 */}
+        {isToken
+          ? <TokenPage key="tokens" scrollRef={scrollRef} />
+          : <ComponentPage key={selected.id} e={selected} scrollRef={scrollRef} />}
+
+        {/* 우측: On This Page */}
+        <Box w="200px" flexShrink={0} py="30px" px="18px" borderLeft="1px solid #E5E7EB" bg="#fff">
+          <Text fontFamily={CHROME} fontSize="11px" fontWeight="800" color="#9CA3AF" letterSpacing="0.04em" pb="10px">ON THIS PAGE</Text>
+          <Flex direction="column" gap="2px">
+            {pageSections.map((s) => {
+              const on = active === s.id;
+              return (
+                <Box as="button" key={s.id} textAlign="left" onClick={() => goSec(s.id)} cursor="pointer" position="relative" pl="10px" py="3px">
+                  {on && <Box position="absolute" left="0" top="3px" bottom="3px" w="2px" borderRadius="2px" bg="#3F3F46" />}
+                  <Text fontFamily={CHROME} fontSize="12px" fontWeight={on ? '700' : '500'} color={on ? '#111827' : '#9CA3AF'}>{s.label}</Text>
+                </Box>
+              );
+            })}
+          </Flex>
         </Box>
       </Flex>
       )}
