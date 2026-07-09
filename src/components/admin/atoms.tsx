@@ -45,27 +45,41 @@ export function StatusBadge({ status }: { status: LiveStatus }) {
   return <Text fontFamily={FONT} fontWeight="700" fontSize="12px" color={colors.gr92}>라이브 종료</Text>;
 }
 
-/** 데이터 테이블 — 2줄 헤더(회색) + 행/셀. 방송 목록 테이블 패턴. */
+/** 미니 버튼 — 셀 안 링크형 작은 버튼(흰 배경 + 회색 테두리 #C8C8C8 + 우측 화살표). "…내역 >" · "영수증 출력 >". */
+export function MiniButton({ label, onClick }: { label: string; onClick?: () => void }) {
+  return (
+    <Flex as="button" onClick={onClick} bg="white" border="1px solid #C8C8C8" borderRadius="4px" px="6px" pt="3px" pb="4px" gap="4px" align="center" justify="center" cursor="pointer" flexShrink={0} w="fit-content" _hover={{ bg: colors.grF8 }}>
+      <Text fontFamily={FONT} fontSize="12px" color={colors.gr72} letterSpacing="-0.24px" whiteSpace="nowrap" lineHeight="1.4">{label}</Text>
+      <Box as="span" display="inline-flex" flexShrink={0}>
+        <svg width="5" height="8" viewBox="0 0 6 10" fill="none" stroke="#727272" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="m1 1 4 4-4 4" /></svg>
+      </Box>
+    </Flex>
+  );
+}
+
+/** 데이터 테이블 — 헤더(회색 grF8·굵게) + 행/셀(흰 배경·중앙). 셀은 다중 라인·MiniButton 포함 가능.
+ * Figma 표: 상하 #ddd 선 + 셀/행 사이 1px 회색(grE8) · 헤더 12px 굵게 gr72 · 본문 12px gr72 중앙. */
 export interface TableColumn { header: string[]; flex?: string; w?: string }
 export function DataTable({ columns, rows }: { columns: TableColumn[]; rows: ReactNode[][] }) {
   return (
-    <Box border="1px solid #DDD" borderRadius="2px" overflow="hidden" w="fit-content" maxW="100%">
+    <Box w="fit-content" maxW="100%" overflowX="auto">
       {/* 헤더 */}
-      <Flex bg={colors.grE8} gap="1px">
+      <Flex bg={colors.grE8} borderTop="1px solid #ddd" borderBottom="1px solid #ddd" gap="1px" py="1px" minW="fit-content">
         {columns.map((col, i) => (
-          <Flex key={i} flex={col.flex} w={col.w} bg={colors.grF8} p="8px" align="center" justify="center" direction="column" alignSelf="stretch">
+          <Flex key={i} flex={col.flex ?? '1'} w={col.w} minW="0" bg={colors.grF8} p="8px" align="center" justify="center" direction="column" alignSelf="stretch">
             {col.header.map((line) => (
-              <Text key={line} fontFamily={FONT} fontWeight="700" fontSize="12px" letterSpacing="-0.24px" color={colors.gr72} textAlign="center" whiteSpace="nowrap">{line}</Text>
+              <Text key={line} fontFamily={FONT} fontWeight="700" fontSize="12px" letterSpacing="-0.24px" color={colors.gr72} textAlign="center" lineHeight="1.4" whiteSpace="nowrap">{line}</Text>
             ))}
           </Flex>
         ))}
       </Flex>
       {/* 행 */}
       {rows.map((row, ri) => (
-        <Flex key={ri} gap="1px" bg="#EEE" borderTop="1px solid #EEE">
+        <Flex key={ri} bg={colors.grE8} gap="1px" pb="1px" align="stretch" minW="fit-content">
           {row.map((cell, ci) => (
-            <Flex key={ci} flex={columns[ci]?.flex} w={columns[ci]?.w} bg="white" p="8px" align="center" justify="center" alignSelf="stretch">
-              <Text as="div" fontFamily={FONT} fontSize="12px" color={colors.gr42} textAlign="center" lineHeight="1.5">{cell}</Text>
+            <Flex key={ci} flex={columns[ci]?.flex ?? '1'} w={columns[ci]?.w} minW="0" bg="white" p="12px" direction="column" align="center" justify="center" gap="4px" alignSelf="stretch"
+              fontFamily={FONT} fontSize="12px" color={colors.gr72} textAlign="center" lineHeight="1.4">
+              {cell}
             </Flex>
           ))}
         </Flex>
