@@ -9,5 +9,6 @@ dist-ssr
 # build cache
 tsconfig.tsbuildinfo
 
-# 로컬 전용 세션 노트(팀 배포 제외)
+# 로컬 전용 노트·가이드(팀 배포 제외)
 .session-notes.md
+*.local.md

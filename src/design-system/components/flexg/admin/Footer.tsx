@@ -1,5 +1,5 @@
 import { Flex, Text, Image, Box } from '@chakra-ui/react';
-import { colors, FONT, asset } from '../../styles/tokens';
+import { colors, FONT, asset } from '../../../tokens';
 
 export function Footer() {
   return (

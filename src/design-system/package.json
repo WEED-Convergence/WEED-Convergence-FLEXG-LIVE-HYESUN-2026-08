@@ -1,0 +1,20 @@
+{
+  "name": "@convergence/design-system",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CONVERGENCE 디자인 시스템 — 서비스별 표준 컴포넌트 + 토큰 + 컴포넌트북. 이 폴더는 self-contained 이며 향후 별도 레포/패키지(Storybook 격)로 추출 가능하다. 밖에서는 ./index.ts(배럴)로만 소비한다.",
+  "type": "module",
+  "main": "./index.ts",
+  "module": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./tokens": "./tokens.ts"
+  },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19",
+    "@chakra-ui/react": ">=3"
+  },
+  "sideEffects": false
+}

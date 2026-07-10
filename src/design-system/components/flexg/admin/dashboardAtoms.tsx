@@ -5,7 +5,7 @@
 // 컴포넌트 갤러리(CONVERGENCE 컴포넌트 표준)에도 등록됨.
 import type { ReactNode } from 'react';
 import { Box, Flex, Text } from '@chakra-ui/react';
-import { colors, FONT, asset } from '../../styles/tokens';
+import { colors, FONT, asset } from '../../../tokens';
 
 /** 광고/홍보 이미지 배너 — 이미지 + (선택)AD 마크. 대시보드 상단 배너 행. */
 export function AdBanner({ src, ad = false, alt = '', flex, w }: { src: string; ad?: boolean; alt?: string; flex?: string; w?: string }) {

@@ -1,5 +1,5 @@
 import { Box, Flex, Text, Image, Link } from '@chakra-ui/react';
-import { sidebar, FONT, asset } from '../../styles/tokens';
+import { sidebar, FONT, asset } from '../../../tokens';
 
 function Separator() {
   return <Box h="2px" w="100%" bg={sidebar.separator} borderTop="1px solid #000" />;

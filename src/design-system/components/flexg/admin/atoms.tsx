@@ -2,7 +2,7 @@
 // (기존 화면 코드는 무영향 — 여기 것을 새로 쓰거나 점진 교체용) 컴포넌트 갤러리에도 노출.
 import type { ReactNode } from 'react';
 import { Box, Flex, Text } from '@chakra-ui/react';
-import { colors, FONT } from '../../styles/tokens';
+import { colors, FONT } from '../../../tokens';
 
 /** 탭 스트립 — 회색 트랙 위 탭 버튼(활성=흰 배경 + 초록 글씨). 설정 탭바 패턴. */
 export function TabStrip({ tabs, active, onChange }: { tabs: string[]; active: string; onChange: (t: string) => void }) {

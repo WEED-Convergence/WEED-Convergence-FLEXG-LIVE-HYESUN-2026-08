@@ -3,7 +3,7 @@
  * 이 화면들에서만 쓰는 진짜 동작하는 버전을 별도로 둔다(공유 컴포넌트 무영향). */
 import { useState } from 'react';
 import { Input as ChakraInput, Flex, Text, Box } from '@chakra-ui/react';
-import { colors, FONT } from '../../styles/tokens';
+import { colors, FONT } from '../../../tokens';
 
 // 실제 타이핑되는 입력창 (InputBox 시안과 동일한 룩)
 export function LInput({ value, onChange, placeholder, width = '320px', type = 'text', onEnter }: {

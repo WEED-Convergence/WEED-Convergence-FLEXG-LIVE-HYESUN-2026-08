@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Flex, Text, Image, Box } from '@chakra-ui/react';
-import { colors, FONT, bevelShadow, asset } from '../../styles/tokens';
+import { colors, FONT, bevelShadow, asset } from '../../../tokens';
 
 /** 3-레이어 베벨 버튼 (border + fill + inset shadow) — Figma 공통 버튼 패턴 */
 export function FilledButton({

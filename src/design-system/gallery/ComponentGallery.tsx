@@ -3,30 +3,30 @@
 // 프로토타입 제작 시 재사용 컴포넌트 카탈로그 역할. (docs 사이드바엔 노출하지 않음)
 import { useEffect, useRef, useState } from 'react';
 import { Box, Flex, Text } from '@chakra-ui/react';
-import { colors, FONT as ADMIN_FONT } from '../styles/tokens';
-import { AdminLayout } from '../components/admin/AdminLayout';
-import { TopNav } from '../components/admin/TopNav';
-import { Sidebar } from '../components/admin/Sidebar';
-import { Footer } from '../components/admin/Footer';
+import { colors, FONT as ADMIN_FONT } from '../tokens';
+import { AdminLayout } from '../components/flexg/admin/AdminLayout';
+import { TopNav } from '../components/flexg/admin/TopNav';
+import { Sidebar } from '../components/flexg/admin/Sidebar';
+import { Footer } from '../components/flexg/admin/Footer';
 import {
   FilledButton, OutlineButton, InputBox, SelectBox, Pagination, ListSearch, RequiredLabel,
-} from '../components/admin/parts';
+} from '../components/flexg/admin/parts';
 import {
   Section, Row, TextInput, NumberWithUnit, HelperText, Radio, Checkbox, Toggle, Segmented, SelectInput, Lit,
-} from '../components/admin/formParts';
-import { LInput, LCheck, LPager, LDateModal } from '../components/admin/discountUi';
-import { TabStrip, StatusBadge, DataTable, MiniButton } from '../components/admin/atoms';
-import { SectionHead, StatCard, StatusPill, PillStatCard, InfoCard, SubBox, LabelValueTable, KVColumns, PromoBanner as DashPromoBanner, AdBanner, NoticeList, Stars } from '../components/admin/dashboardAtoms';
-import { asset as adminAsset } from '../styles/tokens';
+} from '../components/flexg/admin/formParts';
+import { LInput, LCheck, LPager, LDateModal } from '../components/flexg/admin/discountUi';
+import { TabStrip, StatusBadge, DataTable, MiniButton } from '../components/flexg/admin/atoms';
+import { SectionHead, StatCard, StatusPill, PillStatCard, InfoCard, SubBox, LabelValueTable, KVColumns, PromoBanner as DashPromoBanner, AdBanner, NoticeList, Stars } from '../components/flexg/admin/dashboardAtoms';
+import { asset as adminAsset } from '../tokens';
 // 송출앱
-import { c as bc } from '../broadapp/theme';
-import { Toggle as AppToggle } from '../broadapp/frame';
-import { AppHeader, AppButton, Dialog, BottomSheet, InfoSheet, IconButton, GearIcon, LogoutIcon, Chevron } from '../broadapp/components';
-import { EyeIcon, BagIcon, HeartIcon, MicIcon, VideoIcon, ChatIcon, BannerIcon, BoxIcon, SwitchIcon, NoticeIcon } from '../broadapp/icons';
+import { c as bc } from '../components/flexg/broadapp/theme';
+import { Toggle as AppToggle } from '../components/flexg/broadapp/frame';
+import { AppHeader, AppButton, Dialog, BottomSheet, InfoSheet, IconButton, GearIcon, LogoutIcon, Chevron } from '../components/flexg/broadapp/components';
+import { EyeIcon, BagIcon, HeartIcon, MicIcon, VideoIcon, ChatIcon, BannerIcon, BoxIcon, SwitchIcon, NoticeIcon } from '../components/flexg/broadapp/icons';
 // 고객뷰어 · 샵
-import { LoginCard } from '../viewer/Live';
-import { ShopToast } from '../shop/ShopToast';
-import { ShareSheet } from '../shop/ShareSheet';
+import { LoginCard } from '../components/flexg/viewer/Live';
+import { ShopToast } from '../components/flexg/shop/ShopToast';
+import { ShareSheet } from '../components/flexg/shop/ShareSheet';
 
 const CHROME = "'Pretendard', system-ui, sans-serif"; // 갤러리 크롬 폰트(컴포넌트 자체는 자기 폰트 유지)
 
