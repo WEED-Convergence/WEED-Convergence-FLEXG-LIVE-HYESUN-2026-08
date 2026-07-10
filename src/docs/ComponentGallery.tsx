@@ -12,7 +12,7 @@ import {
   FilledButton, OutlineButton, InputBox, SelectBox, Pagination, ListSearch, RequiredLabel,
 } from '../components/admin/parts';
 import {
-  Section, Row, TextInput, NumberWithUnit, HelperText, Radio, Checkbox, Toggle, Segmented, SelectInput, Lit, RightChevron,
+  Section, Row, TextInput, NumberWithUnit, HelperText, Radio, Checkbox, Toggle, Segmented, SelectInput, Lit,
 } from '../components/admin/formParts';
 import { LInput, LCheck, LPager, LDateModal } from '../components/admin/discountUi';
 import { TabStrip, StatusBadge, DataTable, MiniButton } from '../components/admin/atoms';
@@ -170,8 +170,8 @@ const GROUPS: AreaGroup[] = [
     area: '어드민',
     note: 'parts · formParts · discountUi',
     items: [
-      { name: 'FilledButton', source: 'admin/parts', category: 'Components', status: 'Stable', scope: '공통',
-        desc: '사용자 액션을 실행하는 기본 버튼.\nsemantic 색상으로 액션의 성격(기본·강조·성공·위험)을 구분한다.\n화면에서 가장 눈에 띄어야 하는 주 동작에 사용한다.',
+      { name: 'Button', source: 'admin/parts · formParts', category: 'Components', status: 'Stable', scope: '공통',
+        desc: '사용자 액션을 실행하는 버튼.\nsemantic 색상으로 액션의 성격(기본·강조·성공·위험)을 구분하고, 채움·테두리·아이콘 형태를 제공한다.\n화면에서 가장 눈에 띄어야 하는 주 동작에 사용한다.',
         tags: ['label', 'bg', 'onClick', 'iconLeft', 'iconRight', 'disabled', 'loading', 'size'],
         render: () => (<Flex gap="10px" wrap="wrap"><FilledButton label="생성" bg={colors.bcDefault} /><FilledButton label="검색" bg={colors.bcPoint} /><FilledButton label="등록" bg={colors.green} /><FilledButton label="강제종료" bg={colors.red} /></Flex>),
         variants: [
@@ -179,6 +179,8 @@ const GROUPS: AreaGroup[] = [
           { title: 'Semantic actions', desc: '의미가 있는 액션', render: () => (<Flex gap="20px" wrap="wrap"><VLabel name="success"><DocBtn tone="success">등록</DocBtn></VLabel><VLabel name="success"><DocBtn tone="success">저장</DocBtn></VLabel><VLabel name="danger"><DocBtn tone="danger">강제종료</DocBtn></VLabel><VLabel name="danger"><DocBtn tone="danger">삭제</DocBtn></VLabel><VLabel name="warning"><DocBtn tone="warning">주의</DocBtn></VLabel></Flex>) },
           { title: 'States', desc: 'disabled · loading', render: () => (<Flex gap="20px" wrap="wrap"><VLabel name="default"><DocBtn tone="primary">기본</DocBtn></VLabel><VLabel name="disabled"><DocBtn tone="primary" disabled>비활성</DocBtn></VLabel><VLabel name="loading"><DocBtn tone="primary" loading>저장 중…</DocBtn></VLabel></Flex>) },
           { title: 'Sizes', desc: 'sm · md · lg', render: () => (<Flex gap="20px" align="center" wrap="wrap"><VLabel name="sm"><DocBtn tone="default" size="sm">Small</DocBtn></VLabel><VLabel name="md"><DocBtn tone="default" size="md">Medium</DocBtn></VLabel><VLabel name="lg"><DocBtn tone="default" size="lg">Large</DocBtn></VLabel></Flex>) },
+          { title: 'Outline', desc: '테두리형 보조 버튼 (OutlineButton)', render: () => (<Flex gap="12px"><OutlineButton label="지급" /><OutlineButton label="차감" /></Flex>) },
+          { title: 'With icon', desc: '아이콘 동반 (iconLeft · iconRight)', render: () => (<Flex gap="12px"><DocBtn tone="primary">다음 ›</DocBtn></Flex>) },
         ],
         props: [
           { name: 'label', type: 'string', required: true, desc: '버튼에 표시되는 텍스트' },
@@ -229,6 +231,7 @@ const GROUPS: AreaGroup[] = [
 .cv-btn--success{background:var(--FgGreenX);}
 .cv-btn--danger{background:var(--FgRed);}
 .cv-btn--warning{background:#F79009;}
+.cv-btn--outline{background:var(--FgWh);color:var(--FgGr42);border:1px solid var(--FgGrE8);}
 
 /* sizes */
 .cv-btn--sm{font-size:12px;padding:6px 12px;border-radius:6px;}
@@ -239,42 +242,76 @@ const GROUPS: AreaGroup[] = [
   border:2px solid rgba(255,255,255,.45);border-top-color:#fff;
   animation:cv-spin .7s linear infinite;}
 @keyframes cv-spin{to{transform:rotate(360deg);}}` },
-      { name: 'OutlineButton', source: 'admin/parts', desc: '테두리만 있는 보조 버튼.\n주 버튼보다 낮은 위계의 동작이나 표의 행 단위 액션에 사용한다.', tags: ['label', 'onClick'],
-        render: () => (<Flex gap="6px"><OutlineButton label="지급" /><OutlineButton label="차감" /></Flex>),
-        code: `<OutlineButton label="지급" onClick={handleGrant} />`,
-        html: `<button style="font-family:'Nanum Gothic',sans-serif;font-size:12px;color:var(--FgGr42);background:var(--FgWh);border:1px solid var(--FgGrE8);border-radius:6px;padding:6px 12px;cursor:pointer;">지급</button>` },
-      { name: 'InputBox', source: 'admin/parts', desc: '값이나 안내 문구를 보여주는 표시용 입력 상자.\n실제 입력이 필요 없는 읽기 전용 표현에 사용한다.', tags: ['placeholder', 'value', 'width'],
-        render: () => (<Flex direction="column" gap="6px"><InputBox placeholder="검색어 입력" width="200px" /><InputBox value="입력된 값" width="200px" /></Flex>),
-        code: `<InputBox placeholder="검색어 입력" width="200px" />`,
-        html: `<div style="font-family:'Nanum Gothic',sans-serif;font-size:13px;color:var(--FgGrB8);background:var(--FgWh);border:1px solid var(--FgGrE8);border-radius:6px;padding:8px 12px;width:200px;box-sizing:border-box;">검색어 입력</div>` },
-      { name: 'TextInput', source: 'admin/formParts', desc: '한 줄 텍스트를 입력받는 기본 입력 필드. 폼의 일반 텍스트 항목에 사용한다.', tags: ['placeholder', 'defaultValue', 'type', 'width'],
-        render: () => <TextInput placeholder="방송명을 입력하세요" width="220px" />,
-        code: `<TextInput placeholder="방송명을 입력하세요" width="220px" />`,
-        html: `<input type="text" placeholder="방송명을 입력하세요" style="font-family:'Nanum Gothic',sans-serif;font-size:13px;color:var(--FgGr42);background:var(--FgWh);border:1px solid var(--FgGrE8);border-radius:6px;padding:8px 12px;width:220px;box-sizing:border-box;" />` },
-      { name: 'NumberWithUnit', source: 'admin/formParts', desc: '숫자를 입력받고 오른쪽에 단위(원·% 등)를 함께 보여주는 입력 필드.\n금액·비율 입력에 사용한다.', tags: ['unit', 'placeholder', 'width'],
-        render: () => (<Flex gap="10px"><NumberWithUnit unit="원" placeholder="0" width="120px" /><NumberWithUnit unit="%" placeholder="0" width="80px" /></Flex>),
-        code: `<NumberWithUnit unit="원" placeholder="0" width="120px" />`,
-        html: `<div style="display:inline-flex;align-items:center;border:1px solid var(--FgGrE8);border-radius:6px;background:var(--FgWh);width:120px;box-sizing:border-box;font-family:'Nanum Gothic',sans-serif;">
-  <input type="number" placeholder="0" style="flex:1;min-width:0;border:0;outline:0;padding:8px 10px;font-size:13px;color:var(--FgGr42);background:transparent;text-align:right;" />
-  <span style="padding:0 10px;font-size:13px;color:var(--FgGr72);">원</span>
-</div>` },
-      { name: 'LInput', source: 'admin/discountUi', desc: '입력값을 상태로 관리하는 제어형 텍스트 입력 필드.\n검색어·실시간 검증 등 값 변화를 다뤄야 할 때 사용한다.', tags: ['value', 'onChange', 'onEnter'],
-        render: () => <LInputDemo />,
-        code: `const [v, setV] = useState('');\n<LInput value={v} onChange={setV} placeholder="입력해 보세요" />`,
-        html: `<input type="text" placeholder="입력해 보세요" style="font-family:'Nanum Gothic',sans-serif;font-size:13px;color:var(--FgGr42);background:var(--FgWh);border:1px solid var(--FgGrE8);border-radius:6px;padding:8px 12px;width:200px;box-sizing:border-box;" />` },
-      { name: 'SelectBox', source: 'admin/parts', desc: '여러 선택지 중 하나를 고르는 드롭다운.\n클릭하면 목록이 펼쳐지며, 필터·정렬 기준 선택 등에 사용한다.', tags: ['label', 'options', 'onSelect'],
-        render: () => <SelectBox label="전체" width="140px" options={['전체', '진행중', '종료', { divider: true }, '취소']} />,
-        code: `<SelectBox\n  label="전체"\n  options={['전체', '진행중', '종료', { divider: true }, '취소']}\n  onSelect={(v) => setStatus(v)}\n/>`,
-        html: `<div style="display:inline-flex;align-items:center;justify-content:space-between;gap:8px;font-family:'Nanum Gothic',sans-serif;font-size:13px;color:var(--FgGr42);background:var(--FgWh);border:1px solid var(--FgGrE8);border-radius:6px;padding:8px 12px;width:140px;box-sizing:border-box;cursor:pointer;">
-  <span>전체</span><span style="color:var(--FgGrB8);">▾</span>
+      { name: 'Input', source: 'admin/formParts · parts · discountUi', category: 'Components', status: 'Stable', scope: '공통',
+        desc: '텍스트·숫자를 입력받는 기본 입력 필드.\n기본·제어형·표시용·단위 포함 등 상황에 맞는 형태를 제공한다.',
+        tags: ['placeholder', 'value', 'onChange', 'unit', 'type', 'width'],
+        render: () => <TextInput placeholder="방송명을 입력하세요" width="240px" />,
+        variants: [
+          { title: '기본', desc: '한 줄 텍스트 입력 (TextInput)', render: () => <TextInput placeholder="방송명을 입력하세요" width="240px" /> },
+          { title: '제어형', desc: 'value·onChange 로 상태 관리 (LInput)', render: () => <LInputDemo /> },
+          { title: '표시용', desc: '읽기 전용 표현 (InputBox)', render: () => (<Flex direction="column" gap="6px"><InputBox placeholder="검색어 입력" width="200px" /><InputBox value="입력된 값" width="200px" /></Flex>) },
+          { title: '단위 포함', desc: '숫자 + 단위 (NumberWithUnit)', render: () => (<Flex gap="10px"><NumberWithUnit unit="원" placeholder="0" width="120px" /><NumberWithUnit unit="%" placeholder="0" width="80px" /></Flex>) },
+        ],
+        props: [
+          { name: 'placeholder', type: 'string', desc: '입력 안내 문구' },
+          { name: 'value / defaultValue', type: 'string', desc: '제어형 값(LInput) / 비제어 초기값(TextInput)' },
+          { name: 'onChange', type: '(v: string) => void', desc: '제어형 값 변경 이벤트(LInput)' },
+          { name: 'unit', type: 'string', desc: '오른쪽에 붙는 단위 표시(원·% 등, NumberWithUnit)' },
+          { name: 'type', type: `'text' | 'number'`, def: 'text', desc: '입력 타입' },
+          { name: 'width', type: 'string', desc: '입력 너비' },
+        ],
+        guidelines: {
+          do: ['필수 항목은 RequiredLabel과 함께 사용', '읽기 전용 값은 표시용(InputBox)으로 구분', '숫자·금액은 단위 포함 형태로 오해 없이 표기'],
+          dont: ['표시용 입력을 실제 입력처럼 보이게 하지 않기', 'placeholder를 라벨 대용으로만 쓰지 않기'],
+          a11y: ['label과 연결(htmlFor·aria-label)', '오류 시 HelperText로 사유 안내'],
+        },
+        code: `// 기본\n<TextInput placeholder="방송명을 입력하세요" />\n\n// 제어형(값 상태 관리)\n<LInput value={v} onChange={setV} placeholder="입력해 보세요" />\n\n// 표시용(읽기 전용)\n<InputBox value="입력된 값" />\n\n// 숫자 + 단위\n<NumberWithUnit unit="원" placeholder="0" />`,
+        html: `<!-- 기본 입력 -->
+<input class="cv-input" type="text" placeholder="방송명을 입력하세요" />
+
+<!-- 표시용(읽기 전용) -->
+<div class="cv-input cv-input--readonly">입력된 값</div>
+
+<!-- 숫자 + 단위 -->
+<div class="cv-input cv-input--unit">
+  <input type="number" placeholder="0" />
+  <span class="cv-input__unit">원</span>
+</div>`,
+        css: `.cv-input{font-family:'Nanum Gothic',sans-serif;font-size:13px;color:var(--FgGr42);
+  background:var(--FgWh);border:1px solid var(--FgGrE8);border-radius:6px;
+  padding:8px 12px;box-sizing:border-box;}
+.cv-input:focus{outline:none;border-color:var(--FgGr92);}
+.cv-input::placeholder{color:var(--FgGrB8);}
+.cv-input--readonly{color:var(--FgGrB8);}
+.cv-input--unit{display:inline-flex;align-items:center;padding:0;}
+.cv-input--unit input{flex:1;min-width:0;border:0;outline:0;background:transparent;
+  padding:8px 10px;font:inherit;color:var(--FgGr42);text-align:right;}
+.cv-input__unit{padding:0 10px;color:var(--FgGr72);}` },
+      { name: 'Select', source: 'admin/parts · formParts', category: 'Components', status: 'Stable', scope: '공통',
+        desc: '여러 선택지 중 하나를 고르는 선택 컨트롤.\n클릭해 여는 드롭다운과, 값만 보여주는 표시용을 제공한다.',
+        tags: ['label', 'options', 'onSelect', 'width'],
+        render: () => <SelectBox label="전체" width="160px" options={['전체', '진행중', '종료', { divider: true }, '취소']} />,
+        variants: [
+          { title: '드롭다운', desc: '클릭 시 목록 펼침 (SelectBox)', render: () => <SelectBox label="전체" width="160px" options={['전체', '진행중', '종료', { divider: true }, '취소']} /> },
+          { title: '표시용', desc: '값만 보여주는 정적 셀렉트 (SelectInput)', render: () => <SelectInput label="정렬 기준" width="160px" /> },
+        ],
+        props: [
+          { name: 'label', type: 'string', required: true, desc: '현재 선택값 · 기본 라벨' },
+          { name: 'options', type: '(string | { divider })[]', desc: '선택지 목록(구분선 포함)' },
+          { name: 'onSelect', type: '(v: string) => void', desc: '선택 변경 이벤트' },
+          { name: 'width', type: 'string', desc: '너비' },
+        ],
+        code: `<Select\n  label="전체"\n  options={['전체', '진행중', '종료', { divider: true }, '취소']}\n  onSelect={(v) => setStatus(v)}\n/>`,
+        html: `<div class="cv-select">
+  <span>전체</span>
+  <span class="cv-select__caret">▾</span>
 </div>
-<!-- 클릭 시 아래로 옵션 목록(ul>li) 펼침 -->` },
-      { name: 'SelectInput', source: 'admin/formParts', desc: '선택된 값을 보여주는 표시용 셀렉트.\n상호작용 없이 결과만 나타낼 때 사용한다.', tags: ['label', 'width'],
-        render: () => <SelectInput label="정렬 기준" width="140px" />,
-        code: `<SelectInput label="정렬 기준" width="140px" />`,
-        html: `<div style="display:inline-flex;align-items:center;justify-content:space-between;gap:8px;font-family:'Nanum Gothic',sans-serif;font-size:13px;color:var(--FgGr42);background:var(--FgWh);border:1px solid var(--FgGrE8);border-radius:6px;padding:8px 12px;width:140px;box-sizing:border-box;cursor:pointer;">
-  <span>정렬 기준</span><span style="color:var(--FgGrB8);">▾</span>
-</div>` },
+<!-- 클릭 시 아래로 옵션 목록(ul>li) 펼침 -->`,
+        css: `.cv-select{display:inline-flex;align-items:center;justify-content:space-between;gap:8px;
+  font-family:'Nanum Gothic',sans-serif;font-size:13px;color:var(--FgGr42);
+  background:var(--FgWh);border:1px solid var(--FgGrE8);border-radius:6px;
+  padding:8px 12px;box-sizing:border-box;cursor:pointer;}
+.cv-select__caret{color:var(--FgGrB8);}` },
       { name: 'Radio', source: 'admin/formParts', desc: '여러 선택지 중 하나만 고르는 라디오 버튼.\n서로 배타적인 옵션 선택에 사용한다.', tags: ['checked', 'label', 'onClick'],
         render: () => <RadioDemo />,
         code: `<Radio checked={v === '공개'} label="공개" onClick={() => setV('공개')} />`,
@@ -284,18 +321,34 @@ const GROUPS: AreaGroup[] = [
   </span>공개
 </label>
 <!-- 미선택: 테두리 var(--FgGrB8), 안쪽 점 없음 -->` },
-      { name: 'Checkbox', source: 'admin/formParts', desc: '켜짐·꺼짐을 선택하는 체크박스.\n약관 동의나 개별 항목의 선택·해제에 사용한다.', tags: ['checked', 'label', 'onClick'],
+      { name: 'Checkbox', source: 'admin/formParts · discountUi', category: 'Components', status: 'Stable', scope: '공통',
+        desc: '켜짐·꺼짐을 선택하는 체크박스.\n라벨을 붙인 기본형과, 상태값으로 제어하는 제어형을 제공한다.',
+        tags: ['checked', 'label', 'onChange', 'size'],
         render: () => <CheckboxDemo />,
-        code: `<Checkbox checked={on} label="동의합니다" onClick={() => setOn((v) => !v)} />`,
-        html: `<label style="display:inline-flex;align-items:center;gap:7px;font-family:'Nanum Gothic',sans-serif;font-size:13px;color:var(--FgGr42);cursor:pointer;">
-  <span style="width:16px;height:16px;border-radius:4px;background:var(--FgGreenX);display:inline-flex;align-items:center;justify-content:center;color:var(--FgWh);font-size:11px;">✓</span>동의합니다
+        variants: [
+          { title: '기본', desc: '라벨 + 체크 (Checkbox)', render: () => <CheckboxDemo /> },
+          { title: '제어형', desc: '선택 상태를 상태값으로 관리 (LCheck)', render: () => <LCheckDemo /> },
+        ],
+        props: [
+          { name: 'checked', type: 'boolean', required: true, desc: '체크 여부' },
+          { name: 'label', type: 'string', desc: '옆에 붙는 라벨(Checkbox)' },
+          { name: 'onChange / onClick', type: '(v: boolean) => void', desc: '선택 토글 이벤트' },
+          { name: 'size', type: 'number', desc: '박스 크기(LCheck)' },
+        ],
+        guidelines: {
+          do: ['여러 항목을 각각 켜고 끌 때 사용', '하나만 골라야 하면 Radio 사용'],
+          a11y: ['label과 연결해 클릭 영역 확대', '체크 상태를 aria-checked로 노출'],
+        },
+        code: `// 기본\n<Checkbox checked={on} label="동의합니다" onClick={() => setOn(v => !v)} />\n\n// 제어형\n<LCheck checked={on} onChange={setOn} />`,
+        html: `<label class="cv-check">
+  <span class="cv-check__box">✓</span>동의합니다
 </label>
-<!-- 미체크: 배경 var(--FgWh), 테두리 1px var(--FgGrB8), 체크표시 없음 -->` },
-      { name: 'LCheck', source: 'admin/discountUi', desc: '선택 상태를 상태값으로 관리하는 제어형 체크박스.\n목록 전체 선택·필터 등 상태 연동이 필요할 때 사용한다.', tags: ['checked', 'onChange', 'size'],
-        render: () => <LCheckDemo />,
-        code: `<LCheck checked={on} onChange={setOn} />`,
-        html: `<!-- 실동작 체크박스(제어형) — 마크업은 정적 체크박스와 동일 -->
-<span style="width:18px;height:18px;border-radius:4px;background:var(--FgGreenX);display:inline-flex;align-items:center;justify-content:center;color:var(--FgWh);font-size:12px;cursor:pointer;">✓</span>` },
+<!-- 미체크: box 에 cv-check__box--off (배경 흰색·테두리·체크 없음) -->`,
+        css: `.cv-check{display:inline-flex;align-items:center;gap:7px;
+  font-family:'Nanum Gothic',sans-serif;font-size:13px;color:var(--FgGr42);cursor:pointer;}
+.cv-check__box{width:16px;height:16px;border-radius:4px;background:var(--FgGreenX);
+  display:inline-flex;align-items:center;justify-content:center;color:var(--FgWh);font-size:11px;}
+.cv-check__box--off{background:var(--FgWh);border:1px solid var(--FgGrB8);color:transparent;}` },
       { name: 'Toggle', source: 'admin/formParts', desc: '설정의 켜짐·꺼짐을 즉시 전환하는 토글 스위치.\n저장 없이 바로 반영되는 on/off 설정에 사용한다.', tags: ['on', 'onToggle'],
         render: () => <ToggleDemo />,
         code: `<Toggle on={on} onToggle={() => setOn((v) => !v)} />`,
@@ -303,13 +356,6 @@ const GROUPS: AreaGroup[] = [
   <span style="position:absolute;top:2px;left:20px;width:20px;height:20px;border-radius:50%;background:var(--FgWh);"></span>
 </button>
 <!-- OFF: background var(--FgGrB8), 손잡이 left:2px -->` },
-      { name: 'Segmented', source: 'admin/formParts', desc: '나란히 놓인 옵션 중 하나를 고르는 세그먼트 컨트롤.\n공통·개별 설정처럼 소수의 모드를 전환할 때 사용한다.', tags: ['options', 'active', 'onChange'],
-        render: () => <SegmentedDemo />,
-        code: `<Segmented options={['공통설정', '개별설정']} active={v} onChange={setV} />`,
-        html: `<div style="display:inline-flex;background:var(--FgGrF8);border:1px solid var(--FgGrE8);border-radius:8px;padding:3px;font-family:'Nanum Gothic',sans-serif;">
-  <button style="border:0;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;color:var(--FgGr42);background:var(--FgWh);cursor:pointer;">공통설정</button>
-  <button style="border:0;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:500;color:var(--FgGr92);background:transparent;cursor:pointer;">개별설정</button>
-</div>` },
       { name: 'ListSearch', source: 'admin/parts', desc: '목록 상단의 검색 영역.\n검색어 입력과 검색·초기화 실행을 함께 제공한다.', tags: ['onSearch', 'onReset', 'placeholder'],
         render: () => <ListSearch onSearch={() => {}} onReset={() => {}} />,
         code: `<ListSearch onSearch={(q) => filter(q)} onReset={() => reset()} />`,
@@ -318,64 +364,105 @@ const GROUPS: AreaGroup[] = [
   <button style="font-size:13px;font-weight:700;color:var(--FgWh);background:#3F3F46;border:0;border-radius:6px;padding:8px 16px;cursor:pointer;">검색</button>
   <button style="font-size:13px;color:var(--FgGr42);background:var(--FgWh);border:1px solid var(--FgGrE8);border-radius:6px;padding:8px 16px;cursor:pointer;">초기화</button>
 </div>` },
-      { name: 'RequiredLabel', source: 'admin/parts', desc: '폼 항목의 이름 라벨.\n필수 여부를 아이콘으로 함께 표시한다.', tags: ['label', 'required'],
-        render: () => (<Flex direction="column" gap="4px"><RequiredLabel label="방송명" /><RequiredLabel label="메모" required={false} /></Flex>),
-        code: `<RequiredLabel label="방송명" />\n<RequiredLabel label="메모" required={false} />`,
-        html: `<div style="display:flex;align-items:center;gap:4px;font-family:'Nanum Gothic',sans-serif;font-size:13px;color:var(--FgGr42);">
-  <span style="color:var(--FgGreenX);">✓</span>방송명
-</div>
-<!-- required={false}(필수 아님): 앞 체크 아이콘 없음 -->` },
-      { name: 'HelperText', source: 'admin/formParts', desc: '입력 아래 배치하는 보조 설명.\n일반 안내와 오류 경고 두 가지 톤을 가진다.', tags: ['danger'],
-        render: () => (<Flex direction="column" gap="4px"><HelperText>기본 안내 문구입니다.</HelperText><HelperText danger>필수값을 입력하세요.</HelperText></Flex>),
-        code: `<HelperText>기본 안내 문구입니다.</HelperText>\n<HelperText danger>필수값을 입력하세요.</HelperText>`,
-        html: `<p style="margin:0;font-family:'Nanum Gothic',sans-serif;font-size:12px;color:var(--FgGr72);">기본 안내 문구입니다.</p>
-<p style="margin:0;font-family:'Nanum Gothic',sans-serif;font-size:12px;color:var(--FgRed);">필수값을 입력하세요.</p>` },
-      { name: 'Pagination', source: 'admin/parts', desc: '여러 페이지로 나뉜 목록을 이동하는 페이지네이션(표시용).', tags: [],
+      { name: 'Field', source: 'admin/parts · formParts', category: 'Components', status: 'Stable', scope: '공통',
+        desc: '폼 항목을 돕는 보조 요소 모음.\n필수 라벨·도움말·인라인 텍스트를 상황에 맞게 사용한다.',
+        tags: ['label', 'required', 'danger'],
+        render: () => (<Flex direction="column" gap="8px" align="flex-start"><RequiredLabel label="방송명" /><HelperText>기본 안내 문구입니다.</HelperText></Flex>),
+        variants: [
+          { title: '필수 라벨', desc: '항목 이름 + 필수 표시 (RequiredLabel)', render: () => (<Flex direction="column" gap="4px"><RequiredLabel label="방송명" /><RequiredLabel label="메모" required={false} /></Flex>) },
+          { title: '도움말', desc: '안내 · 오류 경고 (HelperText)', render: () => (<Flex direction="column" gap="4px"><HelperText>기본 안내 문구입니다.</HelperText><HelperText danger>필수값을 입력하세요.</HelperText></Flex>) },
+          { title: '인라인 텍스트', desc: '단위·짧은 설명 (Lit)', render: () => (<Flex align="center" gap="6px"><NumberWithUnit unit="" placeholder="0" width="80px" /><Lit>회까지 발송</Lit></Flex>) },
+        ],
+        props: [
+          { name: 'label', type: 'string', desc: '항목 이름(RequiredLabel)' },
+          { name: 'required', type: 'boolean', def: 'true', desc: '필수 표시(RequiredLabel)' },
+          { name: 'danger', type: 'boolean', def: 'false', desc: '오류 톤(HelperText)' },
+        ],
+        code: `<RequiredLabel label="방송명" />\n<HelperText danger>필수값을 입력하세요.</HelperText>\n<Lit>회까지 발송</Lit>`,
+        html: `<div class="cv-field__label"><span class="cv-field__req">✓</span>방송명</div>
+<p class="cv-field__help">기본 안내 문구입니다.</p>
+<p class="cv-field__help cv-field__help--danger">필수값을 입력하세요.</p>`,
+        css: `.cv-field__label{display:flex;align-items:center;gap:4px;font-family:'Nanum Gothic',sans-serif;font-size:13px;color:var(--FgGr42);}
+.cv-field__req{color:var(--FgGreenX);}
+.cv-field__help{margin:0;font-family:'Nanum Gothic',sans-serif;font-size:12px;color:var(--FgGr72);}
+.cv-field__help--danger{color:var(--FgRed);}` },
+      { name: 'Pagination', source: 'admin/parts · discountUi', category: 'Components', status: 'Stable', scope: '공통',
+        desc: '여러 페이지로 나뉜 목록을 이동하는 페이지네이션.\n표시 전용과, 현재 페이지를 상태로 제어하는 실동작형을 제공한다.',
+        tags: ['page', 'totalPages', 'onPage'],
         render: () => <Pagination />,
-        code: `<Pagination />`,
-        html: `<div style="display:inline-flex;align-items:center;gap:4px;font-family:'Nanum Gothic',sans-serif;font-size:13px;">
-  <button style="min-width:30px;height:30px;border:1px solid var(--FgGrE8);background:var(--FgWh);color:var(--FgGr72);border-radius:6px;cursor:pointer;">‹</button>
-  <button style="min-width:30px;height:30px;border:1px solid var(--FgGreenX);background:var(--FgGreenX);color:var(--FgWh);border-radius:6px;font-weight:700;cursor:pointer;">1</button>
-  <button style="min-width:30px;height:30px;border:1px solid var(--FgGrE8);background:var(--FgWh);color:var(--FgGr72);border-radius:6px;cursor:pointer;">2</button>
-  <button style="min-width:30px;height:30px;border:1px solid var(--FgGrE8);background:var(--FgWh);color:var(--FgGr72);border-radius:6px;cursor:pointer;">3</button>
-  <button style="min-width:30px;height:30px;border:1px solid var(--FgGrE8);background:var(--FgWh);color:var(--FgGr72);border-radius:6px;cursor:pointer;">›</button>
-</div>` },
-      { name: 'LPager', source: 'admin/discountUi', desc: '현재 페이지를 상태로 제어하는 실동작 페이지네이션.\n실제 목록 이동과 연동해 사용한다.', tags: ['page', 'totalPages', 'onPage'],
-        render: () => <LPagerDemo />,
-        code: `const [p, setP] = useState(1);\n<LPager page={p} totalPages={8} onPage={setP} />`,
-        html: `<!-- 실동작 페이지네이션(제어형) — 마크업은 정적 Pagination과 동일. 현재 페이지 배경 var(--FgGreenX) -->
-<div style="display:inline-flex;align-items:center;gap:4px;font-family:'Nanum Gothic',sans-serif;font-size:13px;">
-  <button style="min-width:30px;height:30px;border:1px solid var(--FgGreenX);background:var(--FgGreenX);color:var(--FgWh);border-radius:6px;font-weight:700;cursor:pointer;">1</button>
-  <button style="min-width:30px;height:30px;border:1px solid var(--FgGrE8);background:var(--FgWh);color:var(--FgGr72);border-radius:6px;cursor:pointer;">2</button>
-</div>` },
-      { name: 'Lit', source: 'admin/formParts', desc: '입력 옆에 붙이는 인라인 텍스트.\n단위나 짧은 설명을 덧붙일 때 사용한다.', tags: [],
-        render: () => (<Flex align="center" gap="6px"><NumberWithUnit unit="" placeholder="0" width="80px" /><Lit>회까지 발송</Lit></Flex>),
-        code: `<Lit>회까지 발송</Lit>`,
-        html: `<span style="font-family:'Nanum Gothic',sans-serif;font-size:13px;color:var(--FgGr72);">회까지 발송</span>` },
-      { name: 'RightChevron', source: 'admin/formParts', desc: '버튼 오른쪽에 놓아 다음 단계·진행 방향을 나타내는 화살표 아이콘.', tags: [],
-        render: () => (<FilledButton label="다음" bg={colors.bcPoint} iconRight={<RightChevron />} />),
-        code: `<FilledButton label="다음" bg={colors.bcPoint} iconRight={<RightChevron />} />`,
-        html: `<!-- 버튼 우측 화살표(흰색) -->
-<button style="display:inline-flex;align-items:center;gap:6px;font-family:'Nanum Gothic',sans-serif;font-weight:700;font-size:13px;color:var(--FgWh);background:#3F3F46;border:0;border-radius:6px;padding:8px 16px;cursor:pointer;">
-  다음 <span style="font-size:14px;">›</span>
-</button>` },
-      { name: 'TabStrip', source: 'admin/atoms', desc: '같은 영역에서 여러 화면을 전환하는 탭.\n설정·목록의 하위 분류를 오갈 때 사용한다.', tags: ['tabs', 'active', 'onChange'],
+        variants: [
+          { title: '표시용', desc: '정적 표현 (Pagination)', render: () => <Pagination /> },
+          { title: '제어형', desc: 'page 상태와 연동 (LPager)', render: () => <LPagerDemo /> },
+        ],
+        props: [
+          { name: 'page', type: 'number', desc: '현재 페이지(제어형)' },
+          { name: 'totalPages', type: 'number', desc: '전체 페이지 수(제어형)' },
+          { name: 'onPage', type: '(p: number) => void', desc: '페이지 변경 이벤트(제어형)' },
+        ],
+        code: `const [p, setP] = useState(1);\n<Pagination />                                  {/* 표시용 */}\n<LPager page={p} totalPages={8} onPage={setP} /> {/* 제어형 */}`,
+        html: `<nav class="cv-pager">
+  <button class="cv-pager__btn">‹</button>
+  <button class="cv-pager__btn cv-pager__btn--active">1</button>
+  <button class="cv-pager__btn">2</button>
+  <button class="cv-pager__btn">3</button>
+  <button class="cv-pager__btn">›</button>
+</nav>`,
+        css: `.cv-pager{display:inline-flex;align-items:center;gap:4px;font-family:'Nanum Gothic',sans-serif;font-size:13px;}
+.cv-pager__btn{min-width:30px;height:30px;border:1px solid var(--FgGrE8);
+  background:var(--FgWh);color:var(--FgGr72);border-radius:6px;cursor:pointer;}
+.cv-pager__btn--active{border-color:var(--FgGreenX);background:var(--FgGreenX);color:var(--FgWh);font-weight:700;}` },
+      { name: 'Tabs', source: 'admin/atoms · formParts', category: 'Components', status: 'Stable', scope: '공통',
+        desc: '같은 영역에서 여러 화면·모드를 전환하는 탭.\n하위 분류용 탭 스트립과, 소수 옵션용 세그먼트를 제공한다.',
+        tags: ['tabs', 'options', 'active', 'onChange'],
         render: () => <TabStripDemo />,
-        code: `const [tab, setTab] = useState('라이브 상품');\n<TabStrip tabs={['라이브 상품', '라이브 배너', ...]} active={tab} onChange={setTab} />`,
-        html: `<div style="display:inline-flex;background:var(--FgGrF8);border-radius:8px;padding:3px;gap:2px;font-family:'Nanum Gothic',sans-serif;">
-  <button style="border:0;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;color:var(--FgGreenX);background:var(--FgWh);cursor:pointer;">라이브 상품</button>
-  <button style="border:0;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:500;color:var(--FgGr72);background:transparent;cursor:pointer;">라이브 배너</button>
-  <button style="border:0;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:500;color:var(--FgGr72);background:transparent;cursor:pointer;">세컨찬스</button>
-</div>` },
-      { name: 'StatusBadge', source: 'admin/atoms', desc: '라이브 방송의 진행 상태(진행중·대기중·종료)를 한눈에 보여주는 상태 배지.', tags: ['status: live|waiting|ended'],
-        render: () => (<Flex gap="28px" align="center"><StatusBadge status="live" /><StatusBadge status="waiting" /><StatusBadge status="ended" /></Flex>),
-        code: `<StatusBadge status="live" />     {/* LIVE 빨강 + 진행중 */}\n<StatusBadge status="waiting" />  {/* 대기중 초록 */}\n<StatusBadge status="ended" />`,
-        html: `<span style="display:inline-flex;align-items:center;gap:6px;font-family:'Nanum Gothic',sans-serif;">
-  <span style="font-weight:700;font-size:11px;color:var(--FgWh);background:var(--FgRed);border-radius:3px;padding:1px 5px;">LIVE</span>
-  <span style="font-weight:700;font-size:12px;color:var(--FgRed);">진행중</span>
+        variants: [
+          { title: '탭 스트립', desc: '하위 분류 전환 (TabStrip)', render: () => <TabStripDemo /> },
+          { title: '세그먼트', desc: '2~소수 모드 전환 (Segmented)', render: () => <SegmentedDemo /> },
+        ],
+        props: [
+          { name: 'tabs / options', type: 'string[]', required: true, desc: '탭·세그먼트 라벨 목록' },
+          { name: 'active', type: 'string', required: true, desc: '현재 활성 값' },
+          { name: 'onChange', type: '(v: string) => void', required: true, desc: '전환 이벤트' },
+        ],
+        code: `<TabStrip tabs={['라이브 상품', '라이브 배너', '세컨찬스']} active={tab} onChange={setTab} />\n<Segmented options={['공통설정', '개별설정']} active={v} onChange={setV} />`,
+        html: `<div class="cv-tabs">
+  <button class="cv-tabs__tab cv-tabs__tab--active">라이브 상품</button>
+  <button class="cv-tabs__tab">라이브 배너</button>
+  <button class="cv-tabs__tab">세컨찬스</button>
+</div>`,
+        css: `.cv-tabs{display:inline-flex;background:var(--FgGrF8);border-radius:8px;padding:3px;gap:2px;font-family:'Nanum Gothic',sans-serif;}
+.cv-tabs__tab{border:0;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:500;color:var(--FgGr72);background:transparent;cursor:pointer;}
+.cv-tabs__tab--active{font-weight:700;color:var(--FgGreenX);background:var(--FgWh);}` },
+      { name: 'Badge', source: 'admin/atoms · dashboardAtoms', category: 'Components', status: 'Stable', scope: '공통',
+        desc: '상태·속성을 색으로 구분해 압축적으로 보여주는 배지.\n방송 진행 상태 표시형과, 상태별 알약형을 제공한다.',
+        tags: ['status', 'tone', 'children'],
+        render: () => (<Flex gap="20px" align="center"><StatusBadge status="live" /><StatusPill tone="active">진행중</StatusPill></Flex>),
+        variants: [
+          { title: '진행 상태', desc: '라이브 진행중·대기중·종료 (StatusBadge)', render: () => (<Flex gap="28px" align="center"><StatusBadge status="live" /><StatusBadge status="waiting" /><StatusBadge status="ended" /></Flex>) },
+          { title: '알약', desc: '상태별 solid 알약 (StatusPill)', render: () => (<Flex gap="8px"><StatusPill tone="active">진행중</StatusPill><StatusPill tone="ended">종료</StatusPill><StatusPill tone="stopped">중지</StatusPill></Flex>) },
+        ],
+        props: [
+          { name: 'status', type: `'live' | 'waiting' | 'ended'`, desc: '방송 진행 상태(StatusBadge)' },
+          { name: 'tone', type: `'active' | 'ended' | 'stopped'`, desc: '알약 상태 색(StatusPill)' },
+          { name: 'children', type: 'ReactNode', desc: '알약 라벨(StatusPill)' },
+        ],
+        code: `<StatusBadge status="live" />               {/* 진행 상태 */}\n<StatusPill tone="active">진행중</StatusPill>  {/* 알약 */}`,
+        html: `<!-- 진행 상태 -->
+<span class="cv-badge">
+  <span class="cv-badge__live">LIVE</span>
+  <span class="cv-badge__label">진행중</span>
 </span>
-<!-- 대기중: <span style="font-weight:700;font-size:12px;color:var(--FgGreenX);">대기중</span> -->
-<!-- 종료:   <span style="font-weight:700;font-size:12px;color:var(--FgGr92);">종료</span> -->` },
+
+<!-- 알약 -->
+<span class="cv-pill cv-pill--active">진행중</span>`,
+        css: `.cv-badge{display:inline-flex;align-items:center;gap:6px;font-family:'Nanum Gothic',sans-serif;}
+.cv-badge__live{font-weight:700;font-size:11px;color:var(--FgWh);background:var(--FgRed);border-radius:3px;padding:1px 5px;}
+.cv-badge__label{font-weight:700;font-size:12px;color:var(--FgRed);}
+.cv-pill{display:inline-flex;align-items:center;justify-content:center;border-radius:24px;padding:4px 10px;
+  font-family:'Nanum Gothic',sans-serif;font-weight:700;font-size:12px;color:var(--FgWh);}
+.cv-pill--active{background:var(--FgGreenX);}
+.cv-pill--ended{background:var(--FgGrB8);}
+.cv-pill--stopped{background:var(--FgRed);}` },
       { name: 'DataTable', source: 'admin/atoms', category: 'Components', status: 'Stable', scope: '공통',
         desc: '데이터를 행과 열로 정렬해 보여주는 표.\n셀에는 단순 값뿐 아니라 여러 줄 텍스트·상태 배지·액션 버튼을 함께 배치할 수 있다.\n결제 내역·목록 등 복합 데이터를 다룰 때 사용한다.',
         tags: ['columns', 'rows'],
@@ -454,7 +541,7 @@ const GROUPS: AreaGroup[] = [
   border:1px solid #C8C8C8;border-radius:4px;padding:3px 6px 4px;
   font-family:'Nanum Gothic',sans-serif;font-size:12px;color:var(--FgGr72);cursor:pointer;white-space:nowrap;}
 .cv-minibtn:hover{background:var(--FgGrF8);}` },
-      { name: 'LDateModal', source: 'admin/discountUi', desc: '날짜와 시각을 함께 고르는 선택 모달.\n방송 시작 일시 등 정확한 시점을 지정할 때 사용한다.', tags: ['value', 'title', 'onConfirm', 'onClose'],
+      { name: 'DatePicker', source: 'admin/discountUi', category: 'Components', status: 'Stable', scope: '공통', desc: '날짜와 시각을 함께 고르는 선택 모달.\n달력과 시·분 입력을 제공하며, 방송 시작 일시 등 정확한 시점을 지정할 때 사용한다.', tags: ['value', 'title', 'onConfirm', 'onClose'],
         render: () => <LDateModalDemo />,
         code: `<LDateModal value="2026-07-21 20:00" title="시작일시 선택" onConfirm={setDate} onClose={close} />`,
         html: `<!-- 화면 전체 오버레이 위 달력 모달(구조 요약) -->
@@ -492,54 +579,50 @@ const GROUPS: AreaGroup[] = [
   <span style="flex:1;"></span>
   <button style="font-size:12px;color:var(--FgGr92);background:none;border:0;cursor:pointer;">더보기 ›</button>
 </div>` },
-      { name: 'StatCard', source: 'admin/dashboardAtoms', desc: '핵심 지표 하나를 라벨과 큰 숫자로 강조하는 카드.\n감소·주의가 필요한 지표는 색으로 구분한다.', tags: ['label', 'value', 'danger'],
-        render: () => (<Flex gap="8px"><StatCard label="신규주문" value="1,920" w="130px" /><StatCard label="취소요청" value="17" danger w="130px" /></Flex>),
-        code: `<StatCard label="신규주문" value="1,920" />\n<StatCard label="취소요청" value="17" danger />`,
-        html: `<div class="cv-statcard">
-  <div class="cv-statcard__label">신규주문</div>
-  <div class="cv-statcard__box"><span class="cv-statcard__value">1,920</span></div>
-</div>
-
-<!-- 감소 지표(취소·반품 등): 카드에 cv-statcard--danger 추가 → 숫자 빨강 -->
-<div class="cv-statcard cv-statcard--danger">
-  <div class="cv-statcard__label">취소요청</div>
-  <div class="cv-statcard__box"><span class="cv-statcard__value">17</span></div>
+      { name: 'Card', source: 'admin/dashboardAtoms', category: 'Components', status: 'Stable', scope: '공통',
+        desc: '정보를 묶어 담는 카드.\n제목·본문 컨테이너부터 지표 강조·상태 건수·세부 박스까지 대시보드 카드 형태를 제공한다.',
+        tags: ['title', 'action', 'children', 'label', 'value', 'tone', 'danger'],
+        render: () => (<Box w="280px"><InfoCard title="캐시 현황" action={<Text fontFamily="monospace" fontSize="11px" color="#29BC25">충전하기 ›</Text>}><Text fontSize="18px" fontWeight="700">18,000,000c</Text></InfoCard></Box>),
+        variants: [
+          { title: '기본', desc: '제목 + 우측 액션 + 본문 (InfoCard)', render: () => (<Box w="280px"><InfoCard title="캐시 현황" action={<Text fontFamily="monospace" fontSize="11px" color="#29BC25">충전하기 ›</Text>}><Text fontSize="18px" fontWeight="700">18,000,000c</Text></InfoCard></Box>) },
+          { title: '지표', desc: '라벨 + 큰 숫자, 감소는 빨강 (StatCard)', render: () => (<Flex gap="8px"><StatCard label="신규주문" value="1,920" w="130px" /><StatCard label="취소요청" value="17" danger w="130px" /></Flex>) },
+          { title: '상태 건수', desc: '상태 배지 + 건수 (PillStatCard)', render: () => (<Flex gap="16px" w="280px"><PillStatCard tone="active" label="진행중" value="8" /><PillStatCard tone="ended" label="종료" value="3" /><PillStatCard tone="stopped" label="중지" value="0" /></Flex>) },
+          { title: '서브 박스', desc: '카드 안 세부 지표 (SubBox)', render: () => (<Box w="280px"><SubBox rows={[{ label: '· 이번 달 충전', value: '20,000,000c' }, { label: '· 마진 24.89%', value: '5,124,901원', tone: 'green' }]} /></Box>) },
+        ],
+        props: [
+          { name: 'title / action', type: 'ReactNode', desc: '제목 · 우측 액션(기본)' },
+          { name: 'label / value', type: 'string', desc: '지표 라벨·값(지표·상태 건수)' },
+          { name: 'tone', type: `'active' | 'ended' | 'stopped'`, desc: '상태 색(상태 건수)' },
+          { name: 'danger', type: 'boolean', desc: '감소 지표 강조(지표)' },
+          { name: 'rows', type: '{ label, value, tone? }[]', desc: '세부 행(서브 박스)' },
+        ],
+        code: `<InfoCard title="캐시 현황" action={<Link>충전하기 ›</Link>}>18,000,000c</InfoCard>\n<StatCard label="신규주문" value="1,920" />\n<PillStatCard tone="active" label="진행중" value="8" />\n<SubBox rows={[{ label: '· 이번 달 충전', value: '20,000,000c' }]} />`,
+        html: `<div class="cv-card">
+  <div class="cv-card__head">
+    <span class="cv-card__title">캐시 현황</span>
+    <a class="cv-card__action">충전하기 ›</a>
+  </div>
+  <div class="cv-card__body">18,000,000c</div>
 </div>`,
-        css: `.cv-statcard{background:var(--FgWh);border:1px solid var(--FgGrE8);border-radius:16px;padding:16px;width:130px;box-sizing:border-box;font-family:'Nanum Gothic',sans-serif;}
-.cv-statcard__label{padding-bottom:12px;font-weight:700;font-size:12px;letter-spacing:-0.24px;color:var(--FgGr72);text-align:center;}
-.cv-statcard__box{background:var(--FgGrF8);border-radius:12px;padding:17px 0;text-align:center;}
-.cv-statcard__value{font-family:Arial,sans-serif;font-weight:700;font-size:20px;letter-spacing:-0.4px;color:var(--FgGr42);}
-.cv-statcard--danger .cv-statcard__value{color:var(--FgRed);}` },
-      { name: 'StatusPill', source: 'admin/dashboardAtoms', desc: '상태를 색으로 구분해 나타내는 알약형 배지.\n진행중·종료·중지 등 항목의 현재 상태 표시에 사용한다.', tags: ['tone: active|ended|stopped'],
-        render: () => (<Flex gap="8px"><StatusPill tone="active">진행중</StatusPill><StatusPill tone="ended">종료</StatusPill><StatusPill tone="stopped">중지</StatusPill></Flex>),
-        code: `<StatusPill tone="active">진행중</StatusPill>`,
-        html: `<span style="display:inline-flex;align-items:center;justify-content:center;background:var(--FgGreenX);border-radius:24px;padding:4px 10px;font-family:'Nanum Gothic',sans-serif;font-weight:700;font-size:12px;color:var(--FgWh);">진행중</span>
-<!-- 종료: background:var(--FgGrB8) · 중지: background:var(--FgRed) -->` },
-      { name: 'PillStatCard', source: 'admin/dashboardAtoms', desc: '상태 배지와 건수를 묶어 보여주는 카드.\n진행중·종료처럼 상태별 수량을 나란히 표시할 때 사용한다.', tags: ['tone', 'label', 'value'],
-        render: () => (<Flex gap="16px" w="280px"><PillStatCard tone="active" label="진행중" value="8" /><PillStatCard tone="ended" label="종료" value="3" /><PillStatCard tone="stopped" label="중지" value="0" /></Flex>),
-        code: `<InfoCard title="캠페인 진행 현황">\n  <Flex gap="16px">\n    <PillStatCard tone="active" label="진행중" value="8" />\n    <PillStatCard tone="ended" label="종료" value="3" />\n  </Flex>\n</InfoCard>`,
-        html: `<div style="display:flex;flex-direction:column;align-items:center;gap:12px;width:88px;font-family:'Nanum Gothic',sans-serif;">
-  <span style="background:var(--FgGreenX);border-radius:24px;padding:4px 10px;font-weight:700;font-size:12px;color:var(--FgWh);">진행중</span>
-  <div style="width:100%;min-height:52px;background:var(--FgGrF8);border-radius:12px;display:flex;align-items:center;justify-content:center;">
-    <span style="font-family:Arial,sans-serif;font-weight:700;font-size:20px;color:var(--FgGr42);">8</span>
-  </div>
-</div>
-<!-- 종료: 알약 background var(--FgGrB8) · 중지: var(--FgRed) -->` },
-      { name: 'SubBox', source: 'admin/dashboardAtoms', desc: '카드 안에서 세부 지표를 묶는 보조 박스.\n라벨과 값을 행으로 나열한다.', tags: ['title', 'rows', 'tone'],
-        render: () => (<Box w="280px"><SubBox rows={[{ label: '· 이번 달 충전', value: '20,000,000c' }, { label: '· 마진 24.89%', value: '5,124,901원', tone: 'green' }]} /></Box>),
-        code: `<SubBox rows={[{ label: '· 이번 달 충전', value: '20,000,000c' }, ...]} />`,
-        html: `<div style="background:var(--FgGrF8);border-radius:10px;padding:14px;width:280px;font-family:'Nanum Gothic',sans-serif;">
-  <div style="display:flex;justify-content:space-between;gap:8px;padding-bottom:6px;">
-    <span style="font-size:12px;color:var(--FgGr72);">· 이번 달 충전</span>
-    <span style="font-weight:700;font-size:14px;color:var(--FgGr92);">20,000,000c</span>
-  </div>
-  <div style="display:flex;justify-content:space-between;gap:8px;">
-    <span style="font-size:12px;color:var(--FgGr72);">· 마진 24.89%</span>
-    <span style="font-weight:700;font-size:14px;color:var(--FgGreenX);">5,124,901원</span>
-  </div>
-</div>` },
-      { name: 'KVColumns', source: 'admin/dashboardAtoms', desc: '여러 지표를 열로 나누어 요약하는 표.\n열마다 라벨·값 행, 단일 중앙값, 여러 줄 값, 별점 같은 노드 등 형식을 다르게 지정한다.', tags: ['columns', 'rows', 'center', 'lines', 'nodes', 'danger'],
+        css: `.cv-card{display:flex;flex-direction:column;background:var(--FgWh);
+  border:1px solid var(--FgGrE8);border-radius:16px;padding:16px;font-family:'Nanum Gothic',sans-serif;}
+.cv-card__head{display:flex;align-items:center;padding-bottom:8px;}
+.cv-card__title{font-weight:700;font-size:14px;color:var(--FgGr42);}
+.cv-card__action{margin-left:auto;font-size:11px;color:var(--FgGreenX);cursor:pointer;}
+.cv-card__body{font-size:18px;font-weight:700;color:var(--FgGr42);}` },
+      { name: 'SummaryTable', source: 'admin/dashboardAtoms', category: 'Components', status: 'Stable', scope: '공통',
+        desc: '여러 지표를 요약해 보여주는 표.\n열로 나누는 다중 열형과, 제목 아래 라벨-값을 나열하는 형을 제공한다.',
+        tags: ['columns', 'rows', 'header', 'center', 'lines', 'nodes'],
         render: () => (<Box w="100%"><KVColumns columns={[{ header: '회원탈퇴', rows: [['어제', '11', true], ['이번달', '32', true]] }, { header: '총 회원 수', center: '234,902' }, { header: 'SMS', lines: [{ t: '353건', b: true }, { t: '4,589원', b: true }, { t: '(건/13원)' }] }, { header: '별점', nodes: [<Stars key="a" n={5} size={16} />, <Stars key="b" n={3} size={16} />] }, { header: '구매후기 수', lines: [{ t: '2,152', b: true }, { t: '220', b: true }] }]} /></Box>),
+        variants: [
+          { title: '다중 열', desc: '열마다 라벨·값 / 중앙값 / 여러 줄 / 노드 (KVColumns)', render: () => (<Box w="100%"><KVColumns columns={[{ header: '회원탈퇴', rows: [['어제', '11', true], ['이번달', '32', true]] }, { header: '총 회원 수', center: '234,902' }, { header: 'SMS', lines: [{ t: '353건', b: true }, { t: '4,589원', b: true }, { t: '(건/13원)' }] }, { header: '별점', nodes: [<Stars key="a" n={5} size={16} />, <Stars key="b" n={3} size={16} />] }]} /></Box>) },
+          { title: '라벨-값', desc: '제목 + 라벨/값 행 (LabelValueTable)', render: () => (<Box w="240px"><LabelValueTable header="구매 목적 캠페인" rows={[{ label: 'ROAS', value: '500%', tone: 'point' }, { label: '구매 금액', value: '1,000,000원' }]} /></Box>) },
+        ],
+        props: [
+          { name: 'columns', type: 'KVColumn[]', desc: '다중 열 정의(다중 열형)' },
+          { name: 'header / rows', type: 'string · {label,value}[]', desc: '제목·행(라벨-값형)' },
+          { name: 'center / lines / nodes', type: '—', desc: '열 셀 표현 방식(중앙값·여러 줄·노드)' },
+        ],
         code: `<KVColumns columns={[\n  { header: '회원탈퇴', rows: [['어제', '11', true]] },   // danger=빨강\n  { header: '총 회원 수', center: '234,902' },            // 단일 중앙값\n  { header: 'SMS', lines: [{ t: '353건', b: true }, { t: '(건/13원)' }] }, // 중앙 여러 줄\n  { header: '별점', nodes: [<Stars n={5} size={18} />, <Stars n={3} size={18} />] }, // 임의 노드 스택\n]} />`,
         html: `<!-- 상하 #ddd 선 + 셀 사이 1px 회색(바탕 var(--FgGrE8) 이 gap으로 비침) -->
 <div style="display:flex;flex-direction:column;background:var(--FgGrE8);border-top:1px solid #ddd;border-bottom:1px solid #ddd;font-family:'Nanum Gothic',sans-serif;">
@@ -558,45 +641,36 @@ const GROUPS: AreaGroup[] = [
     <div style="flex:1;background:var(--FgWh);padding:12px 16px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--FgGr42);">234,902</div>
   </div>
 </div>` },
-      { name: 'InfoCard', source: 'admin/dashboardAtoms', desc: '제목·우측 액션·본문으로 구성하는 기본 카드 컨테이너.\n대시보드의 지표·현황 묶음을 담을 때 사용한다.', tags: ['title', 'action', 'children'],
-        render: () => (<Box w="280px"><InfoCard title="캐시 현황" action={<Text fontFamily="monospace" fontSize="11px" color="#29BC25">충전하기 ›</Text>}><Text fontSize="18px" fontWeight="700">18,000,000c</Text></InfoCard></Box>),
-        code: `<InfoCard title="캐시 현황" action={<Link>충전하기 ›</Link>}>\n  <Text>18,000,000c</Text>\n</InfoCard>`,
-        html: `<div style="display:flex;flex-direction:column;background:var(--FgWh);border:1px solid var(--FgGrE8);border-radius:16px;padding:16px;width:280px;font-family:'Nanum Gothic',sans-serif;">
-  <div style="display:flex;align-items:center;padding-bottom:8px;">
-    <span style="font-weight:700;font-size:14px;color:var(--FgGr42);">캐시 현황</span>
-    <span style="flex:1;"></span>
-    <span style="font-size:11px;color:var(--FgGreenX);cursor:pointer;">충전하기 ›</span>
-  </div>
-  <div style="font-size:18px;font-weight:700;color:var(--FgGr42);">18,000,000c</div>
-</div>` },
-      { name: 'LabelValueTable', source: 'admin/dashboardAtoms', desc: '제목 아래 라벨과 값을 행으로 나열하는 요약 표.\n캠페인 지표 등 항목-값 쌍을 정리할 때 사용한다.', tags: ['header', 'rows', 'tone'],
-        render: () => (<Box w="240px"><LabelValueTable header="구매 목적 캠페인" rows={[{ label: 'ROAS', value: '500%', tone: 'point' }, { label: '구매 금액', value: '1,000,000원' }]} /></Box>),
-        code: `<LabelValueTable header="구매 목적 캠페인" rows={[{ label: 'ROAS', value: '500%', tone: 'point' }, ...]} />`,
-        html: `<div style="border:1px solid var(--FgGrE8);border-radius:4px;overflow:hidden;width:240px;font-family:'Nanum Gothic',sans-serif;">
-  <div style="background:var(--FgGrF8);padding:9px 14px;border-bottom:1px solid var(--FgGrE8);text-align:center;font-weight:700;font-size:13px;color:var(--FgGr42);">구매 목적 캠페인</div>
-  <div style="display:flex;justify-content:space-between;gap:10px;padding:8px 14px;">
-    <span style="font-size:12px;color:var(--FgGr72);">ROAS</span><span style="font-weight:700;font-size:12px;color:var(--FgGreenX);">500%</span>
-  </div>
-  <div style="display:flex;justify-content:space-between;gap:10px;padding:8px 14px;">
-    <span style="font-size:12px;color:var(--FgGr72);">구매 금액</span><span style="font-weight:700;font-size:12px;color:var(--FgGr42);">1,000,000원</span>
-  </div>
-</div>` },
-      { name: 'AdBanner', source: 'admin/dashboardAtoms', desc: '이미지로 노출하는 홍보 배너.\n광고 항목은 AD 마크로 구분한다.', tags: ['src', 'ad', 'alt'],
-        render: () => (<Flex gap="8px" w="100%"><AdBanner w="200px" src={adminAsset('dashboard/banner-1.png')} /><AdBanner w="200px" src={adminAsset('dashboard/banner-4.png')} ad /></Flex>),
-        code: `<AdBanner src={asset('dashboard/banner-4.png')} ad />`,
-        html: `<div style="position:relative;border-radius:8px;overflow:hidden;width:200px;">
-  <img src="/figma-assets/dashboard/banner-4.png" alt="" style="display:block;width:100%;height:auto;" />
-  <!-- ad 마크(선택) -->
-  <img src="/figma-assets/dashboard/ad-mark.svg" alt="AD" style="position:absolute;top:0;right:0;width:27px;height:20px;" />
-</div>` },
-      { name: 'PromoBanner', source: 'admin/dashboardAtoms', desc: '색 배경에 문구를 얹는 텍스트형 홍보 배너.\n이미지 없이 짧은 프로모션 메시지를 노출할 때 사용한다.', tags: ['bg', 'badge', 'h'],
-        render: () => (<Flex gap="8px"><DashPromoBanner w="150px" bg="#E23C34"><Text fontFamily="'Nanum Gothic', sans-serif" fontSize="12px" fontWeight="700" color="#fff">오픈 준비 끝!</Text></DashPromoBanner><DashPromoBanner w="150px" bg="#6D3BD1" badge="AD"><Text fontFamily="'Nanum Gothic', sans-serif" fontSize="12px" fontWeight="700" color="#fff">SNS활용패키지</Text></DashPromoBanner></Flex>),
-        code: `<PromoBanner bg="#E23C34" badge="AD"><Text>...</Text></PromoBanner>`,
-        html: `<!-- 배경은 배너별 브랜드색(리터럴). 글자는 var(--FgWh) -->
-<div style="position:relative;background:#E23C34;border-radius:8px;padding:12px 16px;width:150px;overflow:hidden;">
-  <span style="position:absolute;top:8px;right:8px;font-size:9px;font-weight:700;color:rgba(255,255,255,0.85);background:rgba(0,0,0,0.25);padding:1px 5px;border-radius:3px;">AD</span>
-  <span style="font-family:'Nanum Gothic',sans-serif;font-size:12px;font-weight:700;color:var(--FgWh);">SNS활용패키지</span>
-</div>` },
+      { name: 'Banner', source: 'admin/dashboardAtoms', category: 'Components', status: 'Stable', scope: '공통',
+        desc: '홍보·안내를 노출하는 배너.\n이미지형과, 색 배경에 문구를 얹는 텍스트형을 제공한다.',
+        tags: ['src', 'ad', 'bg', 'badge'],
+        render: () => (<Flex gap="8px" w="100%"><AdBanner w="200px" src={adminAsset('dashboard/banner-4.png')} ad /></Flex>),
+        variants: [
+          { title: '이미지형', desc: '이미지 배너 + 선택 AD 마크 (AdBanner)', render: () => (<Flex gap="8px"><AdBanner w="200px" src={adminAsset('dashboard/banner-1.png')} /><AdBanner w="200px" src={adminAsset('dashboard/banner-4.png')} ad /></Flex>) },
+          { title: '텍스트형', desc: '색 배경 + 문구 (PromoBanner)', render: () => (<Flex gap="8px"><DashPromoBanner w="150px" bg="#E23C34"><Text fontFamily="'Nanum Gothic', sans-serif" fontSize="12px" fontWeight="700" color="#fff">오픈 준비 끝!</Text></DashPromoBanner><DashPromoBanner w="150px" bg="#6D3BD1" badge="AD"><Text fontFamily="'Nanum Gothic', sans-serif" fontSize="12px" fontWeight="700" color="#fff">SNS활용패키지</Text></DashPromoBanner></Flex>) },
+        ],
+        props: [
+          { name: 'src', type: 'string', desc: '이미지 경로(이미지형)' },
+          { name: 'ad', type: 'boolean', def: 'false', desc: '우상단 AD 마크(이미지형)' },
+          { name: 'bg', type: 'string', desc: '배경색(텍스트형)' },
+          { name: 'badge', type: 'string', desc: '우상단 뱃지 텍스트(텍스트형)' },
+        ],
+        code: `// 이미지형\n<AdBanner src={asset('dashboard/banner-4.png')} ad />\n\n// 텍스트형\n<PromoBanner bg="#E23C34" badge="AD"><Text>...</Text></PromoBanner>`,
+        html: `<!-- 이미지형 -->
+<div class="cv-banner">
+  <img src="/figma-assets/dashboard/banner-4.png" alt="" />
+  <img class="cv-banner__ad" src="/figma-assets/dashboard/ad-mark.svg" alt="AD" />
+</div>
+
+<!-- 텍스트형(배경은 배너별 브랜드색) -->
+<div class="cv-banner cv-banner--text" style="background:#E23C34;">
+  <span class="cv-banner__text">SNS활용패키지</span>
+</div>`,
+        css: `.cv-banner{position:relative;border-radius:8px;overflow:hidden;width:200px;}
+.cv-banner img{display:block;width:100%;height:auto;}
+.cv-banner__ad{position:absolute;top:0;right:0;width:27px;height:20px;}
+.cv-banner--text{padding:12px 16px;}
+.cv-banner__text{font-family:'Nanum Gothic',sans-serif;font-size:12px;font-weight:700;color:var(--FgWh);}` },
       { name: 'NoticeList', source: 'admin/dashboardAtoms', desc: '제목과 날짜로 구성한 공지 목록.\n최신·중요 항목은 굵게 강조한다.', tags: ['items', 'bold'],
         render: () => (<Box w="360px"><NoticeList items={[{ title: '9월 정기 업데이트 소식', date: '2024-09-24', bold: true }, { title: '추석 연휴 휴무 안내', date: '2024-09-06' }, { title: '네이버 단축 URL 서비스 정상화 완료', date: '2024-08-01' }]} /></Box>),
         code: `<NoticeList items={[\n  { title: '9월 정기 업데이트', date: '2024-09-24', bold: true },\n  { title: '추석 연휴 휴무 안내', date: '2024-09-06' },\n]} />`,
@@ -643,15 +717,27 @@ const GROUPS: AreaGroup[] = [
       { name: 'IconButton + 아이콘', source: 'broadapp/icons', desc: '송출 앱에서 쓰는 아이콘 모음과, 이를 감싸는 터치 버튼.\n시청·장바구니·마이크 등 기능을 아이콘으로 제공한다.', tags: ['s', 'color'],
         render: () => (<DarkBox>{[EyeIcon, BagIcon, HeartIcon, MicIcon, VideoIcon, ChatIcon, BannerIcon, BoxIcon, SwitchIcon, NoticeIcon].map((Ic, i) => <Ic key={i} s={22} color="#fff" />)}<GearIcon color="#fff" /><LogoutIcon color="#fff" /></DarkBox>),
         code: `<IconButton onClick={fn}><MicIcon s={22} color="#fff" /></IconButton>` },
-      { name: 'Dialog', source: 'broadapp/components', desc: '확인·경고를 위한 모달 다이얼로그.\n방송 종료처럼 되돌리기 어려운 동작 전에 확인을 받는다.', tags: ['warn', 'title', 'body', 'buttons'],
+      { name: 'Overlay', source: 'broadapp/components', category: 'Components', status: 'Stable', scope: '송출앱',
+        desc: '화면 위에 겹쳐 띄우는 오버레이 모음.\n확인 다이얼로그와, 하단에서 올라오는 옵션·안내 시트를 제공한다.',
+        tags: ['title', 'body', 'buttons', 'options', 'paras', 'onClose'],
         render: () => (<MiniScreen><Dialog warn title="방송을 종료할까요?" body="종료하면 다시 시작할 수 없습니다." buttons={[{ label: '취소', tone: 'gray' }, { label: '종료', tone: 'red' }]} /></MiniScreen>),
-        code: `<Dialog\n  warn\n  title="방송을 종료할까요?"\n  body="종료하면 다시 시작할 수 없습니다."\n  buttons={[\n    { label: '취소', tone: 'gray', onClick: close },\n    { label: '종료', tone: 'red', onClick: end },\n  ]}\n/>` },
-      { name: 'BottomSheet', source: 'broadapp/components', desc: '화면 하단에서 올라오는 옵션 선택 시트.\n화질 설정처럼 목록 중 하나를 고를 때 사용한다.', tags: ['title', 'options', 'selectedIdx', 'onSelect', 'onClose'],
-        render: () => (<MiniScreen><BottomSheetDemo /></MiniScreen>),
-        code: `<BottomSheet\n  title="화질 설정"\n  options={[{ t: '자동', d: '네트워크에 맞춰 조절' }, ...]}\n  selectedIdx={idx}\n  onSelect={setIdx}\n  onClose={close}\n/>` },
-      { name: 'InfoSheet', source: 'broadapp/components', desc: '기능 설명을 하단 시트로 안내하는 안내용 바텀시트.\n"?" 도움말을 눌렀을 때 상세 설명을 보여준다.', tags: ['title', 'paras', 'onClose'],
-        render: () => (<MiniScreen><InfoSheet title="송출이란?" paras={['휴대폰 화면을 실시간으로 내보내는 기능입니다.', '와이파이 환경을 권장합니다.']} onClose={() => {}} /></MiniScreen>),
-        code: `<InfoSheet title="송출이란?" paras={['...', '...']} onClose={close} />` },
+        variants: [
+          { title: '다이얼로그', desc: '확인·경고 모달 (Dialog)', render: () => (<MiniScreen><Dialog warn title="방송을 종료할까요?" body="종료하면 다시 시작할 수 없습니다." buttons={[{ label: '취소', tone: 'gray' }, { label: '종료', tone: 'red' }]} /></MiniScreen>) },
+          { title: '옵션 시트', desc: '하단 옵션 선택 (BottomSheet)', render: () => (<MiniScreen><BottomSheetDemo /></MiniScreen>) },
+          { title: '안내 시트', desc: '기능 설명 안내 (InfoSheet)', render: () => (<MiniScreen><InfoSheet title="송출이란?" paras={['휴대폰 화면을 실시간으로 내보내는 기능입니다.', '와이파이 환경을 권장합니다.']} onClose={() => {}} /></MiniScreen>) },
+        ],
+        props: [
+          { name: 'title', type: 'string', required: true, desc: '제목' },
+          { name: 'body / paras', type: 'string · string[]', desc: '본문(다이얼로그) · 문단(안내 시트)' },
+          { name: 'buttons', type: '{ label, tone, onClick }[]', desc: '하단 버튼(다이얼로그)' },
+          { name: 'options', type: '{ t, d }[]', desc: '선택지 목록(옵션 시트)' },
+          { name: 'onClose', type: '() => void', desc: '닫기 이벤트' },
+        ],
+        guidelines: {
+          do: ['되돌리기 어려운 동작은 다이얼로그로 확인', '옵션이 3개 이하면 옵션 시트로 하단 노출'],
+          a11y: ['열릴 때 포커스 이동, 닫으면 원위치', '배경(dim) 클릭·ESC로 닫기 지원'],
+        },
+        code: `<Dialog warn title="방송을 종료할까요?" body="…"\n  buttons={[{ label: '취소', tone: 'gray' }, { label: '종료', tone: 'red' }]} />\n\n<BottomSheet title="화질 설정" options={[{ t: '자동', d: '…' }]} selectedIdx={idx} onSelect={setIdx} onClose={close} />\n\n<InfoSheet title="송출이란?" paras={['…', '…']} onClose={close} />` },
     ],
   },
   {
@@ -982,7 +1068,7 @@ function ComponentPage({ e, scrollRef }: { e: FlatEntry; scrollRef: React.RefObj
         {/* Variants */}
         {e.variants && e.variants.length > 0 && (
           <>
-            <SecHead id="sec-variants" num={secNum['sec-variants']} note="상태 · 색상 · 크기별 변형">Variants</SecHead>
+            <SecHead id="sec-variants" num={secNum['sec-variants']} note="유형 · 상태 · 크기별 변형">Variants</SecHead>
             <Flex direction="column" gap="24px">
               {e.variants.map((v) => (
                 <Box key={v.title}>
@@ -1353,22 +1439,24 @@ export function ComponentGallery() {
         {/* 중앙 */}
         {isLayout ? <LayoutDoc /> : isToken ? <TokenPage key="tokens" scrollRef={scrollRef} /> : <ComponentPage key={selected.id} e={selected} scrollRef={scrollRef} />}
 
-        {/* 우측 목차 — 레이아웃뷰 제외 · 1280 이하 숨김 */}
+        {/* 우측 목차 — 플로팅 카드(패널 없음) · 레이아웃뷰 제외 · 1280 이하 숨김 */}
         {!isLayout && (
-          <Box w="220px" flexShrink={0} py="34px" px="20px" borderLeft="1px solid #E4E4E7" bg="#fff" display={{ base: 'none', xl: 'block' }}>
-            <Text fontFamily={CHROME} fontSize="13px" fontWeight="800" color="#A1A1AA" letterSpacing="0.05em" pb="14px">이 페이지</Text>
-            <Flex direction="column" gap="1px">
-              {rail.map((s, i) => {
-                const on = active === s.id;
-                return (
-                  <Flex as="button" key={s.id} w="100%" align="baseline" gap="8px" textAlign="left" onClick={() => goSec(s.id)} cursor="pointer" position="relative" pl="12px" py="4px">
-                    {on && <Box position="absolute" left="0" top="4px" bottom="4px" w="2px" borderRadius="2px" bg="#18181B" />}
-                    <Text fontFamily="monospace" fontSize="12px" fontWeight="700" color={colors.green} flexShrink={0}>{String(i + 1).padStart(2, '0')}</Text>
-                    <Text fontFamily={CHROME} fontSize="14.5px" fontWeight={on ? '700' : '500'} color={on ? '#18181B' : '#A1A1AA'}>{s.label}</Text>
-                  </Flex>
-                );
-              })}
-            </Flex>
+          <Box w="212px" flexShrink={0} display={{ base: 'none', xl: 'block' }}>
+            <Box position="sticky" top="22px" mt="26px" mr="20px" bg="#fff" border="1px solid #EAEAEC" borderRadius="12px" boxShadow="0 4px 16px rgba(24,24,27,0.06)" p="14px 16px">
+              <Text fontFamily={CHROME} fontSize="12px" fontWeight="800" color="#A1A1AA" letterSpacing="0.05em" pb="10px">이 페이지</Text>
+              <Flex direction="column" gap="1px">
+                {rail.map((s, i) => {
+                  const on = active === s.id;
+                  return (
+                    <Flex as="button" key={s.id} w="100%" align="baseline" gap="8px" textAlign="left" onClick={() => goSec(s.id)} cursor="pointer" position="relative" pl="10px" py="4px">
+                      {on && <Box position="absolute" left="-2px" top="4px" bottom="4px" w="2px" borderRadius="2px" bg="#18181B" />}
+                      <Text fontFamily="monospace" fontSize="11.5px" fontWeight="700" color={colors.green} flexShrink={0}>{String(i + 1).padStart(2, '0')}</Text>
+                      <Text fontFamily={CHROME} fontSize="13.5px" fontWeight={on ? '700' : '500'} color={on ? '#18181B' : '#A1A1AA'}>{s.label}</Text>
+                    </Flex>
+                  );
+                })}
+              </Flex>
+            </Box>
           </Box>
         )}
       </Flex>
