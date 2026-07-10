@@ -410,9 +410,48 @@ function Viewer() {
 }
 
 // 라우트 → 화면 매핑
+// ── 시작하기(Overview) — 이 표준툴 소개(메타 콘텐츠라 Pretendard) ──
+function Overview() {
+  const OFONT = "'Pretendard', system-ui, sans-serif";
+  const cards = [
+    { n: '01', t: '이게 뭔가요?', d: '사내 UI 표준을 한곳에 모은 컴포넌트북 · 디자인 시스템 문서.\n기획·퍼블리싱·개발이 같은 컴포넌트를 확인하고 복사해 씁니다.' },
+    { n: '02', t: '구조', d: '서비스 → 페이지 → 컴포넌트.\n서비스(FLEXG·발주모아·캐치셀·PAGE)마다 자기 페이지(어드민·송출앱·고객뷰어·샵)와 컴포넌트를 가집니다.' },
+    { n: '03', t: '컴포넌트 페이지', d: '각 컴포넌트는 Preview · Variants · Props · Usage(React·HTML·CSS) · Guidelines로 구성됩니다.\n색은 디자인 토큰(var(--Fg…))으로만 지정합니다.' },
+    { n: '04', t: '프로토타입 시작', d: 'Claude Code가 "어떤 서비스?" → "어떤 페이지?"를 묻고, 그 페이지의 표준 컴포넌트로 화면을 조립합니다.' },
+  ];
+  const linkStyle = { display: 'inline-flex', alignItems: 'center', gap: '6px', height: '40px', padding: '0 18px', borderRadius: '10px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', textDecoration: 'none' } as const;
+  return (
+    <Box minH="100dvh" bg="#F6F6F7" fontFamily={OFONT} color="#18181B">
+      <Box bg="#fff" borderBottom="1px solid #E4E4E7" px="48px" py="52px">
+        <Text fontSize="13px" fontWeight="800" color="#29BC25" letterSpacing="0.08em" pb="10px">CONVERGENCE 컴포넌트 표준</Text>
+        <Text fontSize="34px" fontWeight="800" letterSpacing="-0.02em" pb="12px">시작하기</Text>
+        <Text fontSize="16px" color="#52525B" lineHeight="1.7" maxW="720px">기획 프로토타입을 표준 컴포넌트로 시작하기 위한 개요입니다. 서비스와 페이지를 고르면 그에 맞는 표준 컴포넌트로 화면을 조립합니다.</Text>
+      </Box>
+      <Box px="48px" py="36px">
+        <Flex direction="column" gap="14px" maxW="820px">
+          {cards.map((c) => (
+            <Flex key={c.n} bg="#fff" border="1px solid #E8E8EA" borderRadius="14px" p="22px 24px" gap="18px" align="flex-start" boxShadow="0 1px 3px rgba(0,0,0,0.03)">
+              <Text fontFamily="monospace" fontSize="15px" fontWeight="700" color="#29BC25" pt="2px" flexShrink={0}>{c.n}</Text>
+              <Box>
+                <Text fontSize="17px" fontWeight="800" pb="6px">{c.t}</Text>
+                <Text fontSize="14px" color="#52525B" lineHeight="1.7" whiteSpace="pre-line">{c.d}</Text>
+              </Box>
+            </Flex>
+          ))}
+        </Flex>
+        <Flex gap="10px" pt="24px" maxW="820px" wrap="wrap">
+          <a href="/components" target="_top" style={{ ...linkStyle, background: '#18181B', color: '#fff' }}>컴포넌트북 열기 →</a>
+          <a href="/components/flexg/design-tokens" target="_top" style={{ ...linkStyle, background: '#fff', color: '#3F3F46', border: '1px solid #E4E4E7' }}>디자인 토큰 보기</a>
+        </Flex>
+      </Box>
+    </Box>
+  );
+}
+
 export function DemoScreen() {
   const path = window.location.pathname.replace(/^\/preview\//, '');
   switch (path) {
+    case 'overview': return <Overview />;
     case 'dashboard': return <Dashboard />;
     case 'item-detail': return <ItemDetail />;
     case 'viewer': return <Viewer />;
