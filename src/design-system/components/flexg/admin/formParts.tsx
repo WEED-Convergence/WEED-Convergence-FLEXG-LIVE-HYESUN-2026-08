@@ -1,5 +1,5 @@
 import { Box, Flex, Text, Image, Input as ChakraInput } from '@chakra-ui/react';
-import { colors, FONT, asset } from '../../styles/tokens';
+import { colors, FONT, asset } from '../../../tokens';
 
 /** 섹션 제목 + (필수항목 표기) */
 export function SectionTitle({ title, note = true }: { title: string; note?: boolean }) {

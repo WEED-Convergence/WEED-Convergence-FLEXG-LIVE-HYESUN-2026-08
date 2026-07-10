@@ -1,5 +1,5 @@
 import { Box, Flex, Text, Image } from '@chakra-ui/react';
-import { colors, nav, FONT, asset } from '../../styles/tokens';
+import { colors, nav, FONT, asset } from '../../../tokens';
 
 const MENU_ITEMS: { label: string; badge?: boolean }[] = [
   { label: '상품' },

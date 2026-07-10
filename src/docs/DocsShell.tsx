@@ -5,8 +5,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Flex, Text } from '@chakra-ui/react';
 import {
   DOC_GROUPS, ALL_ENTRIES, AUTHOR, DOC_TITLE, groupTitleOf,
-  RELEASES, FEATURES, AREA_COLS, KIND_LABEL, KIND_COLOR, screenName, screensInArea, splitFeatureTitle,
-  type DocEntry, type DocSection, type ChangeKind, type Feature,
+  AREA_COLS, pageRowsInArea, STATUS_META,
+  type DocEntry, type DocSection, type IndexRow,
 } from './catalog';
 import { DocComments } from './DocComments';
 import { subscribe as subscribeComments, countOf, commentsOf, replyCount, type DocComment } from './commentStore';
@@ -77,13 +77,13 @@ export function DocsShell() {
   const [descCollapsed, setDescCollapsed] = useState(false); // 우측 설명 패널 접기
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const [query, setQuery] = useState('');
-  // 중앙 뷰: 화면 프리뷰 / 배포리스트(변경 이력). URL로 딥링크(/docs/changelog)
-  const [view, setView] = useState<'screen' | 'changelog'>(
-    () => (/^\/docs\/changelog\/?$/.test(window.location.pathname) ? 'changelog' : 'screen'),
+  // 중앙 뷰: 화면 프리뷰 / 작업페이지 한눈에 보기(화면 인덱스). URL로 딥링크(/docs/pages)
+  const [view, setView] = useState<'screen' | 'index'>(
+    () => (/^\/docs\/pages\/?$/.test(window.location.pathname) ? 'index' : 'screen'),
   );
-  const openChangelog = useCallback(() => {
-    setView('changelog');
-    window.history.pushState({}, '', '/docs/changelog');
+  const openIndex = useCallback(() => {
+    setView('index');
+    window.history.pushState({}, '', '/docs/pages');
   }, []);
 
   // 우측 패널 모드: 설명 / 코멘트 / 둘 다. 코멘트·둘다면 핀 노출.
@@ -110,7 +110,7 @@ export function DocsShell() {
   // 뒤/앞으로가기 대응
   useEffect(() => {
     const onPop = () => {
-      if (/^\/docs\/changelog\/?$/.test(window.location.pathname)) { setView('changelog'); return; }
+      if (/^\/docs\/pages\/?$/.test(window.location.pathname)) { setView('index'); return; }
       setView('screen');
       setSelectedId(docIdFromPath());
     };
@@ -180,10 +180,8 @@ export function DocsShell() {
   const q = query.trim().toLowerCase();
   const matches = (e: DocEntry) => !q || e.name.toLowerCase().includes(q) || (e.code ?? '').toLowerCase().includes(q);
 
-  // 배포리스트(changelog) 필터 상태
-  const [clRelease, setClRelease] = useState<string>(RELEASES[0]?.id ?? '');
+  // 작업페이지 인덱스 필터 상태
   const [clArea, setClArea] = useState<string>('all');
-  const [clKind, setClKind] = useState<ChangeKind | 'all'>('all');
   const [clQuery, setClQuery] = useState('');
 
   return (
@@ -220,9 +218,9 @@ export function DocsShell() {
               />
             </Flex>
           </Box>
-          {/* 뷰 전환 — 배포리스트 */}
+          {/* 뷰 전환 — 작업페이지 한눈에 보기 */}
           <Box px="12px" pb="8px">
-            <NavViewBtn t={t} on={view === 'changelog'} onClick={openChangelog} label="배포리스트 한눈에 보기" count={FEATURES.length}><IconList c={view === 'changelog' ? t.onAccent : t.accent} /></NavViewBtn>
+            <NavViewBtn t={t} on={view === 'index'} onClick={openIndex} label="작업페이지 한눈에 보기" count={ALL_ENTRIES.length}><IconList c={view === 'index' ? t.onAccent : t.accent} /></NavViewBtn>
           </Box>
           {/* 트리 */}
           <Box flex="1" overflowY="auto" px="10px" pb="14px">
@@ -253,9 +251,8 @@ export function DocsShell() {
         </Flex>
       )}
 
-      {view === 'changelog' ? (
-        <Changelog t={t} mode={mode} clRelease={clRelease} setClRelease={setClRelease} clArea={clArea} setClArea={setClArea}
-          clKind={clKind} setClKind={setClKind} clQuery={clQuery} setClQuery={setClQuery} onSelectScreen={select} />
+      {view === 'index' ? (
+        <PageIndex t={t} clArea={clArea} setClArea={setClArea} clQuery={clQuery} setClQuery={setClQuery} onSelectScreen={select} />
       ) : (
       <>
       {/* ───────────── 중앙: 화면 프리뷰 ───────────── */}
@@ -423,7 +420,7 @@ export function DocsShell() {
           {entry.stateTable && (
             <Box pt="20px">
               {entry.stateTable.caption && <Text fontSize="11px" fontWeight="800" letterSpacing="0.04em" color={t.textMuted} textTransform="uppercase" pb="8px">{entry.stateTable.caption}</Text>}
-              <Box border={`1px solid ${t.border}`} borderRadius="9px" overflow="hidden">
+              <Box border={`1px solid ${t.border}`} overflow="hidden">
                 <Flex bg={t.hover}>
                   {entry.stateTable.headers.map((h, i) => (
                     <Box key={i} flex="1" px="10px" py="7px" borderLeft={i ? `1px solid ${t.borderSoft}` : undefined}>
@@ -623,6 +620,16 @@ function SectionCard({ s, t, num, hovered, onHover }: {
           {s.badge && <Text fontSize="9px" fontWeight="800" color={t.chipText} bg={t.chip} px="5px" py="1px" borderRadius="4px" letterSpacing="0.03em">{s.badge}</Text>}
         </Flex>
         <Text fontSize="12.5px" color={t.textSub} lineHeight="1.6" whiteSpace="pre-line">{s.body}</Text>
+        {s.components && s.components.length > 0 && (
+          <Box mt="8px" pt="8px" borderTop={`1px solid ${t.borderSoft}`}>
+            <Text fontSize="9.5px" fontWeight="800" color={t.textMuted} letterSpacing="0.04em" pb="5px">사용된 컴포넌트</Text>
+            <Flex gap="4px" wrap="wrap">
+              {s.components.map((c) => (
+                <Text key={c} as="span" fontFamily="monospace" fontSize="10.5px" fontWeight="700" color={t.chipText} bg={t.chip} px="6px" py="2px" borderRadius="5px">{c}</Text>
+              ))}
+            </Flex>
+          </Box>
+        )}
       </Box>
     </Flex>
   );
@@ -654,115 +661,103 @@ function FilterChip({ t, on, label, onClick }: { t: Theme; on: boolean; label: s
   );
 }
 
-// ── 배포리스트(변경 이력) 페이지 ───────────────────────────────────────────
-function Changelog({ t, mode, clRelease, setClRelease, clArea, setClArea, clKind, setClKind, clQuery, setClQuery, onSelectScreen }: {
-  t: Theme; mode: 'light' | 'dark';
-  clRelease: string; setClRelease: (v: string) => void;
+// ── 작업페이지 한눈에 보기(화면 인덱스) ─────────────────────────────────────
+// 배포 이력이 아니라, 이 프로토타입의 작업 화면을 영역별로 모아 보는 목차.
+function PageIndex({ t, clArea, setClArea, clQuery, setClQuery, onSelectScreen }: {
+  t: Theme;
   clArea: string; setClArea: (v: string) => void;
-  clKind: ChangeKind | 'all'; setClKind: (v: ChangeKind | 'all') => void;
   clQuery: string; setClQuery: (v: string) => void;
   onSelectScreen: (id: string) => void;
 }) {
   const clq = clQuery.trim().toLowerCase();
-  const rel = RELEASES.find((r) => r.id === clRelease) ?? RELEASES[0];
-  const planned = rel?.status === 'planned';
-  const featPass = (f: Feature) =>
-    (clArea === 'all' || f.screens.some((sid) => groupTitleOf(sid) === clArea)) &&
-    (clKind === 'all' || f.kind === clKind) &&
-    (!clq || f.title.toLowerCase().includes(clq) || f.desc.toLowerCase().includes(clq) || f.screens.some((sid) => screenName(sid).toLowerCase().includes(clq)));
-  const feats = FEATURES.filter((f) => f.release === rel?.id && featPass(f));
-  const COLS = `36px 52px minmax(150px,1.3fr) minmax(150px,1.6fr) repeat(${AREA_COLS.length}, minmax(72px,0.9fr))`;
-  const featBg = mode === 'light' ? '#FEFCE8' : 'rgba(234,179,8,0.13)';
+  const rowPass = (r: IndexRow) =>
+    !clq ||
+    r.entry.name.toLowerCase().includes(clq) ||
+    (r.entry.code ?? '').toLowerCase().includes(clq) ||
+    (r.entry.summary ?? '').toLowerCase().includes(clq);
+  const areas = clArea === 'all' ? AREA_COLS : AREA_COLS.filter((a) => a === clArea);
+  const sections = areas
+    .map((a) => ({ area: a, rows: pageRowsInArea(a).filter(rowPass) }))
+    .filter((s) => s.rows.length > 0);
+  const total = sections.reduce((n, s) => n + s.rows.length, 0);
 
   return (
     <Flex direction="column" flex="1" minW="0">
       {/* 상단 바 */}
       <Flex align="center" gap="8px" px="18px" h="52px" borderBottom={`1px solid ${t.border}`} bg={t.panel} flexShrink={0}>
         <IconList c={t.accent} />
-        <Text fontSize="14px" fontWeight="800" color={t.text}>배포리스트</Text>
-        <Text fontSize="12px" color={t.textMuted}>배포(릴리즈)별 변경 이력을 한눈에</Text>
+        <Text fontSize="14px" fontWeight="800" color={t.text}>작업페이지 한눈에 보기</Text>
+        <Text fontSize="12px" color={t.textMuted}>영역별 작업 화면과 상태를 한눈에</Text>
       </Flex>
 
-      {/* 릴리즈 탭 */}
-      <Flex gap="6px" px="18px" pt="14px" flexWrap="wrap" flexShrink={0}>
-        {RELEASES.map((r) => (
-          <Box as="button" key={r.id} onClick={() => setClRelease(r.id)} px="14px" h="34px" borderRadius="9px" cursor="pointer"
-            bg={r.id === clRelease ? t.accent : t.chip} border={`1px solid ${r.id === clRelease ? t.accent : t.border}`}>
-            <Flex align="center" gap="6px">
-              <Box w="7px" h="7px" borderRadius="100px" bg={r.status === 'planned' ? '#3B82F6' : '#1B873F'} />
-              <Text fontSize="12.5px" fontWeight="800" color={r.id === clRelease ? t.onAccent : t.textSub} whiteSpace="nowrap">{r.label}</Text>
-            </Flex>
-          </Box>
-        ))}
-      </Flex>
-
-      {/* 필터 */}
+      {/* 필터: 영역 + 검색 */}
       <Flex align="center" gap="6px" px="18px" py="12px" flexWrap="wrap" flexShrink={0}>
         <Text fontSize="11px" fontWeight="800" color={t.textMuted} pr="2px">영역</Text>
         <FilterChip t={t} label="전체" on={clArea === 'all'} onClick={() => setClArea('all')} />
         {AREA_COLS.map((a) => <FilterChip key={a} t={t} label={a} on={clArea === a} onClick={() => setClArea(a)} />)}
-        <Box w="1px" h="18px" bg={t.borderSoft} mx="4px" />
-        <Text fontSize="11px" fontWeight="800" color={t.textMuted} pr="2px">종류</Text>
-        <FilterChip t={t} label="전체" on={clKind === 'all'} onClick={() => setClKind('all')} />
-        {(['add', 'change', 'fix'] as ChangeKind[]).map((k) => <FilterChip key={k} t={t} label={KIND_LABEL[k]} on={clKind === k} onClick={() => setClKind(k)} />)}
         <Box flex="1" minW="10px" />
-        <Flex align="center" gap="6px" bg={t.searchBg} border={`1px solid ${t.borderSoft}`} borderRadius="8px" px="10px" h="32px" w="220px">
+        <Flex align="center" gap="6px" bg={t.searchBg} border={`1px solid ${t.borderSoft}`} borderRadius="8px" px="10px" h="32px" w="240px">
           <IconSearch s={13} c={t.textMuted} />
-          <input value={clQuery} onChange={(e) => setClQuery(e.target.value)} placeholder="기능·설명·화면 검색"
+          <input value={clQuery} onChange={(e) => setClQuery(e.target.value)} placeholder="화면명·코드·요약 검색"
             style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: t.text, fontSize: 12, fontFamily: 'inherit' }} />
         </Flex>
       </Flex>
 
-      {/* 표 */}
+      {/* 본문: 영역별 화면 리스트 */}
       <Box flex="1" overflowY="auto" bg={t.center} px="18px" pb="22px">
-        <Flex align="center" gap="8px" pb="10px" borderBottom={`2px solid ${t.border}`} mb="12px">
-          <Box w="10px" h="10px" borderRadius="100px" bg={planned ? '#3B82F6' : '#1B873F'} />
-          <Text fontSize="16px" fontWeight="800" color={t.text}>{rel?.label}</Text>
-          <Text fontSize="10px" fontWeight="800" color="#fff" bg={planned ? '#3B82F6' : '#1B873F'} px="6px" py="1px" borderRadius="4px">{planned ? '예정' : '반영'}</Text>
-          {rel?.note && <Text fontSize="12px" color={t.textMuted}>— {rel.note}</Text>}
-          <Box flex="1" />
-          <Text fontSize="12px" fontWeight="700" color={t.textMuted}>{feats.length}건</Text>
-        </Flex>
-
-        {feats.length === 0 ? (
-          <Text fontSize="12.5px" color={t.textMuted}>{clq ? `"${clQuery.trim()}" 검색 결과 없음` : '해당 조건의 기능 없음'}</Text>
-        ) : (
-          <Box border={`1px solid ${t.border}`} borderRadius="8px" overflow="hidden">
-            {/* 헤더 */}
-            <Box display="grid" gridTemplateColumns={COLS} px="12px" py="9px" bg="#1A1A1A" position="sticky" top="0" zIndex={1}>
-              {['No', '종류', '기능', '설명'].map((h) => (
-                <Text key={h} fontSize="12px" fontWeight="800" color="#fff" px="8px">{h}</Text>
-              ))}
-              {AREA_COLS.map((a) => (
-                <Text key={a} fontSize="12px" fontWeight="800" color="#fff" textAlign="center" px="6px" whiteSpace="nowrap">{a}</Text>
-              ))}
+        {total === 0 ? (
+          <Text fontSize="13px" color={t.textSub} pt="14px">{clq ? `"${clQuery.trim()}" 검색 결과 없음` : '표시할 화면이 없음'}</Text>
+        ) : sections.map((s) => {
+          const COLS = '88px minmax(110px,1.1fr) 60px minmax(120px,1.2fr) minmax(180px,2fr) 76px 22px';
+          return (
+          <Box key={s.area} pt="18px">
+            {/* 영역 헤더 */}
+            <Flex align="center" gap="8px" pb="9px" borderBottom={`2px solid ${t.border}`} mb="10px">
+              <Text fontSize="15px" fontWeight="800" color={t.text}>{s.area}</Text>
+              <Text fontSize="12px" fontWeight="800" color={t.textSub}>{s.rows.length}</Text>
+            </Flex>
+            <Box border={`1px solid ${t.border}`} overflow="hidden">
+              {/* 컬럼 헤더 */}
+              <Box display="grid" gridTemplateColumns={COLS} gap="12px" px="14px" py="9px" bg={t.searchBg} borderBottom={`1px solid ${t.border}`}>
+                {['코드', '화면', '유형', '경로', '설명', '상태', ''].map((h, ci) => (
+                  <Text key={ci} fontSize="11px" fontWeight="800" color={t.textSub} letterSpacing="0.03em">{h}</Text>
+                ))}
+              </Box>
+              {s.rows.map((r, i) => {
+                const e = r.entry;
+                const sm = e.status ? STATUS_META[e.status] : null;
+                const bc = e.breadcrumb.split('›').map((x) => x.trim()).filter(Boolean);
+                const parentPath = bc.slice(0, -1).join(' › '); // 상위 경로(화면명 제외)
+                return (
+                  <Box as="button" key={e.id} onClick={() => onSelectScreen(e.id)} display="grid" gridTemplateColumns={COLS} gap="12px"
+                    alignItems="center" w="100%" textAlign="left" px="14px" py="12px" bg={t.panel} cursor="pointer"
+                    borderTop={i ? `1px solid ${t.borderSoft}` : undefined} _hover={{ bg: t.hover }}>
+                    {/* 코드 */}
+                    <Text fontFamily="monospace" fontSize="11.5px" fontWeight="700" color={t.textSub} whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{e.code ?? '—'}</Text>
+                    {/* 화면 (상위 경로 + 화면명) */}
+                    <Box minW="0">
+                      {parentPath && <Text fontSize="10.5px" fontWeight="600" color={t.textMuted} whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" pb="1px">{parentPath} ›</Text>}
+                      <Text fontSize="14px" fontWeight="800" color={t.text} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">{e.name}</Text>
+                    </Box>
+                    {/* 유형 (페이지/팝업 셀 분리) */}
+                    <Box>
+                      <Text as="span" fontSize="10px" fontWeight="800" color={e.type === 'page' ? t.onAccent : t.chipText} bg={e.type === 'page' ? t.accent : t.chip} px="6px" py="2px" borderRadius="4px" whiteSpace="nowrap">{e.type === 'page' ? '페이지' : '팝업'}</Text>
+                    </Box>
+                    {/* 경로 */}
+                    <Text fontFamily="monospace" fontSize="12px" fontWeight="700" color={t.text} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">{e.docPath ?? '—'}</Text>
+                    {/* 설명 (셀 분리 · 줄바꿈 허용) */}
+                    <Text fontSize="13.5px" fontWeight="500" color={t.text} lineHeight="1.6">{e.summary || '—'}</Text>
+                    {/* 상태 */}
+                    <Box>{sm && <Text as="span" fontSize="11px" fontWeight="800" bg={sm.bg} color={sm.fg} px="9px" py="3px" borderRadius="6px" whiteSpace="nowrap">{e.status}</Text>}</Box>
+                    {/* 이동 */}
+                    <Text fontSize="14px" fontWeight="700" color={t.textSub} textAlign="right">→</Text>
+                  </Box>
+                );
+              })}
             </Box>
-            {feats.map((f, i) => {
-              const { tag, rest } = splitFeatureTitle(f.title);
-              return (
-                <Box key={f.id} display="grid" gridTemplateColumns={COLS} alignItems="stretch" px="12px" borderTop={`1px solid ${t.borderSoft}`} bg={t.panel}>
-                  <Text fontSize="13px" fontWeight="700" color={t.textMuted} px="8px" py="10px">{i + 1}</Text>
-                  <Text fontSize="13px" fontWeight="800" color={KIND_COLOR[f.kind]} px="8px" py="10px">{KIND_LABEL[f.kind]}</Text>
-                  <Text fontSize="13.5px" fontWeight="700" color={t.text} px="8px" py="10px" lineHeight="1.45" bg={featBg}>
-                    {tag && <Box as="span" fontWeight="800" color={t.accent}>[{tag}]</Box>}{tag ? ' ' : ''}{rest}
-                  </Text>
-                  <Text fontSize="12.5px" color={t.text} px="8px" py="10px" lineHeight="1.55" whiteSpace="pre-line">{f.desc}</Text>
-                  {AREA_COLS.map((a) => {
-                    const sids = screensInArea(f, a);
-                    return (
-                      <Flex key={a} direction="column" gap="3px" px="6px" py="10px" align="center" justify="flex-start">
-                        {sids.length ? sids.map((sid) => (
-                          <Text as="button" key={sid} onClick={() => onSelectScreen(sid)} title={`${screenName(sid)} 바로가기`}
-                            fontSize="12px" color={t.textSub} textDecoration="underline" cursor="pointer" lineHeight="1.3" _hover={{ color: t.text }} textAlign="center">{screenName(sid)}</Text>
-                        )) : <Box as="span" fontSize="13px" color={t.borderSoft}>–</Box>}
-                      </Flex>
-                    );
-                  })}
-                </Box>
-              );
-            })}
           </Box>
-        )}
+          );
+        })}
       </Box>
     </Flex>
   );

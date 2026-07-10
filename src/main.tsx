@@ -5,8 +5,8 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ChakraProvider, defaultSystem } from '@chakra-ui/react';
 import { DocsShell } from './docs/DocsShell';
-import { DemoScreen } from './demo/DemoScreens';
-import { ComponentGallery } from './docs/ComponentGallery';
+import { DemoScreen } from './preview/screens';
+import { ComponentGallery } from './design-system'; // 공개 배럴로 소비(단방향)
 
 // 클라이언트 경로 분기 —
 //   /preview/*   → 프리뷰용 샘플 화면(iframe 안에서 렌더)

@@ -6,10 +6,8 @@
 //       탭 있는 화면은 data-doc-tab 으로 탭 컨텍스트를 표시한다.
 import { useState, useEffect } from 'react';
 import { Box, Flex, Text } from '@chakra-ui/react';
-// 대시보드(홈) — 표준 컴포넌트 조합
-import { AdminLayout } from '../components/admin/AdminLayout';
-import { SectionHead, StatCard, InfoCard, PillStatCard, KVColumns, AdBanner, NoticeList, Stars } from '../components/admin/dashboardAtoms';
-import { colors, FONT as AFONT, asset } from '../styles/tokens';
+// 대시보드(홈) — 표준 컴포넌트 조합. deep import 금지, 디자인시스템 공개 배럴로만 소비.
+import { AdminLayout, SectionHead, StatCard, InfoCard, PillStatCard, KVColumns, AdBanner, NoticeList, Stars, colors, FONT as AFONT, asset } from '../design-system';
 
 const FONT = "'Pretendard', system-ui, sans-serif"; // 화면 콘텐츠 폰트 — 전체 프리텐다드 통일
 
