@@ -852,10 +852,10 @@ function CodeBlock({ code, lang = 'tsx' }: { code: string; lang?: string }) {
 // 섹션 제목(상세 페이지 내부 앵커) — 넘버링 + 제목 + 선택 설명
 function SecHead({ id, num, children, note }: { id: string; num?: number; children: React.ReactNode; note?: string }) {
   return (
-    <Box id={id} data-anchor={id} scrollMarginTop="20px" pt="42px" pb="14px">
+    <Box id={id} data-anchor={id} scrollMarginTop="20px" pt="64px" pb="16px">
       <Flex align="center" gap="10px">
-        {num != null && <Text fontFamily="monospace" fontSize="15px" fontWeight="700" color={colors.green} lineHeight="1" mt="2px">{String(num).padStart(2, '0')}</Text>}
-        <Text fontFamily={CHROME} fontSize="21px" fontWeight="800" color="#18181B" letterSpacing="-0.01em">{children}</Text>
+        {num != null && <Text fontFamily="monospace" fontSize="17px" fontWeight="700" color={colors.green} lineHeight="1" mt="2px">{String(num).padStart(2, '0')}</Text>}
+        <Text fontFamily={CHROME} fontSize="23px" fontWeight="800" color="#18181B" letterSpacing="-0.01em">{children}</Text>
       </Flex>
       {note && <Text fontFamily={CHROME} fontSize="14.5px" color="#71717A" pt="4px" pl={num != null ? '30px' : '0'}>{note}</Text>}
     </Box>
