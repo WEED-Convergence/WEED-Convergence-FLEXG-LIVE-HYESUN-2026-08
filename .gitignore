@@ -12,3 +12,6 @@ tsconfig.tsbuildinfo
 # 로컬 전용 노트·가이드(팀 배포 제외)
 .session-notes.md
 *.local.md
+
+# 로컬 전용 작업 로그(디자인시스템 업데이트 등 — 팀 배포 제외)
+dailylog/
