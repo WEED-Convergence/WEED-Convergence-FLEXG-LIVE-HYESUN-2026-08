@@ -982,10 +982,34 @@ function UsageTabs({ e }: { e: FlatEntry }) {
 }
 
 // 디자인 토큰 페이지 — 색 스와치 + 복사용 :root CSS
-function TokenPage({ scrollRef }: { scrollRef: React.RefObject<HTMLDivElement | null> }) {
+// 본문 우측 플로팅 목차 카드(sticky) — 별도 패널 컬럼 없이 콘텐츠 안에 떠 있음
+function PageTOC({ sections, active, onNav }: { sections: { id: string; label: string }[]; active: string; onNav: (id: string) => void }) {
+  return (
+    <Box as="aside" w="196px" flexShrink={0} display={{ base: 'none', xl: 'block' }} alignSelf="flex-start" position="sticky" top="26px">
+      <Box bg="#fff" border="1px solid #EAEAEC" borderRadius="12px" boxShadow="0 4px 16px rgba(24,24,27,0.06)" p="14px 16px">
+        <Text fontFamily={CHROME} fontSize="12px" fontWeight="800" color="#A1A1AA" letterSpacing="0.05em" pb="10px">이 페이지</Text>
+        <Flex direction="column" gap="1px">
+          {sections.map((s, i) => {
+            const on = active === s.id;
+            return (
+              <Flex as="button" key={s.id} w="100%" align="baseline" gap="8px" textAlign="left" onClick={() => onNav(s.id)} cursor="pointer" position="relative" pl="10px" py="4px">
+                {on && <Box position="absolute" left="-2px" top="4px" bottom="4px" w="2px" borderRadius="2px" bg="#18181B" />}
+                <Text fontFamily="monospace" fontSize="11.5px" fontWeight="700" color={colors.green} flexShrink={0}>{String(i + 1).padStart(2, '0')}</Text>
+                <Text fontFamily={CHROME} fontSize="13.5px" fontWeight={on ? '700' : '500'} color={on ? '#18181B' : '#A1A1AA'}>{s.label}</Text>
+              </Flex>
+            );
+          })}
+        </Flex>
+      </Box>
+    </Box>
+  );
+}
+
+function TokenPage({ scrollRef, active, goSec }: { scrollRef: React.RefObject<HTMLDivElement | null>; active: string; goSec: (id: string) => void }) {
   return (
     <Box ref={scrollRef} flex="1" minW="0" overflowY="auto">
-      <Box maxW="900px" mx="auto" px="32px" py="26px">
+      <Flex maxW="1180px" mx="auto" px="40px" py="30px" gap="44px" align="flex-start">
+        <Box flex="1" minW="0">
         <Flex align="center" gap="9px" pb="6px" wrap="wrap">
           <Text fontFamily={CHROME} fontSize="28px" fontWeight="800" color="#111827">디자인 토큰</Text>
           <Text fontFamily="monospace" fontSize="14px" color="#9CA3AF">Figma variables → CSS 변수</Text>
@@ -1024,7 +1048,9 @@ function TokenPage({ scrollRef }: { scrollRef: React.RefObject<HTMLDivElement | 
         <SecHead id="sec-usage" num={2}>토큰 CSS (복사해서 한 번 포함)</SecHead>
         <CodeBlock code={TOKEN_CSS} lang="css" />
         <Box h="40px" />
-      </Box>
+        </Box>
+        <PageTOC sections={[{ id: 'sec-preview', label: '색상 토큰' }, { id: 'sec-usage', label: '토큰 CSS' }]} active={active} onNav={goSec} />
+      </Flex>
     </Box>
   );
 }
@@ -1045,13 +1071,14 @@ function PreviewCard({ children, note, minH = '128px' }: { children: React.React
 }
 
 // 컴포넌트 상세 페이지 — Header / Preview / Variants / Props / Usage / Guidelines
-function ComponentPage({ e, scrollRef }: { e: FlatEntry; scrollRef: React.RefObject<HTMLDivElement | null> }) {
+function ComponentPage({ e, scrollRef, active, goSec }: { e: FlatEntry; scrollRef: React.RefObject<HTMLDivElement | null>; active: string; goSec: (id: string) => void }) {
   const scope = e.scope ?? e.area;
   const secNum: Record<string, number> = {};
   sectionsFor(e).forEach((s, i) => { secNum[s.id] = i + 1; });
   return (
     <Box ref={scrollRef} flex="1" minW="0" overflowY="auto">
-      <Box maxW="1080px" mx="auto" px="44px" py="34px">
+      <Flex maxW="1240px" mx="auto" px="44px" py="34px" gap="44px" align="flex-start">
+        <Box flex="1" minW="0">
         {/* Header */}
         <Flex align="center" gap="9px" pb="10px" wrap="wrap">
           <Text fontFamily={CHROME} fontSize="32px" fontWeight="800" color="#18181B" letterSpacing="-0.02em">{e.name}</Text>
@@ -1099,7 +1126,9 @@ function ComponentPage({ e, scrollRef }: { e: FlatEntry; scrollRef: React.RefObj
           </>
         )}
         <Box h="56px" />
-      </Box>
+        </Box>
+        <PageTOC sections={sectionsFor(e)} active={active} onNav={goSec} />
+      </Flex>
     </Box>
   );
 }
@@ -1370,9 +1399,6 @@ export function ComponentGallery() {
   const groups = GROUPED.map((g) => ({ ...g, items: g.items.filter(match) })).filter((g) => g.items.length);
   const tokenMatches = !q || 'foundation 디자인 토큰 design tokens'.includes(q);
   const layoutMatches = !q || 'patterns 어드민 레이아웃 admin layout'.includes(q);
-  const rail: { id: string; label: string }[] = isToken
-    ? [{ id: 'sec-preview', label: '색상 토큰' }, { id: 'sec-usage', label: '토큰 CSS' }]
-    : sectionsFor(selected);
 
   const NavRow = ({ id, label, swatch }: { id: string; label: string; swatch?: boolean }) => {
     const on = id === selectedId;
@@ -1392,7 +1418,9 @@ export function ComponentGallery() {
   const sidebar = (
     <Flex direction="column" h="100%" minH="0">
       <Box p="12px 12px 8px" flexShrink={0}>
-        <LInput value={query} onChange={setQuery} placeholder="컴포넌트 검색…" width="100%" />
+        <input type="text" value={query} placeholder="컴포넌트 검색…"
+          onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setQuery(ev.target.value)}
+          style={{ width: '100%', height: '34px', padding: '0 12px', fontFamily: CHROME, fontSize: '13px', color: '#18181B', background: '#F4F4F5', border: '1px solid #E4E4E7', borderRadius: '8px', boxSizing: 'border-box', outline: 'none' }} />
       </Box>
       <Box flex="1" overflowY="auto" px="6px" pb="24px">
         {tokenMatches && (<><CatLabel>Foundation</CatLabel><NavRow id={TOKEN_ID} label="디자인 토큰" swatch /></>)}
@@ -1436,29 +1464,12 @@ export function ComponentGallery() {
           </Box>
         )}
 
-        {/* 중앙 */}
-        {isLayout ? <LayoutDoc /> : isToken ? <TokenPage key="tokens" scrollRef={scrollRef} /> : <ComponentPage key={selected.id} e={selected} scrollRef={scrollRef} />}
-
-        {/* 우측 목차 — 플로팅 카드(패널 없음) · 레이아웃뷰 제외 · 1280 이하 숨김 */}
-        {!isLayout && (
-          <Box w="212px" flexShrink={0} display={{ base: 'none', xl: 'block' }}>
-            <Box position="sticky" top="22px" mt="26px" mr="20px" bg="#fff" border="1px solid #EAEAEC" borderRadius="12px" boxShadow="0 4px 16px rgba(24,24,27,0.06)" p="14px 16px">
-              <Text fontFamily={CHROME} fontSize="12px" fontWeight="800" color="#A1A1AA" letterSpacing="0.05em" pb="10px">이 페이지</Text>
-              <Flex direction="column" gap="1px">
-                {rail.map((s, i) => {
-                  const on = active === s.id;
-                  return (
-                    <Flex as="button" key={s.id} w="100%" align="baseline" gap="8px" textAlign="left" onClick={() => goSec(s.id)} cursor="pointer" position="relative" pl="10px" py="4px">
-                      {on && <Box position="absolute" left="-2px" top="4px" bottom="4px" w="2px" borderRadius="2px" bg="#18181B" />}
-                      <Text fontFamily="monospace" fontSize="11.5px" fontWeight="700" color={colors.green} flexShrink={0}>{String(i + 1).padStart(2, '0')}</Text>
-                      <Text fontFamily={CHROME} fontSize="13.5px" fontWeight={on ? '700' : '500'} color={on ? '#18181B' : '#A1A1AA'}>{s.label}</Text>
-                    </Flex>
-                  );
-                })}
-              </Flex>
-            </Box>
-          </Box>
-        )}
+        {/* 중앙 — 우측 목차는 각 페이지 본문 안 플로팅 카드로 들어감(별도 컬럼 없음) */}
+        {isLayout
+          ? <LayoutDoc />
+          : isToken
+            ? <TokenPage key="tokens" scrollRef={scrollRef} active={active} goSec={goSec} />
+            : <ComponentPage key={selected.id} e={selected} scrollRef={scrollRef} active={active} goSec={goSec} />}
       </Flex>
     </Flex>
   );
