@@ -371,8 +371,8 @@ export function DocsShell() {
         </Box>
       </Flex>
 
-      {/* ───────────── 우측: 설명 패널 (접기 가능) ───────────── */}
-      {descCollapsed ? (
+      {/* ───────────── 우측: 설명 패널 (접기 가능 · hideDesc면 아예 없음) ───────────── */}
+      {!entry.hideDesc && (descCollapsed ? (
         <Flex direction="column" w="40px" flexShrink={0} bg={t.panel} borderLeft={`1px solid ${t.border}`} boxShadow={`-6px 0 16px -8px ${t.shadow}`} zIndex={1} align="center" pt="14px">
           <IconBtn t={t} title="설명 펼치기" onClick={() => setDescCollapsed(false)}><IconPanel c={t.textSub} /></IconBtn>
         </Flex>
@@ -466,7 +466,7 @@ export function DocsShell() {
           )}
         </Box>
       </Flex>
-      )}
+      ))}
       </>
       )}
     </Flex>

@@ -39,6 +39,7 @@ export interface DocEntry {
   stateTable?: StateTable;
   children?: DocEntry[]; // 소속 팝업
   updatedAt?: string;  // 최근 수정일 YYYY-MM-DD
+  hideDesc?: boolean;  // 우측 설명 패널을 숨김(그 자체가 문서인 개요/표지 화면용). 프리뷰가 전체 폭 차지
 }
 
 export interface DocGroup {
@@ -54,24 +55,19 @@ export const DOC_TITLE = 'CONVERGENCE Docs.';
 // ─────────────────────────────────────────────────────────────────────────
 export const DOC_GROUPS: DocGroup[] = [
   {
-    title: '시작하기',
+    title: '개요',
     entries: [
       {
         id: 'overview',
-        name: '컴포넌트 표준 개요',
+        name: '프로토타입 개요',
         docPath: '/overview',
         route: '/preview/overview',
-        breadcrumb: '시작하기 › 개요',
+        breadcrumb: '개요',
         type: 'page',
         updatedAt: '2026-07-10',
-        summary: '이 표준 컴포넌트북이 무엇이고, 서비스 → 페이지 → 컴포넌트 구조로 어떻게 프로토타입을 시작하는지 안내함.',
-        common:
-          '1) 사내 UI 표준을 모은 컴포넌트북 · 디자인 시스템 문서\n2) 서비스(FLEXG·발주모아·캐치셀·PAGE) → 페이지(area) → 컴포넌트 계층\n3) 각 컴포넌트는 Preview·Variants·Props·Usage(React·HTML·CSS)·Guidelines로 구성',
-        sections: [
-          { title: '이게 뭔가요?', badge: 'INTRO', body: '기획·퍼블리싱·개발이 같은 표준 컴포넌트를 확인하고 복사해 쓰는 문서.' },
-          { title: '구조', badge: 'STRUCTURE', body: '서비스마다 자기 페이지·컴포넌트·토큰을 가짐(공통 레이어 없음 — 부서별 분리).' },
-          { title: '프로토타입 시작', badge: 'FLOW', body: '어떤 서비스? → 어떤 페이지? → 그 페이지의 표준 컴포넌트로 화면을 조립.' },
-        ],
+        hideDesc: true, // 프리뷰(표지) 자체가 문서 → 우측 설명 패널 숨김
+        summary: '이 프로토타입이 어떤 서비스의 어떤 기능을 위해 만들어졌는지 개요·목적·범위를 협업 개발자·디자이너에게 전달하는 표지 페이지.',
+        sections: [],
       },
     ],
   },

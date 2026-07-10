@@ -8,34 +8,19 @@
 
 ---
 
-## 🧭 세션 연속성 — 새 세션은 여기부터 (마지막 갱신 2026-07-09)
+## 🚀 프로토타입 시작 — 질문으로 시작 (팀원용·필독)
 
-> ⚠️ **이 폴더에서 Claude Code를 새로 열면 이전 세션 메모리는 안 보인다**(예전 개발은 다른 경로 `~/projects/flexg_live_2` 세션에서 진행됨). **이 CLAUDE.md가 유일한 컨텍스트다.** 작업 상태가 바뀌면 이 절을 반드시 갱신할 것.
+> 이 저장소를 받아 **새 프로토타입을 시작하면**, Claude Code는 곧바로 코드를 치지 말고 **아래 2가지를 먼저 질문**한다. 답을 받은 뒤 그 서비스·페이지의 **표준 컴포넌트로만** 화면을 조립한다.
 
-### 저장소 유래 · 위치 · 원격
-- 원래 개인 로컬 `~/projects/flexg-docs-template`(로컬전용)에서 개발 → **2026-07-09 회사 org로 이관.**
-- **작업 폴더(현재)**: `~/weed_projects_heeyeon/convergence-docs-template-heeyeon-2026-07`
-- **원격**: `git@github-company:WEED-Convergence/convergence-docs-template-heeyeon-2026-07.git` (private)
-- **회사 push 방법**: SSH 별칭 `github-company`(키 `~/.ssh/id_ed25519_company`, 인증 신원 `WEED-Convergence`)로만 됨. 개인 `gh`(yeonying-smile)는 이 org 접근 불가 → org 레포 생성은 회사계정 웹, push는 이 SSH 리모트.
-- 원본은 `~/projects/_ARCHIVED-flexg-docs-template--migrated-to-weed-2026-07` 로 아카이브(**사용 금지**).
+1. **"어떤 서비스를 만드시나요?"** — FLEXG · 발주모아 · 캐치셀 · PAGE
+   - 서비스마다 컴포넌트·디자인 토큰(브랜드 색)이 **다르다.** 공통 레이어는 없다(부서가 다름).
+2. **"어떤 페이지(영역)를 작업하시나요?"** — 그 서비스의 area
+   - 예) FLEXG: 어드민 · 송출앱 · 고객뷰어 · 샵.
+3. → **그 서비스+페이지의 표준 컴포넌트**(`/components/<service>`)로 화면을 조립한다. 없으면 새로 만들고 **반드시 갤러리에 등록**(아래 규칙 3·4).
 
-### git 규칙
-- **커밋·push·PR은 사용자가 명시 지시할 때만.** 작업 마무리라는 이유로 알아서 커밋하지 않는다. 기본은 "수정만 하고 보고".
-- 관련 변경은 한 번에 모아서(기능마다 쪼개지 말 것). 커밋 위생: `node_modules`·`tsconfig.tsbuildinfo` 커밋 금지(`.gitignore` 반영됨).
-
-### 현재 진행 상태 (작업 로그)
-- ✅ **샘플 대시보드(홈)** Figma 정밀 구현 완료 — `/docs/dashboard`(=`/preview/dashboard`, `src/demo/DemoScreens.tsx`의 `Dashboard`). Figma file `1pTvqSYmvdYcNTyAnXRdfy`. 6영역: ①프로모배너 ②오늘의할일 ③CRM현황·지표 ④쇼핑몰현황(DatAI 실시간표 + 신규가입/리워드 표 + 매출카드 + 배너) ⑤유료서비스현황 ⑥구매후기·상품문의·공지. `data-doc-mark`: promo/todo/crm/shop/paid/reviews.
-- ✅ **표준 컴포넌트 확장**(모두 `/components` 갤러리 등록): `KVColumns`(열 타입 4종 rows/center/lines/nodes), `SectionHead`(`more`=더보기 링크), `Stars`(`size`), `NoticeList`(흰 박스+상하 회색선·첫 줄 bold·항목 사이 선 없음). DatAI 표는 헤더/본문을 **공용 grid 컬럼**(`DATAI_COLS`, `minmax(0,…)`)으로 정렬(세로선 편차 0).
-- 🔄 **진행중(#40): `/components` 갤러리 shadcn식 개편** — `src/docs/ComponentGallery.tsx` 리팩터 중.
-  - 목표: 좌측 **알파벳순 평면 목록**(+검색, area 태그, 중복이름 Toggle×2는 slug로 유일화) / 중앙 **개별 컴포넌트 페이지**(미리보기→Props표→사용법) / 우측 **On This Page** / **`/components/<slug>` 라우팅**(pushState+popstate).
-  - `CompEntry`에 `props?: PropRow[]` 필드 추가함. `ALL`(평면 정렬 목록)·`byId`·`PAGE_SECTIONS` 추가함.
-  - **미완일 수 있음** — 리팩터 도중이면 `CompRow`/구 목록 JSX 제거와 새 마스터-디테일 뷰 연결이 남아 tsc 에러가 있을 수 있으니 이어서 완성할 것.
-- ⏭ **남은 일**: (1) Props 데이터 채우기(대시보드·어드민 표준부터) (2) tsc+로컬 검증.
-
-### 검증 방법
-- 타입: `npx tsc --noEmit`
-- 로컬: `npm run dev` → http://localhost:3000 · 문서 `/docs` · 대시보드 `/docs/dashboard` · 컴포넌트 `/components`
-- Figma 대조: `get_design_context`/`get_screenshot`로 노드 받아 픽셀 비교(헤더/본문 정렬·셀 여백 꼼꼼히).
+- 서비스가 정해지면 **그 서비스의 디자인 토큰(`var(--Fg…)`)** 으로만 색을 지정한다. 하드코딩 금지.
+- 컴포넌트북 구조: **서비스 → 페이지(area) → 컴포넌트**. 각 컴포넌트 페이지 = Preview · Variants · Props · Usage(React·HTML·CSS) · Guidelines.
+- 개요는 `/docs/overview`(시작하기), 컴포넌트북은 `/components/<service>`.
 
 ---
 
@@ -47,11 +32,12 @@
 2. **모호하면 임의로 진행하지 않는다.** 먼저 되묻거나 제안(안)을 제시 → 확인 → 구현. 변경이 크면 코드부터 치지 말고 체크리스트·제안부터.
 3. **표준 컴포넌트를 먼저 쓴다.** `/components`(CONVERGENCE 컴포넌트 표준)에 정의된 컴포넌트로 화면을 조립한다.
    - 어드민 `src/components/admin/*`(parts·formParts·atoms·dashboardAtoms) · 송출앱 `src/broadapp/*` · 고객뷰어·샵 `src/viewer`·`src/shop`.
-4. **표준에 없어 새로 만든 컴포넌트는 반드시 `/components` 갤러리에 등록한다.** (`src/docs/ComponentGallery.tsx` 의 `ITEMS`) — 미리보기 + 설명 + props 태그 + 사용 코드. 등록 안 하면 다음 사람이 또 새로 만든다.
+4. **표준에 없어 새로 만든 컴포넌트는 반드시 `/components` 갤러리에 등록한다.** (`src/docs/ComponentGallery.tsx` 의 `GROUPS` — 해당 서비스·area 그룹에 `CompEntry` 추가) — Preview·Variants·Props·Usage(React·HTML·CSS)·Guidelines. 같은 성격이면 낱개로 쪼개지 말고 표준 1개 + Variants로. 등록 안 하면 다음 사람이 또 새로 만든다.
 5. **어드민 화면은 `AdminLayout` 으로 감싼다.** (상단 네비 + 사이드바 + 본문 + 푸터 표준 셸) 홈은 `navActive="home"`, 목록 화면은 해당 메뉴 라벨.
 6. **Figma → 화면 만들 때 순서:** ① 노드를 `get_design_context` 로 분석(치수·색·텍스트·이미지) → ② 표준 컴포넌트로 구성, 없으면 새 컴포넌트 생성(+④ 갤러리 등록) → ③ 실제 이미지·아이콘은 `public/figma-assets/` 에 받아 사용 → ⑤ 설명 마커 `data-doc-mark` 연결.
 7. **끝나면 검증한다.** `npx tsc -b` 통과 + 로컬(`npm run dev`)에서 화면 확인.
 8. **셸(DocsShell) 레이아웃 코드는 건드리지 않는다.** 데이터(카탈로그)·프리뷰 화면·컴포넌트만 채운다.
+9. **커밋·push·PR은 사용자가 명시 지시할 때만.** 작업 마무리라는 이유로 알아서 커밋하지 않는다. 기본은 "수정만 하고 보고".
 
 > 컴포넌트 카탈로그: `/components` (CONVERGENCE 컴포넌트 표준) — 어떤 표준 컴포넌트가 있는지 먼저 여기서 확인.
 
