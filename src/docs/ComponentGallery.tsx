@@ -757,13 +757,22 @@ const GROUPS: AreaGroup[] = [
   },
 ];
 
-const TOTAL = GROUPS.reduce((n, g) => n + g.items.length, 0);
 
-// ── 평면(알파벳순) 컴포넌트 목록 — area 라벨 유지, /components/<slug> 라우팅용 유일 id ──
-type FlatEntry = CompEntry & { area: string; id: string };
+// ── 서비스(플렉스지·발주모아·캐치셀·PAGE) — 서비스마다 자기 컴포넌트/토큰을 온전히 가짐(공통 레이어 없음) ──
+type ServiceId = 'flexg' | 'juanmoa' | 'catchsell' | 'page';
+const SERVICES: { id: ServiceId; name: string }[] = [
+  { id: 'flexg', name: 'FLEXG' },
+  { id: 'juanmoa', name: '발주모아' },
+  { id: 'catchsell', name: '캐치셀' },
+  { id: 'page', name: 'PAGE' },
+];
+
+// ── 평면(알파벳순) 컴포넌트 목록 — area 라벨 유지, /components/<service>/<slug> 라우팅용 유일 id ──
+type FlatEntry = CompEntry & { area: string; id: string; service: ServiceId };
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 const ALL: FlatEntry[] = (() => {
-  const flat = GROUPS.flatMap((g) => g.items.map((e) => ({ ...e, area: g.area })));
+  // 현재 컴포넌트는 전부 FLEXG. 발주모아·캐치셀·PAGE는 이후 각자 GROUPS로 추가.
+  const flat = GROUPS.flatMap((g) => g.items.map((e) => ({ ...e, area: g.area, service: 'flexg' as ServiceId })));
   flat.sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
   const seen = new Map<string, number>();
   return flat.map((e) => {
@@ -775,7 +784,6 @@ const ALL: FlatEntry[] = (() => {
     return { ...e, id };
   });
 })();
-const byId = (id: string) => ALL.find((e) => e.id === id);
 // area(화면)별 그룹 — 그룹 안에서만 알파벳순(전체를 한 덩어리로 섞지 않음)
 const GROUPED: { area: string; items: FlatEntry[] }[] = GROUPS.map((g) => ({
   area: g.area,
@@ -798,7 +806,11 @@ const TOKENS: { name: string; value: string; use: string }[] = [
 ];
 const TOKEN_ID = 'design-tokens';
 const LAYOUT_ID = 'admin-layout';   // Patterns — 어드민 레이아웃(LayoutDoc)
-const TOKEN_CSS = ':root{\n' + TOKENS.map((t) => `  --${t.name}: ${t.value};`).join('\n') + '\n}';
+// 서비스별 토큰(지금은 FLEXG만 실제 값, 나머지는 준비중). 서비스마다 브랜드 색이 다름.
+const SERVICE_TOKENS: Record<ServiceId, { name: string; value: string; use: string }[]> = {
+  flexg: TOKENS, juanmoa: [], catchsell: [], page: [],
+};
+const tokenCssFor = (toks: { name: string; value: string }[]) => ':root{\n' + toks.map((t) => `  --${t.name}: ${t.value};`).join('\n') + '\n}';
 
 // 코드 스니펫 블록(복사) — HeroUI식. 가로 스크롤 없이 줄바꿈, 복사 버튼은 헤더로 분리.
 function CodeBlock({ code, lang = 'tsx' }: { code: string; lang?: string }) {
@@ -1005,14 +1017,28 @@ function PageTOC({ sections, active, onNav }: { sections: { id: string; label: s
   );
 }
 
-function TokenPage({ scrollRef, active, goSec }: { scrollRef: React.RefObject<HTMLDivElement | null>; active: string; goSec: (id: string) => void }) {
+function TokenPage({ scrollRef, active, goSec, service }: { scrollRef: React.RefObject<HTMLDivElement | null>; active: string; goSec: (id: string) => void; service: ServiceId }) {
+  const toks = SERVICE_TOKENS[service];
+  const svcName = SERVICES.find((s) => s.id === service)?.name ?? '';
+  if (toks.length === 0) {
+    return (
+      <Box ref={scrollRef} flex="1" minW="0" overflowY="auto">
+        <Box maxW="900px" mx="auto" px="40px" py="60px">
+          <Text fontFamily={CHROME} fontSize="28px" fontWeight="800" color="#111827" pb="10px">디자인 토큰</Text>
+          <Box p="20px 22px" bg="#FFF7ED" border="1px solid #FED7AA" borderRadius="12px">
+            <Text fontFamily={CHROME} fontSize="14px" color="#9A3412">{svcName} 서비스의 디자인 토큰은 준비중입니다.</Text>
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
   return (
     <Box ref={scrollRef} flex="1" minW="0" overflowY="auto">
       <Flex maxW="1180px" mx="auto" px="40px" py="30px" gap="44px" align="flex-start">
         <Box flex="1" minW="0">
         <Flex align="center" gap="9px" pb="6px" wrap="wrap">
           <Text fontFamily={CHROME} fontSize="28px" fontWeight="800" color="#111827">디자인 토큰</Text>
-          <Text fontFamily="monospace" fontSize="14px" color="#9CA3AF">Figma variables → CSS 변수</Text>
+          <Text fontFamily="monospace" fontSize="14px" color="#9CA3AF">{svcName} · Figma variables → CSS 변수</Text>
         </Flex>
         <Text fontFamily={CHROME} fontSize="15.5px" color="#4B5563" lineHeight="1.7" pb="8px">
           Figma 변수명 그대로 CSS 변수(<Box as="span" fontFamily="monospace">--FgGreenX</Box> 등)로 제공. HTML 코드는 색을 하드코딩하지 말고 이 토큰을 <Box as="span" fontFamily="monospace">var(--…)</Box> 로 참조한다. 아래 <Box as="span" fontFamily="monospace">:root</Box> CSS를 프로젝트에 한 번 포함하면 됨.
@@ -1027,7 +1053,7 @@ function TokenPage({ scrollRef, active, goSec }: { scrollRef: React.RefObject<HT
               </Box>
             ))}
           </Flex>
-          {TOKENS.map((t) => (
+          {toks.map((t) => (
             <Flex key={t.name} borderTop="1px solid #F0F1F3" align="center">
               <Box flex="0 0 52px" px="12px" py="8px">
                 <Box w="26px" h="26px" borderRadius="6px" bg={t.value} border="1px solid #E5E7EB" />
@@ -1046,7 +1072,7 @@ function TokenPage({ scrollRef, active, goSec }: { scrollRef: React.RefObject<HT
         </Box>
 
         <SecHead id="sec-usage" num={2}>토큰 CSS (복사해서 한 번 포함)</SecHead>
-        <CodeBlock code={TOKEN_CSS} lang="css" />
+        <CodeBlock code={tokenCssFor(toks)} lang="css" />
         <Box h="40px" />
         </Box>
         <PageTOC sections={[{ id: 'sec-preview', label: '색상 토큰' }, { id: 'sec-usage', label: '토큰 CSS' }]} active={active} onNav={goSec} />
@@ -1345,22 +1371,30 @@ function LayoutDoc() {
 }
 
 // URL(/components/<slug>)에서 현재 항목 id 파싱(없거나 무효면 첫 항목)
-function currentIdFromPath(): string {
-  const m = window.location.pathname.match(/^\/components\/([^/?#]+)/);
-  const id = m ? decodeURIComponent(m[1]) : '';
-  return (id === TOKEN_ID || id === LAYOUT_ID || byId(id)) ? id : (ALL[0]?.id ?? '');
+const firstIdOf = (svc: ServiceId): string => ALL.find((e) => e.service === svc)?.id ?? TOKEN_ID;
+// URL: /components/<service>/<slug> (레거시 /components/<slug> → flexg)
+function currentRoute(): { service: ServiceId; id: string } {
+  const m = window.location.pathname.match(/^\/components(?:\/([^/?#]+))?(?:\/([^/?#]+))?/);
+  const seg1 = m?.[1] ? decodeURIComponent(m[1]) : '';
+  const seg2 = m?.[2] ? decodeURIComponent(m[2]) : '';
+  const svc = SERVICES.find((s) => s.id === seg1)?.id;
+  const svcId = svc ?? 'flexg';
+  const id = svc ? seg2 : seg1;
+  const valid = id === TOKEN_ID || (id === LAYOUT_ID && svcId === 'flexg') || ALL.some((e) => e.id === id && e.service === svcId);
+  return { service: svcId, id: valid ? id : firstIdOf(svcId) };
 }
 
 export function ComponentGallery() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const [selectedId, setSelectedId] = useState<string>(() => currentIdFromPath());
+  const [service, setService] = useState<ServiceId>(() => currentRoute().service);
+  const [selectedId, setSelectedId] = useState<string>(() => currentRoute().id);
   const [active, setActive] = useState<string>('sec-preview');
   const [query, setQuery] = useState('');
   const [navOpen, setNavOpen] = useState(false);
 
-  // 뒤로/앞으로 가기 → URL 동기화
+  // 뒤로/앞으로 가기 → URL 동기화(서비스+컴포넌트)
   useEffect(() => {
-    const onPop = () => setSelectedId(currentIdFromPath());
+    const onPop = () => { const r = currentRoute(); setService(r.service); setSelectedId(r.id); };
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
   }, []);
@@ -1386,19 +1420,27 @@ export function ComponentGallery() {
     setSelectedId(id);
     setActive('sec-preview');
     setNavOpen(false);
-    if (window.location.pathname !== `/components/${id}`) window.history.pushState({}, '', `/components/${id}`);
+    const path = `/components/${service}/${id}`;
+    if (window.location.pathname !== path) window.history.pushState({}, '', path);
+    scrollRef.current?.scrollTo({ top: 0 });
+  };
+  const selectService = (svc: ServiceId) => {
+    const id = firstIdOf(svc);
+    setService(svc); setSelectedId(id); setActive('sec-preview'); setQuery(''); setNavOpen(false);
+    window.history.pushState({}, '', `/components/${svc}/${id}`);
     scrollRef.current?.scrollTo({ top: 0 });
   };
   const goSec = (id: string) => scrollRef.current?.querySelector(`#${CSS.escape(id)}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   const isToken = selectedId === TOKEN_ID;
   const isLayout = selectedId === LAYOUT_ID;
-  const selected = byId(selectedId) ?? ALL[0];
+  const selected = ALL.find((e) => e.id === selectedId && e.service === service) ?? ALL.find((e) => e.service === service) ?? ALL[0];
   const q = query.trim().toLowerCase();
   const match = (e: FlatEntry) => !q || e.name.toLowerCase().includes(q) || e.area.toLowerCase().includes(q) || e.tags.some((t) => t.toLowerCase().includes(q));
-  const groups = GROUPED.map((g) => ({ ...g, items: g.items.filter(match) })).filter((g) => g.items.length);
+  const groups = GROUPED.map((g) => ({ ...g, items: g.items.filter((e) => e.service === service && match(e)) })).filter((g) => g.items.length);
+  const svcHasComponents = ALL.some((e) => e.service === service);
   const tokenMatches = !q || 'foundation 디자인 토큰 design tokens'.includes(q);
-  const layoutMatches = !q || 'patterns 어드민 레이아웃 admin layout'.includes(q);
+  const layoutMatches = service === 'flexg' && (!q || 'patterns 어드민 레이아웃 admin layout'.includes(q));
 
   const NavRow = ({ id, label, swatch }: { id: string; label: string; swatch?: boolean }) => {
     const on = id === selectedId;
@@ -1432,7 +1474,8 @@ export function ComponentGallery() {
           </Box>
         ))}
         {layoutMatches && (<><CatLabel>Patterns</CatLabel><NavRow id={LAYOUT_ID} label="어드민 레이아웃" /></>)}
-        {groups.length === 0 && !tokenMatches && !layoutMatches && <Text px="14px" py="10px" fontSize="12px" color="#B0B4BB">검색 결과 없음</Text>}
+        {!svcHasComponents && !q && (<><CatLabel>Components</CatLabel><Text px="14px" py="8px" fontSize="12.5px" color="#B0B4BB">컴포넌트 준비중</Text></>)}
+        {groups.length === 0 && svcHasComponents && !tokenMatches && !layoutMatches && <Text px="14px" py="10px" fontSize="12px" color="#B0B4BB">검색 결과 없음</Text>}
       </Box>
     </Flex>
   );
@@ -1449,8 +1492,20 @@ export function ComponentGallery() {
           <Text fontSize="14.5px" fontWeight="700" color="#52525B">← CONVERGENCE Docs.</Text>
         </Box>
         <Text fontSize="18px" fontWeight="800" color="#18181B" letterSpacing="-0.01em">컴포넌트 표준</Text>
+        {/* 서비스 스위처 */}
+        <Flex ml="6px" bg="#F4F4F5" borderRadius="9px" p="3px" gap="2px" display={{ base: 'none', md: 'flex' }}>
+          {SERVICES.map((s) => {
+            const on = s.id === service;
+            return (
+              <Box as="button" key={s.id} onClick={() => selectService(s.id)} px="12px" py="5px" borderRadius="7px" cursor="pointer"
+                bg={on ? '#fff' : 'transparent'} boxShadow={on ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'}>
+                <Text fontSize="12.5px" fontWeight="800" color={on ? '#18181B' : '#8A8A92'}>{s.name}</Text>
+              </Box>
+            );
+          })}
+        </Flex>
         <Box flex="1" />
-        <Text fontSize="14px" fontWeight="700" color="#A1A1AA" display={{ base: 'none', sm: 'block' }}>{TOTAL} components</Text>
+        <Text fontSize="14px" fontWeight="700" color="#A1A1AA" display={{ base: 'none', lg: 'block' }}>{ALL.filter((e) => e.service === service).length} components</Text>
       </Flex>
 
       <Flex flex="1" minH="0" position="relative">
@@ -1468,8 +1523,8 @@ export function ComponentGallery() {
         {isLayout
           ? <LayoutDoc />
           : isToken
-            ? <TokenPage key="tokens" scrollRef={scrollRef} active={active} goSec={goSec} />
-            : <ComponentPage key={selected.id} e={selected} scrollRef={scrollRef} active={active} goSec={goSec} />}
+            ? <TokenPage key={`tokens-${service}`} scrollRef={scrollRef} active={active} goSec={goSec} service={service} />
+            : <ComponentPage key={`${service}-${selected.id}`} e={selected} scrollRef={scrollRef} active={active} goSec={goSec} />}
       </Flex>
     </Flex>
   );
