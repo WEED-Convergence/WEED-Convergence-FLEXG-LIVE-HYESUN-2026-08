@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Flex, Text } from '@chakra-ui/react';
 import {
-  DOC_GROUPS, ALL_ENTRIES, AUTHOR, VERSION, DOC_TITLE, groupTitleOf,
+  DOC_GROUPS, ALL_ENTRIES, AUTHOR, DOC_TITLE, groupTitleOf,
   AREA_COLS, pageRowsInArea, STATUS_META,
   type DocEntry, type DocSection, type IndexRow,
 } from './catalog';
@@ -52,6 +52,7 @@ const IconSun = ({ s = 16, c = 'currentColor' }) => (<svg width={s} height={s} v
 const IconMoon = ({ s = 16, c = 'currentColor' }) => (<svg width={s} height={s} viewBox="0 0 24 24" {...IC} stroke={c}><path d="M20 14.5A7.5 7.5 0 0 1 9.5 4a7.5 7.5 0 1 0 10.5 10.5Z" /></svg>);
 const IconComment = ({ s = 16, c = 'currentColor' }) => (<svg width={s} height={s} viewBox="0 0 24 24" {...IC} stroke={c}><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z" /></svg>);
 const IconList = ({ s = 16, c = 'currentColor' }) => (<svg width={s} height={s} viewBox="0 0 24 24" {...IC} stroke={c}><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" /></svg>);
+const IconGrid = ({ s = 16, c = 'currentColor' }) => (<svg width={s} height={s} viewBox="0 0 24 24" {...IC} stroke={c}><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></svg>);
 const IconPanel = ({ s = 16, c = 'currentColor' }) => (<svg width={s} height={s} viewBox="0 0 24 24" {...IC} stroke={c}><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M15 4v16" /></svg>);
 const IconClose = ({ s = 16, c = 'currentColor' }) => (<svg width={s} height={s} viewBox="0 0 24 24" {...IC} stroke={c} strokeWidth={2}><path d="M6 6l12 12M18 6 6 18" /></svg>);
 const IconCheck = ({ s = 14, c = 'currentColor' }) => (<svg width={s} height={s} viewBox="0 0 24 24" {...IC} stroke={c} strokeWidth={2.4}><path d="M5 12l5 5L20 6" /></svg>);
@@ -62,14 +63,6 @@ function docIdFromPath(): string {
   const id = m?.[1] ? decodeURIComponent(m[1]) : '';
   return id && ALL_ENTRIES.some((e) => e.id === id) ? id : ALL_ENTRIES[0].id;
 }
-
-function iframeSrcFor(e: DocEntry, tab: string): string {
-  const base = e.route;
-  if (!e.tabs?.length || !tab) return base;
-  return base + (base.includes('?') ? '&' : '?') + 'tab=' + encodeURIComponent(tab);
-}
-const pathOf = (u: string) => u.split('?')[0];
-const tabOf = (u: string) => { const m = u.match(/[?&]tab=([^&]*)/); return m ? decodeURIComponent(m[1]) : ''; };
 
 interface MarkPos { mark: string; x: number; y: number; num: number }
 
@@ -170,30 +163,13 @@ export function DocsShell() {
   }, [marks]);
 
   // iframe src — 탭 있는 화면은 ?tab=활성탭 을 실어 로드
-  const iframeSrc = useMemo(() => iframeSrcFor(entry, activeTab), [entry, activeTab]);
+  const iframeSrc = useMemo(() => {
+    const base = entry.route;
+    if (!entry.tabs?.length || !activeTab) return base;
+    return base + (base.includes('?') ? '&' : '?') + 'tab=' + encodeURIComponent(activeTab);
+  }, [entry, activeTab]);
 
   const openInNew = () => window.open(iframeSrc, '_blank', 'noopener');
-
-  // 프리뷰(iframe) 안에서 버튼·하단 탭 등으로 다른 화면으로 이동하면, 좌측 트리 선택도 그 화면으로 동기화
-  const syncFromIframe = useCallback(() => {
-    const ifr = iframeRef.current;
-    if (!ifr) return;
-    let path = '';
-    try { path = ifr.contentWindow?.location.pathname ?? ''; } catch { return; }
-    if (!path) return;
-    const matched = ALL_ENTRIES.find((e) => e.route === path);
-    if (matched && matched.id !== selectedId) select(matched.id);
-  }, [selectedId, select]);
-
-  // 트리 선택·탭 변경 시엔 iframe을 목적 화면으로 이동. 단, iframe 내부 이동으로 이미 그 화면이면
-  // 다시 로드하지 않는다(불필요한 새로고침·딥링크 쿼리 손실 방지). src는 ref로 명령형 관리.
-  useEffect(() => {
-    const ifr = iframeRef.current;
-    if (!ifr) return;
-    let cur = '';
-    try { const l = ifr.contentWindow?.location; cur = l ? l.pathname + l.search : ''; } catch { cur = ''; }
-    if (pathOf(cur) !== pathOf(iframeSrc) || tabOf(cur) !== tabOf(iframeSrc)) ifr.src = iframeSrc;
-  }, [iframeSrc]);
 
   // 설명 패널에 노출할 섹션 — 활성 탭 것만(탭 없으면 전부)
   const shownSections = entry.sections.filter((s) => !s.context || s.context === activeTab);
@@ -218,13 +194,21 @@ export function DocsShell() {
       ) : (
         <Flex direction="column" w="288px" flexShrink={0} bg={t.panel} borderRight={`1px solid ${t.border}`} boxShadow={`4px 0 12px -4px ${t.shadow}`} zIndex={2}>
           {/* 헤더 */}
-          <Flex align="center" gap="8px" px="16px" pt="18px" pb="20px">
+          <Flex align="center" gap="8px" px="16px" pt="16px" pb="4px">
             <Text fontSize="17px" fontWeight="800" color={t.text} flex="1">{DOC_TITLE}</Text>
             <IconBtn t={t} title="문서 영역 접기" onClick={() => setNavCollapsed(true)}><IconMenu c={t.textSub} /></IconBtn>
           </Flex>
-          {/* 검색 — 아래 '작업페이지 한눈에 보기' 버튼과 동일 크기(px 12 · h 38) */}
-          <Box px="12px" pb="10px">
-            <Flex align="center" gap="8px" bg={t.searchBg} border={`1px solid ${t.borderSoft}`} borderRadius="9px" px="10px" h="38px">
+          {/* 컴포넌트 바로가기 — 타이틀 아래 작은 링크 */}
+          <Box px="16px" pb="12px">
+            <Flex as="button" align="center" gap="5px" onClick={() => { window.location.href = '/components'; }} cursor="pointer" title="주요 컴포넌트 카탈로그로 이동"
+              _hover={{ '& svg': { stroke: t.text }, '& p': { color: t.text } }}>
+              <IconGrid s={12} c={t.textMuted} />
+              <Text fontSize="11.5px" fontWeight="700" color={t.textMuted}>컴포넌트 바로가기 ↗</Text>
+            </Flex>
+          </Box>
+          {/* 검색 */}
+          <Box px="16px" pb="12px">
+            <Flex align="center" gap="8px" bg={t.searchBg} border={`1px solid ${t.borderSoft}`} borderRadius="9px" px="10px" h="36px">
               <IconSearch c={t.textMuted} />
               <input
                 value={query}
@@ -286,7 +270,7 @@ export function DocsShell() {
           {/* 유형 뱃지 */}
           <Text fontSize="9px" fontWeight="800" flexShrink={0} px="6px" py="2px" borderRadius="4px"
             color={entry.type === 'page' ? t.onAccent : t.chipText} bg={entry.type === 'page' ? t.accent : t.chip}>
-            {entry.type === 'page' ? '페이지' : '모달'}
+            {entry.type === 'page' ? '페이지' : '팝업'}
           </Text>
           {/* 실제 페이지 주소 — 클릭 시 새 창 */}
           <Text as="button" fontSize="12px" color={t.chipText} flexShrink={0} fontFamily="monospace" cursor="pointer"
@@ -302,12 +286,6 @@ export function DocsShell() {
           <Flex align="center" gap="5px" flexShrink={0}>
             <Text fontSize="11px" color={t.textMuted}>작성자</Text>
             <Text fontSize="12px" fontWeight="700" color={t.textSub}>{AUTHOR}</Text>
-          </Flex>
-          <Box w="1px" h="14px" bg={t.border} flexShrink={0} />
-          {/* 버전 */}
-          <Flex align="center" gap="5px" flexShrink={0}>
-            <Text fontSize="11px" color={t.textMuted}>버전</Text>
-            <Text fontSize="12px" fontWeight="700" color={t.textSub}>{VERSION}</Text>
           </Flex>
           <Box w="1px" h="14px" bg={t.border} flexShrink={0} />
           {/* 변경일 */}
@@ -357,9 +335,11 @@ export function DocsShell() {
             boxShadow={`0 6px 24px -8px ${t.shadow}`}
           >
             <iframe
+              key={entry.id}
               ref={iframeRef}
+              src={iframeSrc}
               title={entry.name}
-              onLoad={() => { syncFromIframe(); recompute(); }}
+              onLoad={recompute}
               style={{ width: '100%', height: '100%', border: 'none', display: 'block', background: '#FFFFFF' }}
             />
 
@@ -408,7 +388,7 @@ export function DocsShell() {
           <Flex align="center" gap="8px" pb="4px">
             {entry.code && <Text fontSize="11px" fontWeight="800" color={t.textMuted} bg={t.chip} px="6px" py="1px" borderRadius="5px">{entry.code}</Text>}
             <Text fontSize="10px" fontWeight="800" color={entry.type === 'page' ? t.onAccent : t.chipText} bg={entry.type === 'page' ? t.accent : t.chip} px="6px" py="2px" borderRadius="5px">
-              {entry.type === 'page' ? '페이지' : '모달'}
+              {entry.type === 'page' ? '페이지' : '팝업'}
             </Text>
           </Flex>
           <Text fontSize="20px" fontWeight="800" color={t.text} pb="2px">{entry.name}</Text>
@@ -573,7 +553,7 @@ function TypeTag({ kind, t }: { kind: 'page' | 'popup'; t: Theme }) {
   return (
     <Text fontSize="9px" fontWeight="700" flexShrink={0} px="5px" py="1px" borderRadius="4px"
       color={kind === 'page' ? t.onAccent : t.chipText} bg={kind === 'page' ? t.accent : t.chip}>
-      {kind === 'page' ? '페이지' : '모달'}
+      {kind === 'page' ? '페이지' : '팝업'}
     </Text>
   );
 }
@@ -595,7 +575,7 @@ function PageRow({ e, t, active, commentCount, collapsed, onToggle, onSelect }: 
       </Flex>
       <Text flex="1" minW="0" fontSize="14px" fontWeight="700" color={t.text} truncate>{e.name}</Text>
       <CommentBadge n={commentCount} />
-      {e.code && <TypeTag kind={e.type} t={t} />}
+      <TypeTag kind={e.type} t={t} />
       {hasChildren && <Text fontSize="10px" color={t.textMuted} flexShrink={0}>{e.children!.length}</Text>}
     </Flex>
   );
@@ -759,14 +739,12 @@ function PageIndex({ t, clArea, setClArea, clQuery, setClQuery, onSelectScreen }
                       {parentPath && <Text fontSize="10.5px" fontWeight="600" color={t.textMuted} whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" pb="1px">{parentPath} ›</Text>}
                       <Text fontSize="14px" fontWeight="800" color={t.text} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">{e.name}</Text>
                     </Box>
-                    {/* 유형 (페이지/팝업 셀 분리) · 문서 페이지(코드 없음)는 — */}
+                    {/* 유형 (페이지/팝업 셀 분리) */}
                     <Box>
-                      {e.code
-                        ? <Text as="span" fontSize="10px" fontWeight="800" color={e.type === 'page' ? t.onAccent : t.chipText} bg={e.type === 'page' ? t.accent : t.chip} px="6px" py="2px" borderRadius="4px" whiteSpace="nowrap">{e.type === 'page' ? '페이지' : '모달'}</Text>
-                        : <Text fontSize="12px" color={t.textMuted}>—</Text>}
+                      <Text as="span" fontSize="10px" fontWeight="800" color={e.type === 'page' ? t.onAccent : t.chipText} bg={e.type === 'page' ? t.accent : t.chip} px="6px" py="2px" borderRadius="4px" whiteSpace="nowrap">{e.type === 'page' ? '페이지' : '팝업'}</Text>
                     </Box>
-                    {/* 경로 · 문서 페이지는 — */}
-                    <Text fontFamily="monospace" fontSize="12px" fontWeight="700" color={t.text} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">{e.code ? (e.docPath ?? '—') : '—'}</Text>
+                    {/* 경로 */}
+                    <Text fontFamily="monospace" fontSize="12px" fontWeight="700" color={t.text} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">{e.docPath ?? '—'}</Text>
                     {/* 설명 (셀 분리 · 줄바꿈 허용) */}
                     <Text fontSize="13.5px" fontWeight="500" color={t.text} lineHeight="1.6">{e.summary || '—'}</Text>
                     {/* 상태 */}
