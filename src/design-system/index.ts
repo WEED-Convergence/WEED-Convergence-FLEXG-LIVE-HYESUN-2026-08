@@ -23,3 +23,11 @@ export {
   SectionHead, StatCard, StatusPill, PillStatCard, InfoCard, SubBox,
   LabelValueTable, KVColumns, PromoBanner, AdBanner, NoticeList, Stars,
 } from './components/flexg/admin/dashboardAtoms';
+
+// FLEXG · 모바일 앱 chrome (운영 모바일 앱 화면 조립용 표준 컴포넌트)
+// broadapp 계층에서 브랜드 무관한 공통 모바일 요소만 공개한다.
+export { StatusBar, HomeIndicator, BackArrow, Toggle } from './components/flexg/broadapp/frame';
+export {
+  Chevron, IconButton, AppButton, Dialog, BottomSheet,
+  InfoDot, FieldLabel, TextField, SelectRow,
+} from './components/flexg/broadapp/components';
