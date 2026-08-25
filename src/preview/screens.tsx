@@ -7,7 +7,11 @@
 import { useState, useEffect } from 'react';
 import { Box, Flex, Text } from '@chakra-ui/react';
 // 대시보드(홈) — 표준 컴포넌트 조합. deep import 금지, 디자인시스템 공개 배럴로만 소비.
-import { AdminLayout, SectionHead, StatCard, InfoCard, PillStatCard, KVColumns, AdBanner, NoticeList, Stars, colors, FONT as AFONT, asset } from '../design-system';
+import {
+  AdminLayout, SectionHead, StatCard, InfoCard, PillStatCard, KVColumns, AdBanner, NoticeList, Stars,
+  DataTable, FilledButton, OutlineButton, TextInput, RequiredLabel, SelectBox, Pagination, HelperText, PromoBanner,
+  colors, FONT as AFONT, asset,
+} from '../design-system';
 
 const FONT = "'Pretendard', system-ui, sans-serif"; // 화면 콘텐츠 폰트 — 전체 프리텐다드 통일
 
@@ -352,6 +356,148 @@ function Dashboard() {
             </Box>
           </Flex>
         </Flex>
+      </Box>
+    </AdminLayout>
+  );
+}
+
+// ── 라이브 단골 리스트 — 실제 서비스(어드민 › LIVE › 라이브 단골 관리, oct=1) 구성을 참고해 재현 ──
+const REGULARS_SIDEBAR_ITEMS = [
+  { label: '라이브 통계 대시보드' },
+  { label: '라이브 방송 관리' },
+  {
+    label: '라이브 단골 관리',
+    sub: [
+      { label: '단골 리스트', active: true },
+      { label: '단골 쿠폰 꾸미기' },
+      { label: '혜택 발급 설정' },
+    ],
+  },
+  { label: '라이브 채팅 관리' },
+  { label: '라이브 게임 관리' },
+  { label: '동시송출 설정' },
+  { label: '방송 녹화본' },
+];
+
+// 회원 구분 배지(기존/신규) — 아웃라인 + 점. 표준 배지(StatusPill)는 솔리드 전용이라
+// 이 화면 전용으로 임시 조립(표준 컴포넌트 미적용 — 디자인시스템 요청 대상, 우측 설명 참고).
+function RegularBadge({ tone }: { tone: 'existing' | 'new' }) {
+  const c = tone === 'new' ? colors.green : colors.gr72;
+  return (
+    <Flex border={`1px solid ${tone === 'new' ? colors.green : colors.grD8}`} borderRadius="24px" px="8px" py="3px" align="center" gap="4px" w="fit-content">
+      <Box w="5px" h="5px" borderRadius="100px" bg={c} />
+      <Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color={c} whiteSpace="nowrap">{tone === 'new' ? '신규' : '기존'}</Text>
+    </Flex>
+  );
+}
+
+type RegularRow = { no: string; name: string; tone: 'existing' | 'new'; nickname: string; phone: string; put: string; buy: string; amount: string; joinedAt: string };
+const REGULAR_ROWS: RegularRow[] = [
+  { no: '1930', name: '홍길동', tone: 'existing', nickname: '길동이님', phone: '010-1234-5678', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2024-09-24 16:02:24' },
+  { no: '1929', name: '당웨이', tone: 'new', nickname: '웨이웨이', phone: '010-1234-9999', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 14:33:20' },
+  { no: '1927', name: '카리나', tone: 'new', nickname: '겨울요정', phone: '010-1234-5678', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20' },
+  { no: '1926', name: '웬디', tone: 'existing', nickname: '웬디트리', phone: '010-1234-5638', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20' },
+  { no: '1925', name: '크리스탈', tone: 'new', nickname: '수정님', phone: '010-1334-5678', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20' },
+  { no: '1924', name: '공유', tone: 'existing', nickname: '도깨비', phone: '010-1134-5678', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20' },
+  { no: '1923', name: '공명', tone: 'new', nickname: '공블리', phone: '010-1234-5578', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20' },
+  { no: '1922', name: '태민', tone: 'existing', nickname: '카이로스', phone: '010-1236-5678', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20' },
+];
+
+function LiveRegulars() {
+  const LinkText = ({ children }: { children: React.ReactNode }) => (
+    <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.green} cursor="pointer" whiteSpace="nowrap">{children}</Text>
+  );
+  return (
+    <AdminLayout navActive="LIVE" sidebar={{ items: REGULARS_SIDEBAR_ITEMS }}>
+      <Box fontFamily={AFONT} color={colors.gr42} minW="1200px">
+        {/* 1. 검색 조건 */}
+        <SectionHead title="라이브 단골 검색" />
+        <Box data-doc-mark="search" bg="white" border={`1px solid ${colors.grE8}`} borderRadius="12px" p="24px" mb="32px">
+          <Flex gap="20px">
+            <Box flex="1"><RequiredLabel label="이름" required={false} /><TextInput placeholder="이름 입력" width="100%" /></Box>
+            <Box flex="1"><RequiredLabel label="닉네임" required={false} /><TextInput placeholder="닉네임 입력" width="100%" /></Box>
+            <Box flex="1"><RequiredLabel label="연락처" required={false} /><TextInput placeholder="연락처 입력" width="100%" /></Box>
+          </Flex>
+          <Flex justify="center" gap="8px" pt="20px">
+            <FilledButton label="초기화" bg={colors.bcSub} />
+            <FilledButton label="검색" bg={colors.bcPoint} />
+          </Flex>
+        </Box>
+
+        {/* 2. 목록 타이틀 */}
+        <Flex align="baseline" gap="8px" pb="14px">
+          <Text fontFamily={AFONT} fontWeight="700" fontSize="18px" color={colors.gr42} letterSpacing="-0.36px">라이브 단골 리스트</Text>
+          <Text fontFamily={AFONT} fontSize="12px" color={colors.gr92}>전체 16개 (페이지 1/9)</Text>
+        </Flex>
+
+        {/* 3. 안내 배너 */}
+        <Box data-doc-mark="promo" mb="24px">
+          <PromoBanner bg="#2A2A2A" h="auto">
+            <Flex align="center" gap="24px" py="6px">
+              <Flex direction="column" align="flex-start" gap="8px" flexShrink={0}>
+                <Flex bg={colors.red} borderRadius="4px" px="6px" py="2px"><Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color="white">LIVE</Text></Flex>
+                <Text fontFamily={AFONT} fontWeight="700" fontSize="17px" color="white" lineHeight="1.3">라이브는 실감나게</Text>
+                <Flex gap="6px" pt="2px">
+                  <FilledButton label="단골 가입 URL 복사" bg={colors.red} />
+                  <FilledButton label="바로가기 ›" bg={colors.gr72} />
+                </Flex>
+              </Flex>
+              <Box w="1px" alignSelf="stretch" bg="rgba(255,255,255,0.15)" />
+              <Flex direction="column" gap="4px">
+                <Text fontFamily={AFONT} fontSize="12px" color="rgba(255,255,255,0.75)">· 라이브 단골 기능은 라이브 관련 소식을 받을 수 있는 기능입니다.</Text>
+                <Text fontFamily={AFONT} fontSize="12px" color="rgba(255,255,255,0.75)">· 단골 가입페이지를 공유하거나 인스타그램, 카카오톡 프로필 등에 등록하여 단골을 늘려보세요.</Text>
+                <Text fontFamily={AFONT} fontSize="12px" color="rgba(255,255,255,0.75)">· 단골고객에게 대기/진행중인 방송 알림톡을 발송할 수 있습니다.</Text>
+              </Flex>
+            </Flex>
+          </PromoBanner>
+        </Box>
+
+        {/* 4. 회원 구분 필터 + 정렬 */}
+        <Flex data-doc-mark="filter" align="center" pb="14px" gap="10px">
+          <FilledButton label="전체" bg={colors.gr42} />
+          <OutlineButton label="기존 회원" />
+          <OutlineButton label="신규 회원" />
+          <HelperText>신규 6 · 기존 5 ⓘ 라이브를 보다가 그 자리에서 가입한 회원을 「신규」로 봅니다.</HelperText>
+          <Box flex="1" />
+          <SelectBox label="가입순" width="120px" options={['가입순', '이름순']} />
+          <SelectBox label="100개씩 보기" width="150px" options={['20개씩 보기', '50개씩 보기', '100개씩 보기']} />
+        </Flex>
+
+        {/* 5. 선택 대상 일괄 발송 */}
+        <Flex data-doc-mark="actions" align="center" gap="8px" pb="10px">
+          <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.gr72}>선택한 대상</Text>
+          <FilledButton label="알림톡 발송" bg={colors.bcDefault} />
+          <OutlineButton label="전체 고객 발송" />
+        </Flex>
+
+        {/* 6. 단골 리스트 표 */}
+        <Box data-doc-mark="table" pb="4px">
+          <DataTable
+            columns={[
+              { header: ['No'], w: '90px' },
+              { header: ['이름'], w: '90px' },
+              { header: ['회원 구분'], w: '96px' },
+              { header: ['닉네임'], w: '110px' },
+              { header: ['연락처'], flex: '1.1' },
+              { header: ['총 담은 횟수', '총 구매횟수', '총 구매금액'], flex: '1.4' },
+              { header: ['단골 등록일'], w: '190px' },
+            ]}
+            rows={REGULAR_ROWS.map((r) => [
+              <Flex align="center" gap="8px"><Box w="14px" h="14px" borderRadius="3px" border={`1px solid ${colors.grD8}`} flexShrink={0} /><Text>{r.no}</Text></Flex>,
+              <LinkText>{r.name}</LinkText>,
+              <RegularBadge tone={r.tone} />,
+              r.nickname,
+              <LinkText>{r.phone}</LinkText>,
+              <Flex direction="column" gap="2px" align="center"><Text>{r.put}</Text><Text>{r.buy}</Text><Text>{r.amount}</Text></Flex>,
+              r.joinedAt,
+            ])}
+          />
+        </Box>
+
+        {/* 7. 페이지네이션 */}
+        <Box data-doc-mark="pagination">
+          <Pagination />
+        </Box>
       </Box>
     </AdminLayout>
   );
@@ -710,6 +856,8 @@ export function DemoScreen() {
   switch (path) {
     case 'overview': return <Overview />;
     case 'dashboard': return <Dashboard />;
+    case 'live-regulars': return <LiveRegulars />;
+    case 'discount-code': return <LiveRegulars />;
     case 'item-detail': return <ItemDetail />;
     case 'viewer': return <Viewer />;
     default: return <Screen><Text>알 수 없는 프리뷰: {path}</Text></Screen>;
