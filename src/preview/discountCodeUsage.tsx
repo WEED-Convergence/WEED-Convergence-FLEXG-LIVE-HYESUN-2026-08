@@ -33,22 +33,22 @@ type UsageRow = {
   userId: string; name: string; phone: string; email: string;
 };
 const USAGE_ROWS: UsageRow[] = [
-  { no: 61, division: '일반', orderedAt: '2026-07-23 12:03:56', orderNo: 'WAB260723-00000001', code: '할인해주세요', kind: '500,000원', env: 'Web', userId: 'alwns1234', name: '정민준', phone: '010-4132-6396', email: 'alwns7984@naver.com' },
-  { no: 60, division: '일반', orderedAt: '2026-05-21 16:44:49', orderNo: 'WAB260521-00000002', code: '할인해주세요', kind: '500,000원', env: 'Web', userId: 'ziny123', name: '이진희', phone: '010-5215-3068', email: 'testflexg' },
-  { no: 59, division: '일반', orderedAt: '2026-02-26 15:10:42', orderNo: 'WAB260226-00000015', code: '할인해주세요', kind: '500,000원', env: 'Web', userId: 'testtest1', name: '진혜정', phone: '010-8775-0330', email: 'testflexg' },
-  { no: 58, division: '일반', orderedAt: '2026-02-26 14:42:59', orderNo: 'WAB260226-00000012', code: '할인해주세요', kind: '500,000원', env: 'Web', userId: 'testtest1', name: '진혜정', phone: '010-8775-0330', email: 'testflexg' },
-  { no: 57, division: '일반', orderedAt: '2026-02-26 14:35:38', orderNo: 'WAB260226-00000010', code: '할인해주세요', kind: '500,000원', env: 'Web', userId: '테스트', name: '-', phone: '010-0000-0000', email: '-' },
-  { no: 56, division: '일반', orderedAt: '2026-02-26 14:21:56', orderNo: 'WAB260226-00000008', code: '할인해주세요', kind: '500,000원', env: 'Web', userId: 'alwns1234', name: '정민준', phone: '010-4132-6396', email: 'alwns7984@naver.com' },
-  { no: 55, division: '일반', orderedAt: '2026-02-26 14:20:47', orderNo: 'WAB260226-00000007', code: '할인해주세요', kind: '500,000원', env: 'Web', userId: 'alwns1234', name: '정민준', phone: '010-4132-6396', email: 'alwns7984@naver.com' },
-  { no: 54, division: '일반', orderedAt: '2026-02-26 14:07:12', orderNo: 'WAB260226-00000004', code: '할인코드취소주문금액할인코드취소', kind: '10,000원', env: 'Web', userId: 'jinhee1', name: '이진희', phone: '010-0000-0000', email: '-' },
+  { no: 61, division: '라이브', orderedAt: '2026-07-23 12:03:56', orderNo: 'WAB260723-00000001', code: '할인해주세요', kind: '500,000원', env: 'Web', userId: 'alwns1234', name: '정민준', phone: '010-4132-6396', email: 'alwns7984@naver.com' },
+  { no: 60, division: '라이브', orderedAt: '2026-05-21 16:44:49', orderNo: 'WAB260521-00000002', code: '할인해주세요', kind: '500,000원', env: 'Web', userId: 'ziny123', name: '이진희', phone: '010-5215-3068', email: 'testflexg' },
+  { no: 59, division: '라이브', orderedAt: '2026-02-26 15:10:42', orderNo: 'WAB260226-00000015', code: '할인해주세요', kind: '500,000원', env: 'Web', userId: 'testtest1', name: '진혜정', phone: '010-8775-0330', email: 'testflexg' },
+  { no: 58, division: '라이브', orderedAt: '2026-02-26 14:42:59', orderNo: 'WAB260226-00000012', code: '할인해주세요', kind: '500,000원', env: 'Web', userId: 'testtest1', name: '진혜정', phone: '010-8775-0330', email: 'testflexg' },
+  { no: 57, division: '라이브', orderedAt: '2026-02-26 14:35:38', orderNo: 'WAB260226-00000010', code: '할인해주세요', kind: '500,000원', env: 'Web', userId: '테스트', name: '-', phone: '010-0000-0000', email: '-' },
+  { no: 56, division: '라이브', orderedAt: '2026-02-26 14:21:56', orderNo: 'WAB260226-00000008', code: '할인해주세요', kind: '500,000원', env: 'Web', userId: 'alwns1234', name: '정민준', phone: '010-4132-6396', email: 'alwns7984@naver.com' },
+  { no: 55, division: '라이브', orderedAt: '2026-02-26 14:20:47', orderNo: 'WAB260226-00000007', code: '할인해주세요', kind: '500,000원', env: 'Web', userId: 'alwns1234', name: '정민준', phone: '010-4132-6396', email: 'alwns7984@naver.com' },
+  { no: 54, division: '라이브', orderedAt: '2026-02-26 14:07:12', orderNo: 'WAB260226-00000004', code: '할인코드취소주문금액할인코드취소', kind: '10,000원', env: 'Web', userId: 'jinhee1', name: '이진희', phone: '010-0000-0000', email: '-' },
 ];
 
 // 라벨 + 입력을 한 줄에 나란히 놓는 검색 필드(이 화면 전용 레이아웃)
 function FieldRow({ label, labelWidth = '64px', children }: { label: string; labelWidth?: string; children: React.ReactNode }) {
   return (
-    <Flex align="center" gap="10px" flex="1" minW="0">
+    <Flex align="center" gap="10px" flexShrink={0}>
       <Text fontFamily={FONT} fontWeight="700" fontSize="13px" color={colors.gr42} whiteSpace="nowrap" w={labelWidth} flexShrink={0}>{label}</Text>
-      <Box flex="1" minW="0">{children}</Box>
+      {children}
     </Flex>
   );
 }
@@ -72,7 +72,7 @@ function DownloadGlyph() {
 }
 
 export function DiscountCodeUsage() {
-  const [division, setDivision] = useState<'일반' | 'CRM'>('일반');
+  const [division, setDivision] = useState<'일반' | 'CRM' | '라이브'>('일반');
   const [orderNoQ, setOrderNoQ] = useState('');
   const [codeQ, setCodeQ] = useState('');
   const [dateFrom, setDateFrom] = useState('');
@@ -105,12 +105,13 @@ export function DiscountCodeUsage() {
               <Text fontFamily={FONT} fontWeight="700" fontSize="13px" color={colors.gr42} whiteSpace="nowrap">구분</Text>
               <Radio checked={division === '일반'} label="일반" onClick={() => setDivision('일반')} />
               <Radio checked={division === 'CRM'} label="CRM" onClick={() => setDivision('CRM')} />
+              <Radio checked={division === '라이브'} label="라이브" onClick={() => setDivision('라이브')} />
             </Flex>
             <FieldRow label="주문번호">
-              <LInput value={orderNoQ} onChange={setOrderNoQ} placeholder="주문번호 입력" width="100%" />
+              <LInput value={orderNoQ} onChange={setOrderNoQ} placeholder="주문번호 입력" width="220px" />
             </FieldRow>
             <FieldRow label="할인코드">
-              <LInput value={codeQ} onChange={setCodeQ} placeholder="할인코드 입력" width="100%" />
+              <LInput value={codeQ} onChange={setCodeQ} placeholder="할인코드 입력" width="220px" />
             </FieldRow>
           </Flex>
           <Box borderTop={`1px solid ${colors.grE8}`} pt="20px" pb="20px">
@@ -126,7 +127,6 @@ export function DiscountCodeUsage() {
                   <QuickRangeButton key={q} label={q} active={quick === q} onClick={() => setQuick(q)} />
                 ))}
               </Flex>
-              <Box flex="1" />
               <Flex align="center" gap="14px" flexShrink={0}>
                 <Text fontFamily={FONT} fontWeight="700" fontSize="13px" color={colors.gr42} whiteSpace="nowrap">사용 환경</Text>
                 <Radio checked={env === '전체'} label="전체" onClick={() => setEnv('전체')} />
@@ -143,10 +143,10 @@ export function DiscountCodeUsage() {
           </Box>
           <Box borderTop={`1px solid ${colors.grE8}`} pt="20px">
             <Flex align="center" gap="24px" wrap="wrap">
-              <FieldRow label="아이디"><LInput value={idQ} onChange={setIdQ} placeholder="아이디 입력" width="100%" /></FieldRow>
-              <FieldRow label="이름"><LInput value={nameQ} onChange={setNameQ} placeholder="이름 입력" width="100%" /></FieldRow>
-              <FieldRow label="연락처"><LInput value={phoneQ} onChange={setPhoneQ} placeholder="연락처 입력" width="100%" /></FieldRow>
-              <FieldRow label="이메일"><LInput value={emailQ} onChange={setEmailQ} placeholder="이메일 주소 입력" width="100%" /></FieldRow>
+              <FieldRow label="아이디"><LInput value={idQ} onChange={setIdQ} placeholder="아이디 입력" width="220px" /></FieldRow>
+              <FieldRow label="이름"><LInput value={nameQ} onChange={setNameQ} placeholder="이름 입력" width="220px" /></FieldRow>
+              <FieldRow label="연락처"><LInput value={phoneQ} onChange={setPhoneQ} placeholder="연락처 입력" width="220px" /></FieldRow>
+              <FieldRow label="이메일"><LInput value={emailQ} onChange={setEmailQ} placeholder="이메일 주소 입력" width="220px" /></FieldRow>
             </Flex>
           </Box>
         </Box>
