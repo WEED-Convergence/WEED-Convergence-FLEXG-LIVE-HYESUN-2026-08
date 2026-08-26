@@ -516,7 +516,7 @@ function ItemDetail() {
           <Box data-doc-mark="form">
             <Field label="항목명" value="신규 캠페인 A" />
             <Field label="상태" value="진행중" />
-            <Field label="담당자" value="김희연" />
+            <Field label="담당자" value="최혜선" />
           </Box>
         </Box>
         {/* 2. 하단 액션 */}
@@ -524,30 +524,6 @@ function ItemDetail() {
           <Flex px="16px" h="40px" border="1px solid #E5E7EB" borderRadius="9px" align="center" fontSize="14px" color="#DC2626">삭제</Flex>
           <Flex px="16px" h="40px" border="1px solid #E5E7EB" borderRadius="9px" align="center" fontSize="14px">닫기</Flex>
           <Flex px="20px" h="40px" bg="#3F3F46" color="#fff" borderRadius="9px" align="center" fontWeight="700" fontSize="14px">저장</Flex>
-        </Flex>
-      </Box>
-    </Box>
-  );
-}
-
-// ── 뷰어 홈 ──
-function Viewer() {
-  return (
-    <Box minH="100dvh" bg="#fff" fontFamily={FONT} color="#111827">
-      {/* 1. 히어로 배너 */}
-      <Box data-doc-mark="hero" h="240px" bgGradient="linear(to-r, #6D28D9, #DB2777)" bg="#7C3AED" display="flex" alignItems="flex-end" p="28px">
-        <Box><Text color="#fff" fontSize="13px" opacity={0.85} mb="6px">오늘의 라이브</Text><Text color="#fff" fontSize="28px" fontWeight="800">여름 특가 라이브 방송</Text></Box>
-      </Box>
-      {/* 2. 콘텐츠 카드 */}
-      <Box p="24px">
-        <Text fontSize="18px" fontWeight="800" mb="16px">추천 콘텐츠</Text>
-        <Flex data-doc-mark="grid" gap="16px" flexWrap="wrap">
-          {[1, 2, 3, 4].map((i) => (
-            <Box key={i} w="calc(50% - 8px)" bg="#F7F8FA" border="1px solid #EEF0F3" borderRadius="14px" overflow="hidden">
-              <Box h="120px" bg="#E5E7EB" />
-              <Box p="14px"><Text fontSize="15px" fontWeight="700" mb="4px">콘텐츠 {i}</Text><Text fontSize="13px" color="#6B7280">한 줄 설명이 들어갑니다</Text></Box>
-            </Box>
-          ))}
         </Flex>
       </Box>
     </Box>
@@ -596,7 +572,7 @@ function Overview() {
     { k: '페이지', v: '어드민 (관리자)' },
     { k: '화면 수', v: '1 (홈 대시보드)' },
     { k: '상태', v: '검토중' },
-    { k: '작성자', v: '김희연' },
+    { k: '작성자', v: '최혜선' },
     { k: '최종 수정', v: '2026-07-10' },
   ];
   const goals: { t: string; d: string }[] = [
@@ -859,7 +835,6 @@ export function DemoScreen() {
     case 'live-regulars': return <LiveRegulars />;
     case 'discount-code': return <LiveRegulars />;
     case 'item-detail': return <ItemDetail />;
-    case 'viewer': return <Viewer />;
     default: return <Screen><Text>알 수 없는 프리뷰: {path}</Text></Screen>;
   }
 }

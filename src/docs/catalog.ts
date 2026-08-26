@@ -57,7 +57,7 @@ export interface DocGroup {
   entries: DocEntry[];
 }
 
-export const AUTHOR = '컨버전스 김희연';
+export const AUTHOR = '컨버전스 최혜선';
 export const DOC_TITLE = 'CONVERGENCE Docs.';
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -184,7 +184,6 @@ export const DOC_GROUPS: DocGroup[] = [
       },
       {
         id: 'discount-code',
-        code: 'ADM-P003',
         name: '할인코드',
         docPath: '/admin/discount-code',
         route: '/preview/discount-code',
@@ -192,7 +191,7 @@ export const DOC_GROUPS: DocGroup[] = [
         type: 'page',
         updatedAt: '2026-08-25',
         status: '작성중',
-        summary: '라이브 방송 소식을 받기로 가입한 단골 고객을 검색·조회하고, 선택 대상에게 알림톡을 발송하는 어드민 화면.',
+        summary: '',
         common:
           '1) 실제 서비스 화면(어드민 › LIVE › 라이브 단골 관리 › 단골 리스트)을 참고해 동일 구성으로 재현함\n2) 표준 셸(상단 네비 + 좌측 사이드바 + 푸터) 사용, 상단 네비는 LIVE 활성 · 좌측은 라이브 단골 관리 › 단골 리스트 활성\n3) 검색 → 회원 구분 필터 → 선택 발송 → 목록 확인 순으로 사용함',
         sections: [
@@ -228,36 +227,7 @@ export const DOC_GROUPS: DocGroup[] = [
   },
   {
     title: '고객뷰어',
-    entries: [
-      {
-        id: 'viewer-home',
-        code: 'VW-P001',
-        name: '뷰어 홈',
-        docPath: '/viewer',
-        route: '/preview/viewer',
-        breadcrumb: '고객뷰어 › 홈',
-        type: 'page',
-        updatedAt: '2026-07-08',
-        status: '작성중',
-        summary: '고객이 처음 보는 화면.',
-        common:
-          '1) 상단 히어로 배너 + 콘텐츠 카드 그리드로 구성함\n2) 로그인 전/후로 노출·액션이 달라짐(아래 표)',
-        sections: [
-          { title: '히어로 배너', badge: 'HERO', mark: 'hero',
-            body: '1) 대표 콘텐츠를 큰 배너로 노출\n2) 클릭 시 상세로 이동\n※ 표준 컴포넌트 없이 임시 조립 — 디자인시스템에 히어로 표준 필요(요청 대상)' },
-          { title: '콘텐츠 카드', badge: 'GRID', mark: 'grid',
-            body: '1) 콘텐츠를 카드 그리드로 나열\n2) 스크롤 하단 도달 시 추가 로드\n예외) 결과 없으면 빈 상태 안내\n※ 표준 카드 컴포넌트 미적용 — 디자인시스템 정식 카드로 교체 예정' },
-        ],
-        stateTable: {
-          caption: '로그인 상태별',
-          headers: ['상태', '찜하기', '구매'],
-          rows: [
-            ['로그인 전', 'X (로그인 유도)', 'X'],
-            ['로그인 후', 'O', 'O'],
-          ],
-        },
-      },
-    ],
+    entries: [],
   },
 ];
 
