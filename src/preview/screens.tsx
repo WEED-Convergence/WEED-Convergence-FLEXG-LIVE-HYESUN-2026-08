@@ -632,28 +632,31 @@ function RibbonGlyph() {
     </svg>
   );
 }
-type AlimtalkTemplate = { id: string; label: string; title: string; body: string; imageGradient: string };
+type AlimtalkTemplate = { id: string; label: string; title: string; body: string; imageFrom: string; imageTo: string };
 const ALIMTALK_TEMPLATES: AlimtalkTemplate[] = [
   {
     id: 'welcome',
     label: '할인코드 발급 안내',
     title: '[할인코드 발급 안내]\n라이브 단골 전용 혜택이\n도착했어요!',
     body: '안녕하세요, 고객님 :)\n라이브 단골 고객님께만 드리는\n특별 할인코드를 보내드려요.\n\n▶ 사용기간 : 발급일로부터 7일\n▶ 사용방법 : 결제 시 코드 입력\n\n지금 바로 확인해보세요!',
-    imageGradient: 'linear(135deg, #7C3AED, #DB2777)',
+    imageFrom: '#7C3AED',
+    imageTo: '#DB2777',
   },
   {
     id: 'limited',
     label: '한정 할인코드',
     title: '[한정 할인코드]\n놓치면 아쉬운 혜택,\n지금 확인하세요',
     body: '고객님을 위한\n한정 수량 할인코드가\n도착했습니다.\n\n▶ 대상 : 라이브 단골 고객\n▶ 유효기간 : 발급일로부터 7일\n\n서두르세요, 한정 수량이에요!',
-    imageGradient: 'linear(135deg, #F59E0B, #EF4444)',
+    imageFrom: '#F59E0B',
+    imageTo: '#EF4444',
   },
   {
     id: 'thanks',
     label: '단골 고객 감사 쿠폰',
     title: '[단골 고객 감사 쿠폰]\n항상 함께해주셔서\n감사합니다',
     body: '늘 저희 라이브를\n찾아주시는 고객님께\n감사한 마음을 담았어요.\n\n▶ 전용 할인코드가 발급되었습니다\n▶ 사용기간 : 발급일로부터 7일\n\n소중한 마음, 잊지 않을게요!',
-    imageGradient: 'linear(135deg, #10B981, #059669)',
+    imageFrom: '#10B981',
+    imageTo: '#059669',
   },
 ];
 function AlimtalkCard({ tpl, selected, onSelect }: { tpl: AlimtalkTemplate; selected: boolean; onSelect: () => void }) {
@@ -669,7 +672,7 @@ function AlimtalkCard({ tpl, selected, onSelect }: { tpl: AlimtalkTemplate; sele
           <KakaoGlyph />
           <Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color="#3A1D1D">알림톡 도착</Text>
         </Flex>
-        <Box w="100%" position="relative" bgGradient={tpl.imageGradient} borderRadius="10px 10px 0 0" overflow="hidden" p="12px" minH="86px">
+        <Box w="100%" position="relative" bgGradient="to-br" gradientFrom={tpl.imageFrom} gradientTo={tpl.imageTo} borderRadius="10px 10px 0 0" overflow="hidden" p="12px" minH="86px">
           <RibbonGlyph />
           {tpl.title.split('\n').map((line, i) => (
             <Text key={`t${i}`} position="relative" fontFamily={AFONT} fontWeight="700" fontSize="13px" color="white" lineHeight="1.5">{line}</Text>
