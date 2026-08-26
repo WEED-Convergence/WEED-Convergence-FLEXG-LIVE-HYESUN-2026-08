@@ -592,33 +592,49 @@ function RibbonGlyph() {
     </svg>
   );
 }
-type AlimtalkTemplate = { id: string; label: string; title: string; body: string; imageFrom: string; imageTo: string };
+// 이미지 영역 「단골고객 안내」 문구 위 간단한 안내 아이콘 — 실제 등록 시엔 업로드 이미지로 대체되는 자리 표시
+function NoticeGlyph() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="11" fill="rgba(255,255,255,0.22)" />
+      <path d="M12 6.5v7" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="12" cy="16.5" r="1.1" fill="white" />
+    </svg>
+  );
+}
+type AlimtalkTemplate = { id: string; type: 'A' | 'B' | 'C'; label: string; title: string; body: string; imageFrom: string; imageTo: string };
 const ALIMTALK_TEMPLATES: AlimtalkTemplate[] = [
   {
     id: 'welcome',
+    type: 'A',
     label: '할인코드 발급 안내',
-    title: '[할인코드 발급 안내]\n라이브 단골 전용 혜택이\n도착했어요!',
-    body: '안녕하세요, 고객님 :)\n라이브 단골 고객님께만 드리는\n특별 할인코드를 보내드려요.\n\n▶ 사용기간 : 발급일로부터 7일\n▶ 사용방법 : 결제 시 코드 입력\n\n지금 바로 확인해보세요!',
+    title: '단골고객 안내',
+    body: '안녕하세요, 고객님 :)\n라이브 단골 고객님께만 드리는\n특별 할인코드를 보내드려요.\n\n▶ 사용기간 : 발급일로부터 3일\n▶ 사용방법 : 결제 시 코드 입력\n\n지금 바로 확인해보세요!',
     imageFrom: '#7C3AED',
     imageTo: '#DB2777',
   },
   {
     id: 'limited',
+    type: 'B',
     label: '한정 할인코드',
-    title: '[한정 할인코드]\n놓치면 아쉬운 혜택,\n지금 확인하세요',
-    body: '고객님을 위한\n한정 수량 할인코드가\n도착했습니다.\n\n▶ 대상 : 라이브 단골 고객\n▶ 유효기간 : 발급일로부터 7일\n\n서두르세요, 한정 수량이에요!',
+    title: '단골고객 안내',
+    body: '고객님을 위한\n한정 수량 할인코드가\n도착했습니다.\n\n▶ 대상 : 라이브 단골 고객\n▶ 유효기간 : 발급일로부터 3일\n\n서두르세요, 한정 수량이에요!',
     imageFrom: '#F59E0B',
     imageTo: '#EF4444',
   },
   {
     id: 'thanks',
+    type: 'C',
     label: '단골 고객 감사 쿠폰',
-    title: '[단골 고객 감사 쿠폰]\n항상 함께해주셔서\n감사합니다',
-    body: '늘 저희 라이브를\n찾아주시는 고객님께\n감사한 마음을 담았어요.\n\n▶ 전용 할인코드가 발급되었습니다\n▶ 사용기간 : 발급일로부터 7일\n\n소중한 마음, 잊지 않을게요!',
+    title: '단골고객 안내',
+    body: '늘 저희 라이브를\n찾아주시는 고객님께\n감사한 마음을 담았어요.\n\n▶ 전용 할인코드가 발급되었습니다\n▶ 사용기간 : 발급일로부터 3일\n\n소중한 마음, 잊지 않을게요!',
     imageFrom: '#10B981',
     imageTo: '#059669',
   },
 ];
+// 발송내역에서 발송 당시 선택한 템플릿명(라벨)으로 타입(A/B/C)을 역조회
+const templateTypeOf = (label: string) => ALIMTALK_TEMPLATES.find((t) => t.label === label)?.type ?? '';
+
 function AlimtalkCard({ tpl, selected, onSelect }: { tpl: AlimtalkTemplate; selected: boolean; onSelect: () => void }) {
   return (
     <Box as="button" onClick={onSelect} position="relative" w="200px" flexShrink={0} textAlign="left"
@@ -627,13 +643,18 @@ function AlimtalkCard({ tpl, selected, onSelect }: { tpl: AlimtalkTemplate; sele
         border={`1.5px solid ${selected ? colors.blue : colors.grD8}`} align="center" justify="center" zIndex={1}>
         {selected && <Box w="8px" h="8px" borderRadius="100px" bg={colors.blue} />}
       </Flex>
+      <Flex position="absolute" top="8px" right="8px" bg={colors.gr42} borderRadius="10px" px="8px" py="3px" zIndex={1}>
+        <Text fontFamily={AFONT} fontWeight="800" fontSize="11px" color="white" whiteSpace="nowrap">{tpl.type}타입</Text>
+      </Flex>
       <Flex direction="column" align="center" bg={colors.grF8} borderRadius="12px" p="18px 12px 12px">
         <Flex align="center" gap="4px" bg="#FAE100" borderRadius="14px" px="10px" py="4px" mb="12px">
           <KakaoGlyph />
           <Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color="#3A1D1D">알림톡 도착</Text>
         </Flex>
-        <Box w="100%" position="relative" bgGradient="to-br" gradientFrom={tpl.imageFrom} gradientTo={tpl.imageTo} borderRadius="10px 10px 0 0" overflow="hidden" p="12px" minH="86px">
+        <Box w="100%" position="relative" bgGradient="to-br" gradientFrom={tpl.imageFrom} gradientTo={tpl.imageTo} borderRadius="10px 10px 0 0" overflow="hidden" p="12px" minH="86px"
+          display="flex" flexDirection="column" alignItems="center" justifyContent="center" gap="6px">
           <RibbonGlyph />
+          <NoticeGlyph />
           {tpl.title.split('\n').map((line, i) => (
             <Text key={`t${i}`} position="relative" fontFamily={AFONT} fontWeight="700" fontSize="13px" color="white" lineHeight="1.5">{line}</Text>
           ))}
@@ -696,7 +717,7 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
 
   return (
     <Box position="fixed" inset="0" bg="rgba(17,24,39,0.45)" zIndex={1000} display="flex" alignItems="center" justifyContent="center" p="24px" onClick={onClose}>
-      <Box bg="white" borderRadius="12px" w="880px" maxW="100%" maxH="88vh" overflowY="auto" boxShadow="0 20px 60px rgba(0,0,0,0.3)" onClick={(e) => e.stopPropagation()}>
+      <Box bg="white" borderRadius="12px" w="1180px" maxW="96vw" maxH="88vh" overflowY="auto" boxShadow="0 20px 60px rgba(0,0,0,0.3)" onClick={(e) => e.stopPropagation()}>
         <Flex px="24px" py="16px" borderBottom="1px solid #F0F1F3" align="center" justify="space-between">
           <Text fontFamily={AFONT} fontWeight="800" fontSize="17px" color={colors.gr42}>할인코드</Text>
           <Box as="button" onClick={onClose} cursor="pointer"><Text fontSize="18px" color={colors.gr72}>×</Text></Box>
@@ -712,7 +733,7 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
               <Text fontFamily={AFONT} fontSize="12px" color={colors.gr92} pb="14px">선택한 대상 {targetCount}명에게 할인코드를 발급·발송합니다.</Text>
               <Section title="할인코드 등록" note>
                 <Row label="사용여부">
-                  <Box opacity={0.55} pointerEvents="none"><Toggle on={true} onToggle={() => {}} /></Box>
+                  <Box pointerEvents="none"><Toggle on={true} onToggle={() => {}} /></Box>
                   <HelperText>신규 등록 시 사용여부는 항상 ON으로 고정됩니다.</HelperText>
                 </Row>
                 <Row label="할인코드">
@@ -783,27 +804,28 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
                 <DataTable
                   columns={[
                     { header: ['이름', '휴대폰번호'], flex: '1.1' },
-                    { header: ['닉네임'], w: '100px' },
-                    { header: ['회원 구분'], w: '90px' },
+                    { header: ['닉네임', '회원 구분'], w: '120px' },
                     { header: ['아이디', '이메일'], flex: '1.2' },
-                    { header: ['가입일'], w: '160px' },
-                    { header: ['최종 로그인 일자', '최근 구매일'], w: '130px' },
-                    { header: ['로그인 횟수'], w: '90px' },
-                    { header: ['마케팅 수신 동의'], w: '110px' },
-                    { header: ['처리내역'], w: '100px' },
-                    { header: ['발송일'], w: '100px' },
+                    { header: ['가입일'], w: '150px' },
+                    { header: ['최종 로그인 일자', '최근 구매일'], w: '120px' },
+                    { header: ['로그인 횟수'], w: '80px' },
+                    { header: ['마케팅 수신 동의'], w: '100px' },
+                    { header: ['알림톡 템플릿'], w: '120px' },
+                    { header: ['처리내역', '발송일'], w: '100px' },
                   ]}
                   rows={history.filter((h) => h.sentAt === historyDate).map((h) => [
                     <Flex direction="column" gap="2px" align="center"><Text>{h.name}</Text><Text color={colors.gr92}>{h.phone}</Text></Flex>,
-                    h.nickname,
-                    <RegularBadge tone={h.tone} />,
+                    <Flex direction="column" gap="4px" align="center"><Text>{h.nickname}</Text><RegularBadge tone={h.tone} /></Flex>,
                     <Flex direction="column" gap="2px" align="center"><Text>{h.userId}</Text><Text color={colors.gr92}>{h.email}</Text></Flex>,
                     h.joinedAt,
                     <Flex direction="column" gap="2px" align="center"><Text>{h.lastLogin}</Text><Text color={colors.gr92}>{h.lastPurchase}</Text></Flex>,
                     h.loginCount,
                     h.marketingAgree ? '동의' : '미동의',
-                    <Flex bg={colors.green} borderRadius="4px" px="8px" py="3px" w="fit-content"><Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color="white">발송완료</Text></Flex>,
-                    h.sentAt,
+                    <Flex direction="column" gap="2px" align="center"><Text fontFamily={AFONT} fontWeight="700" color={colors.gr42}>{templateTypeOf(h.template)}타입</Text><Text color={colors.gr92}>{h.template}</Text></Flex>,
+                    <Flex direction="column" gap="4px" align="center">
+                      <Flex bg={colors.green} borderRadius="4px" px="8px" py="3px" w="fit-content"><Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color="white">발송완료</Text></Flex>
+                      <Text>{h.sentAt}</Text>
+                    </Flex>,
                   ])}
                 />
               </>
