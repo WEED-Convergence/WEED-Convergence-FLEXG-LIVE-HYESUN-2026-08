@@ -212,6 +212,27 @@ export const DOC_GROUPS: DocGroup[] = [
             components: ['DataTable', 'LCheck'] },
         ],
       },
+      {
+        id: 'discount-code-usage',
+        name: '할인코드 사용내역',
+        docPath: '/admin/discount-code-usage',
+        route: '/preview/discount-code-usage',
+        breadcrumb: '어드민 › 회원 › 할인코드 사용내역',
+        type: 'page',
+        updatedAt: '2026-08-26',
+        status: '작성중',
+        summary: '고객이 실제로 사용한 할인코드 이력을 주문·회원 기준으로 검색·조회하는 어드민 화면. 참고 화면을 그대로 재현.',
+        common:
+          '1) 참고 화면(할인코드 사용 검색 화면)을 문구·배치·목데이터까지 그대로 재현함 — 등록·발급용 「할인코드」 화면과는 별개의 독립 화면\n2) 표준 셸(상단 네비 + 좌측 사이드바 + 푸터) 사용, 좌측 사이드바는 「회원」 메뉴로 「할인코드 사용내역」이 활성 상태\n3) 검색 조건 → 리스트 순으로 구성',
+        sections: [
+          { title: '할인코드 사용 검색', badge: 'SEARCH', mark: 'search',
+            body: '1) 첫 줄: 구분(일반/CRM 라디오, 기본 일반) · 주문번호 · 할인코드 텍스트 검색\n2) 둘째 줄: 주문일 기간(직접 입력 또는 오늘/7일/15일/1개월/2개월/전체 버튼) · 사용 환경(전체/APP/Web(PC/Mobile) 라디오, 기본 전체) · 회원 구분(전체/회원/비회원 라디오, 기본 전체)\n3) 셋째 줄: 아이디 · 이름 · 연락처 · 이메일 텍스트 검색\n4) 초기화로 조건 전체 삭제, 검색으로 목록 재조회\n예외) 조건을 아무것도 입력하지 않고 검색하면 전체 목록 표시',
+            components: ['Radio', 'LInput', 'FilledButton'] },
+          { title: '할인코드 사용 리스트', badge: 'TABLE', mark: 'table',
+            body: '1) 체크박스 · No · 구분 · 주문일 · 주문번호 · 할인코드 · 할인종류 · 사용 환경 · 아이디/이름 · 연락처/이메일 순으로 표기\n2) 우측 상단 「할인코드 사용내역」 버튼으로 현재 목록을 파일로 내려받음\n3) 우측에서 페이지당 노출 개수를 선택\n예외) 목록이 없으면 0건으로 표기(빈 상태 문구는 이 화면 범위 밖)',
+            components: ['DataTable', 'LCheck', 'SelectBox'] },
+        ],
+      },
     ],
   },
   {
