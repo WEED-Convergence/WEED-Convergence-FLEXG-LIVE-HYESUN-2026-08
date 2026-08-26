@@ -10,7 +10,7 @@ import { Box, Flex, Text } from '@chakra-ui/react';
 import {
   AdminLayout, SectionHead, StatCard, InfoCard, PillStatCard, KVColumns, AdBanner, NoticeList, Stars,
   DataTable, FilledButton, OutlineButton, TextInput, RequiredLabel, SelectBox, Pagination, HelperText, PromoBanner,
-  TabStrip, Section, SectionTitle, Row, Radio, Toggle, LInput, LCheck,
+  TabStrip, Section, SectionTitle, Row, Radio, LInput, LCheck,
   colors, FONT as AFONT, asset,
 } from '../design-system';
 
@@ -634,6 +634,10 @@ const ALIMTALK_TEMPLATES: AlimtalkTemplate[] = [
 ];
 // 발송내역에서 발송 당시 선택한 템플릿명(라벨)으로 타입(A/B/C)을 역조회
 const templateTypeOf = (label: string) => ALIMTALK_TEMPLATES.find((t) => t.label === label)?.type ?? '';
+// 발송내역 검색조건 — 알림톡 템플릿 필터 옵션(전체 + 현재 사용 중인 템플릿 타입)
+const HISTORY_TEMPLATE_FILTER_OPTIONS = ['전체', ...Array.from(new Set(ALIMTALK_TEMPLATES.map((t) => t.type))).map((t) => `${t}타입`)];
+// 발송내역 검색조건 — 처리내역 상태 필터 옵션
+const HISTORY_STATUS_FILTER_OPTIONS = ['전체', '발송완료', '실패'];
 
 function AlimtalkCard({ tpl, selected, onSelect }: { tpl: AlimtalkTemplate; selected: boolean; onSelect: () => void }) {
   return (
@@ -674,7 +678,7 @@ type SendHistoryRow = {
   userId: string; email: string; joinedAt: string; lastLogin: string; loginCount: string;
   lastPurchase: string; marketingAgree: boolean; template: string; sentAt: string;
 };
-// 발송내역 탭에 일자별 구성을 보여주기 위한 과거 발송 샘플(신규 발송은 오늘 날짜로 계속 누적됨)
+// 발송내역 탭 검색조건 데모용 과거 발송 샘플(신규 발송은 오늘 날짜로 계속 누적됨)
 const SEED_SEND_HISTORY: SendHistoryRow[] = [
   { name: '크리스탈', phone: '010-1334-5678', nickname: '수정님', tone: 'new', userId: 'crystal_s', email: 'crystal.s@example.com', joinedAt: '2026-10-09 13:33:20', lastLogin: '2026-08-11', loginCount: '5회', lastPurchase: '2026-08-10', marketingAgree: false, template: '한정 할인코드', sentAt: '2026-08-20' },
   { name: '태민', phone: '010-1236-5678', nickname: '카이로스', tone: 'existing', userId: 'kairos_t', email: 'kairos.t@example.com', joinedAt: '2026-10-09 13:33:20', lastLogin: '2026-08-05', loginCount: '203회', lastPurchase: '2026-08-05', marketingAgree: false, template: '단골 고객 감사 쿠폰', sentAt: '2026-08-20' },
@@ -698,12 +702,44 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
   const [codeError, setCodeError] = useState(false);
   const [templateError, setTemplateError] = useState(false);
 
-  // 발송내역 — 발송일(일자)별로 묶어 탭으로 전환
-  const historyDates = Array.from(new Set(history.map((h) => h.sentAt)));
-  const [historyDate, setHistoryDate] = useState(historyDates[0] ?? '');
-  useEffect(() => {
-    if (historyDates.length && !historyDates.includes(historyDate)) setHistoryDate(historyDates[0]);
-  }, [history]);
+  // 발송내역 — 검색조건(초안 입력값)
+  const [historyQDraft, setHistoryQDraft] = useState('');
+  const [historyStartDraft, setHistoryStartDraft] = useState('');
+  const [historyEndDraft, setHistoryEndDraft] = useState('');
+  const [historyTemplateDraft, setHistoryTemplateDraft] = useState('전체');
+  const [historyStatusDraft, setHistoryStatusDraft] = useState('전체');
+  // 발송내역 — 검색조건(실제 목록에 반영된 값, 「검색」 클릭 시에만 갱신)
+  const [historyQ, setHistoryQ] = useState('');
+  const [historyStart, setHistoryStart] = useState('');
+  const [historyEnd, setHistoryEnd] = useState('');
+  const [historyTemplate, setHistoryTemplate] = useState('전체');
+  const [historyStatus, setHistoryStatus] = useState('전체');
+  const [historyFilterKey, setHistoryFilterKey] = useState(0); // 초기화 시 SelectBox 표시값 리셋용
+
+  const searchHistory = () => {
+    setHistoryQ(historyQDraft.trim());
+    setHistoryStart(historyStartDraft);
+    setHistoryEnd(historyEndDraft);
+    setHistoryTemplate(historyTemplateDraft);
+    setHistoryStatus(historyStatusDraft);
+  };
+  const resetHistorySearch = () => {
+    setHistoryQDraft(''); setHistoryStartDraft(''); setHistoryEndDraft('');
+    setHistoryTemplateDraft('전체'); setHistoryStatusDraft('전체');
+    setHistoryQ(''); setHistoryStart(''); setHistoryEnd('');
+    setHistoryTemplate('전체'); setHistoryStatus('전체');
+    setHistoryFilterKey((k) => k + 1);
+  };
+  // 기본값(기간 전체)이라 날짜 조건 없이도 기존 발송 이력이 모두 노출됨. AND 결합.
+  const filteredHistory = history.filter((h) => {
+    const q = historyQ;
+    const matchesQuery = !q || h.name.includes(q) || h.nickname.includes(q) || h.phone.includes(q);
+    const matchesStart = !historyStart || h.sentAt >= historyStart;
+    const matchesEnd = !historyEnd || h.sentAt <= historyEnd;
+    const matchesTemplate = historyTemplate === '전체' || `${templateTypeOf(h.template)}타입` === historyTemplate;
+    const matchesStatus = historyStatus === '전체' || historyStatus === '발송완료'; // 현재 이력은 모두 발송완료
+    return matchesQuery && matchesStart && matchesEnd && matchesTemplate && matchesStatus;
+  });
 
   const send = () => {
     const noCode = !code.trim();
@@ -733,8 +769,9 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
               <Text fontFamily={AFONT} fontSize="12px" color={colors.gr92} pb="14px">선택한 대상 {targetCount}명에게 할인코드를 발급·발송합니다.</Text>
               <Section title="할인코드 등록" note>
                 <Row label="사용여부">
-                  <Box pointerEvents="none"><Toggle on={true} onToggle={() => {}} /></Box>
-                  <HelperText>신규 등록 시 사용여부는 항상 ON으로 고정됩니다.</HelperText>
+                  <Flex bg={colors.green} borderRadius="4px" px="10px" py="4px" w="fit-content">
+                    <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color="white">ON</Text>
+                  </Flex>
                 </Row>
                 <Row label="할인코드">
                   <LInput value={code} onChange={(v) => setCode(v.replace(/[^0-9A-Za-z가-힣]/g, '').slice(0, 16))} placeholder="영문·숫자·한글로 16자 이내 입력" width="280px" />
@@ -791,16 +828,39 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
               </Box>
             ) : (
               <>
-                <Flex align="center" gap="6px" pb="14px" wrap="wrap">
-                  {historyDates.map((d) => (
-                    <Box key={d} as="button" onClick={() => setHistoryDate(d)} cursor="pointer"
-                      bg={d === historyDate ? colors.gr42 : 'white'}
-                      border={`1px solid ${d === historyDate ? colors.gr42 : colors.grD8}`}
-                      borderRadius="20px" px="12px" py="5px">
-                      <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={d === historyDate ? 'white' : colors.gr72}>{d}</Text>
+                <Box data-doc-mark="history-search" border={`1px solid ${colors.grE8}`} borderRadius="12px" p="18px 20px" mb="16px">
+                  <Flex align="flex-end" gap="16px" pb="16px" wrap="wrap">
+                    <Box flex="1" minW="220px">
+                      <RequiredLabel label="이름 · 닉네임 · 연락처" required={false} />
+                      <LInput value={historyQDraft} onChange={setHistoryQDraft} placeholder="이름, 닉네임, 연락처로 검색" width="100%" onEnter={searchHistory} />
                     </Box>
-                  ))}
-                </Flex>
+                    <Box>
+                      <RequiredLabel label="기간" required={false} />
+                      <Flex align="center" gap="6px">
+                        <LInput type="date" value={historyStartDraft} onChange={setHistoryStartDraft} width="150px" />
+                        <Text color={colors.gr72}>~</Text>
+                        <LInput type="date" value={historyEndDraft} onChange={setHistoryEndDraft} width="150px" />
+                      </Flex>
+                    </Box>
+                    <Box>
+                      <RequiredLabel label="알림톡 템플릿" required={false} />
+                      <SelectBox key={`tpl-${historyFilterKey}`} label="전체" width="140px" options={HISTORY_TEMPLATE_FILTER_OPTIONS} onSelect={setHistoryTemplateDraft} />
+                    </Box>
+                    <Box>
+                      <RequiredLabel label="처리내역" required={false} />
+                      <SelectBox key={`status-${historyFilterKey}`} label="전체" width="120px" options={HISTORY_STATUS_FILTER_OPTIONS} onSelect={setHistoryStatusDraft} />
+                    </Box>
+                  </Flex>
+                  <Flex justify="center" gap="8px">
+                    <FilledButton label="초기화" bg={colors.bcSub} onClick={resetHistorySearch} />
+                    <FilledButton label="검색" bg={colors.bcPoint} onClick={searchHistory} />
+                  </Flex>
+                </Box>
+                {filteredHistory.length === 0 ? (
+                  <Box bg="white" border={`1px dashed ${colors.grD8}`} borderRadius="12px" py="48px" textAlign="center">
+                    <Text fontFamily={AFONT} fontSize="13px" color={colors.gr92}>검색 조건에 맞는 발송 내역이 없습니다.</Text>
+                  </Box>
+                ) : (
                 <DataTable
                   columns={[
                     { header: ['이름', '휴대폰번호'], flex: '1.1' },
@@ -813,7 +873,7 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
                     { header: ['알림톡 템플릿'], w: '120px' },
                     { header: ['처리내역', '발송일'], w: '100px' },
                   ]}
-                  rows={history.filter((h) => h.sentAt === historyDate).map((h) => [
+                  rows={filteredHistory.map((h) => [
                     <Flex direction="column" gap="2px" align="center"><Text>{h.name}</Text><Text color={colors.gr92}>{h.phone}</Text></Flex>,
                     <Flex direction="column" gap="4px" align="center"><Text>{h.nickname}</Text><RegularBadge tone={h.tone} /></Flex>,
                     <Flex direction="column" gap="2px" align="center"><Text>{h.userId}</Text><Text color={colors.gr92}>{h.email}</Text></Flex>,
@@ -828,6 +888,7 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
                     </Flex>,
                   ])}
                 />
+                )}
               </>
             )}
           </Box>
