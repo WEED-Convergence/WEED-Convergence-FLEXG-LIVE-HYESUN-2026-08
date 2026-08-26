@@ -190,7 +190,7 @@ export const DOC_GROUPS: DocGroup[] = [
       },
       {
         id: 'discount-code-2',
-        name: '할인코드2',
+        name: '할인코드',
         docPath: '/admin/discount-code-2',
         route: '/preview/discount-code-2',
         breadcrumb: '어드민 › LIVE › 할인코드 관리 › 할인코드',

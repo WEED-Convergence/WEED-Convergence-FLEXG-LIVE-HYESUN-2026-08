@@ -638,9 +638,9 @@ function AlimtalkCard({ tpl, selected, onSelect }: { tpl: AlimtalkTemplate; sele
             <Text key={`t${i}`} position="relative" fontFamily={AFONT} fontWeight="700" fontSize="13px" color="white" lineHeight="1.5">{line}</Text>
           ))}
         </Box>
-        <Box w="100%" bg="#2B2B2B" borderRadius="0 0 10px 10px" p="14px">
+        <Box w="100%" bg="#FFFFFF" borderRadius="0 0 10px 10px" p="14px">
           {tpl.body.split('\n').map((line, i) => (
-            <Text key={`b${i}`} fontFamily={AFONT} fontSize="11.5px" color="rgba(255,255,255,0.82)" lineHeight="1.6">{line || ' '}</Text>
+            <Text key={`b${i}`} fontFamily={AFONT} fontSize="11.5px" color={colors.gr42} lineHeight="1.6">{line || ' '}</Text>
           ))}
         </Box>
       </Flex>
