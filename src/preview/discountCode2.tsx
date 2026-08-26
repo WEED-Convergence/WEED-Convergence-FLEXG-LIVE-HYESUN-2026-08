@@ -31,12 +31,12 @@ const SIDEBAR_ITEMS = [
 
 type CodeRow = { division: string; used: boolean; code: string; kind: string; date: string; env: string; memo: string };
 const CODE_ROWS: CodeRow[] = [
-  { division: 'CRM', used: true, code: '베리타이어드', kind: '1,000원', date: '2026-08-25', env: '전체', memo: '나오늘너무피곤하다' },
-  { division: 'CRM', used: true, code: 'XXXX', kind: '12%', date: '2026-08-04', env: '전체', memo: '뜸한 고객의 재방문 유도하기_20260804_1' },
-  { division: 'CRM', used: true, code: 'EEEEOO', kind: '10,000원', date: '2026-08-03', env: '전체', memo: '신규 고객의 첫 구매 유도하기_20260803_1' },
-  { division: 'CRM', used: true, code: '앱미설치CRM할인코드', kind: '20%', date: '2026-07-20', env: 'APP', memo: 'APP미설치 고객의 APP설치 유도하기_20260720_1' },
-  { division: 'CRM', used: true, code: '테스트0720', kind: '20%', date: '2026-07-20', env: '전체', memo: '뜸한 고객의 재방문 유도하기_20260720_1' },
-  { division: 'CRM', used: true, code: '테스트111', kind: '20%', date: '2026-07-20', env: '전체', memo: '신규 고객의 첫 구매 유도하기_20260720_1' },
+  { division: '라이브', used: true, code: '베리타이어드', kind: '1,000원', date: '2026-08-25', env: '전체', memo: '여름 특가 라이브' },
+  { division: '라이브', used: true, code: 'XXXX', kind: '12%', date: '2026-08-04', env: '전체', memo: '뜸한 고객 재방문 유도 라이브' },
+  { division: '라이브', used: true, code: 'EEEEOO', kind: '10,000원', date: '2026-08-03', env: '전체', memo: '신규 고객 첫 구매 라이브' },
+  { division: '라이브', used: true, code: '앱미설치CRM할인코드', kind: '20%', date: '2026-07-20', env: 'APP', memo: 'APP 미설치 고객 설치 유도 라이브' },
+  { division: '라이브', used: true, code: '테스트0720', kind: '20%', date: '2026-07-20', env: '전체', memo: '뜸한 고객 재방문 유도 라이브' },
+  { division: '라이브', used: true, code: '테스트111', kind: '20%', date: '2026-07-20', env: '전체', memo: '신규 고객 첫 구매 라이브' },
 ];
 
 // 라벨 + 입력을 한 줄에 나란히 놓는 검색 필드(이 화면 전용 레이아웃)
