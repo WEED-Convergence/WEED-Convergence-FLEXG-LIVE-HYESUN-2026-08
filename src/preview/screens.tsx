@@ -633,6 +633,8 @@ const ALIMTALK_TEMPLATES: AlimtalkTemplate[] = [
 const templateTypeOf = (label: string) => ALIMTALK_TEMPLATES.find((t) => t.label === label)?.type ?? '';
 // 발송내역 검색조건 — 알림톡 템플릿 필터 옵션(전체 + 현재 사용 중인 템플릿 타입)
 const HISTORY_TEMPLATE_FILTER_OPTIONS = ['전체', ...Array.from(new Set(ALIMTALK_TEMPLATES.map((t) => t.type))).map((t) => `${t}타입`)];
+// 발송내역 검색조건 — 처리내역 상태 필터 옵션
+const HISTORY_STATUS_FILTER_OPTIONS = ['전체', '발송완료', '실패'];
 
 function AlimtalkCard({ tpl, selected, onSelect }: { tpl: AlimtalkTemplate; selected: boolean; onSelect: () => void }) {
   return (
@@ -702,11 +704,13 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
   const [historyStartDraft, setHistoryStartDraft] = useState('');
   const [historyEndDraft, setHistoryEndDraft] = useState('');
   const [historyTemplateDraft, setHistoryTemplateDraft] = useState('전체');
+  const [historyStatusDraft, setHistoryStatusDraft] = useState('전체');
   // 발송내역 — 검색조건(실제 목록에 반영된 값, 「검색」 클릭 시에만 갱신)
   const [historyQ, setHistoryQ] = useState('');
   const [historyStart, setHistoryStart] = useState('');
   const [historyEnd, setHistoryEnd] = useState('');
   const [historyTemplate, setHistoryTemplate] = useState('전체');
+  const [historyStatus, setHistoryStatus] = useState('전체');
   const [historyFilterKey, setHistoryFilterKey] = useState(0); // 초기화 시 SelectBox 표시값 리셋용
 
   const searchHistory = () => {
@@ -714,12 +718,13 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
     setHistoryStart(historyStartDraft);
     setHistoryEnd(historyEndDraft);
     setHistoryTemplate(historyTemplateDraft);
+    setHistoryStatus(historyStatusDraft);
   };
   const resetHistorySearch = () => {
     setHistoryQDraft(''); setHistoryStartDraft(''); setHistoryEndDraft('');
-    setHistoryTemplateDraft('전체');
+    setHistoryTemplateDraft('전체'); setHistoryStatusDraft('전체');
     setHistoryQ(''); setHistoryStart(''); setHistoryEnd('');
-    setHistoryTemplate('전체');
+    setHistoryTemplate('전체'); setHistoryStatus('전체');
     setHistoryFilterKey((k) => k + 1);
   };
   // 기본값(기간 전체)이라 날짜 조건 없이도 기존 발송 이력이 모두 노출됨. AND 결합.
@@ -729,7 +734,8 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
     const matchesStart = !historyStart || h.sentAt >= historyStart;
     const matchesEnd = !historyEnd || h.sentAt <= historyEnd;
     const matchesTemplate = historyTemplate === '전체' || `${templateTypeOf(h.template)}타입` === historyTemplate;
-    return matchesQuery && matchesStart && matchesEnd && matchesTemplate;
+    const matchesStatus = historyStatus === '전체' || historyStatus === '발송완료'; // 현재 이력은 모두 발송완료
+    return matchesQuery && matchesStart && matchesEnd && matchesTemplate && matchesStatus;
   });
 
   const send = () => {
@@ -837,6 +843,10 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
                       <RequiredLabel label="알림톡 템플릿" required={false} />
                       <SelectBox key={`tpl-${historyFilterKey}`} label="전체" width="140px" options={HISTORY_TEMPLATE_FILTER_OPTIONS} onSelect={setHistoryTemplateDraft} />
                     </Box>
+                    <Box>
+                      <RequiredLabel label="처리내역" required={false} />
+                      <SelectBox key={`status-${historyFilterKey}`} label="전체" width="120px" options={HISTORY_STATUS_FILTER_OPTIONS} onSelect={setHistoryStatusDraft} />
+                    </Box>
                   </Flex>
                   <Flex justify="center" gap="8px">
                     <FilledButton label="초기화" bg={colors.bcSub} onClick={resetHistorySearch} />
@@ -858,7 +868,7 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
                     { header: ['로그인 횟수'], w: '80px' },
                     { header: ['마케팅 수신 동의'], w: '100px' },
                     { header: ['알림톡 템플릿'], w: '120px' },
-                    { header: ['발송일'], w: '100px' },
+                    { header: ['처리내역', '발송일'], w: '100px' },
                   ]}
                   rows={filteredHistory.map((h) => [
                     <Flex direction="column" gap="2px" align="center"><Text>{h.name}</Text><Text color={colors.gr92}>{h.phone}</Text></Flex>,
@@ -869,7 +879,10 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
                     h.loginCount,
                     h.marketingAgree ? '동의' : '미동의',
                     <Flex direction="column" gap="2px" align="center"><Text fontFamily={AFONT} fontWeight="700" color={colors.gr42}>{templateTypeOf(h.template)}타입</Text><Text color={colors.gr92}>{h.template}</Text></Flex>,
-                    h.sentAt,
+                    <Flex direction="column" gap="4px" align="center">
+                      <Flex bg={colors.green} borderRadius="4px" px="8px" py="3px" w="fit-content"><Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color="white">발송완료</Text></Flex>
+                      <Text>{h.sentAt}</Text>
+                    </Flex>,
                   ])}
                 />
                 )}
