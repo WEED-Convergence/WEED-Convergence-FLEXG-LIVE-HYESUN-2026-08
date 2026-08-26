@@ -418,19 +418,20 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
           <Box as="button" onClick={onClose} cursor="pointer"><Text fontSize="18px" color={colors.gr72}>×</Text></Box>
         </Flex>
 
-        <Box px="24px" pt="16px" data-doc-mark="modal-notice">
-          <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.red}>할인코드는 발급일로 부터 3일동안만 유효합니다.</Text>
-          <Text fontFamily={AFONT} fontSize="12px" color={colors.gr72}>할인코드 사용내역은 [회원&gt;할인코드 사용내역] 화면에서 확인하실 수 있습니다.</Text>
-        </Box>
-
         <Box px="24px" pt="16px">
           <TabStrip tabs={['할인코드 발송', '발송내역']} active={tab} onChange={(t) => setTab(t as '할인코드 발송' | '발송내역')} />
+        </Box>
+
+        <Box px="24px" pt="16px" data-doc-mark="modal-notice">
+          <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.red}>할인코드는 발급일로 부터 3일동안만 유효합니다.</Text>
+          <Text fontFamily={AFONT} fontSize="12px" color={colors.gr72}>
+            할인코드 사용내역은 <Text as="span" color={colors.green} textDecoration="underline">[회원&gt;할인코드 사용내역]</Text> 화면에서 확인하실 수 있습니다.
+          </Text>
         </Box>
 
         {tab === '할인코드 발송' ? (
           <Box data-doc-tab="할인코드 발송">
             <Box p="20px 24px 4px" data-doc-mark="modal-form">
-              <Text fontFamily={AFONT} fontSize="12px" color={colors.gr92} pb="14px">선택한 대상 {targetCount}명에게 할인코드를 발급·발송합니다.</Text>
               <Section title="할인코드 등록" note>
                 <Row label="사용여부">
                   <Flex bg={colors.green} borderRadius="4px" px="10px" py="4px" w="fit-content">
@@ -479,9 +480,12 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
               {templateError && <Box pt="10px"><HelperText danger>발송할 알림톡 템플릿을 선택해 주세요.</HelperText></Box>}
             </Box>
 
-            <Flex data-doc-mark="modal-actions" px="24px" py="16px" borderTop="1px solid #F0F1F3" justify="flex-end" gap="8px">
-              <OutlineButton label="취소" onClick={onClose} />
-              <FilledButton label="발송" bg={colors.bcPoint} onClick={send} />
+            <Flex data-doc-mark="modal-actions" px="24px" py="16px" borderTop="1px solid #F0F1F3" align="center" justify="space-between" gap="8px">
+              <Text fontFamily={AFONT} fontSize="12px" color={colors.gr92}>선택한 대상 {targetCount}명에게 할인코드를 발급·발송합니다.</Text>
+              <Flex gap="8px">
+                <OutlineButton label="취소" onClick={onClose} />
+                <FilledButton label="발송" bg={colors.bcPoint} onClick={send} />
+              </Flex>
             </Flex>
           </Box>
         ) : (
