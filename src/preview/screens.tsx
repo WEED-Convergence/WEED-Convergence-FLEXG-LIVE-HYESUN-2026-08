@@ -10,6 +10,7 @@ import { Box, Flex, Text } from '@chakra-ui/react';
 import {
   AdminLayout, SectionHead, StatCard, InfoCard, PillStatCard, KVColumns, AdBanner, NoticeList, Stars,
   DataTable, FilledButton, OutlineButton, TextInput, RequiredLabel, SelectBox, Pagination, HelperText, PromoBanner,
+  TabStrip, Section, SectionTitle, Row, Radio, Toggle, LInput, LCheck,
   colors, FONT as AFONT, asset,
 } from '../design-system';
 
@@ -391,16 +392,20 @@ function RegularBadge({ tone }: { tone: 'existing' | 'new' }) {
   );
 }
 
-type RegularRow = { no: string; name: string; tone: 'existing' | 'new'; nickname: string; phone: string; put: string; buy: string; amount: string; joinedAt: string };
+type RegularRow = {
+  no: string; name: string; tone: 'existing' | 'new'; nickname: string; phone: string;
+  put: string; buy: string; amount: string; joinedAt: string;
+  lastPurchase: string; marketingAgree: boolean;
+};
 const REGULAR_ROWS: RegularRow[] = [
-  { no: '1930', name: '홍길동', tone: 'existing', nickname: '길동이님', phone: '010-1234-5678', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2024-09-24 16:02:24' },
-  { no: '1929', name: '당웨이', tone: 'new', nickname: '웨이웨이', phone: '010-1234-9999', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 14:33:20' },
-  { no: '1927', name: '카리나', tone: 'new', nickname: '겨울요정', phone: '010-1234-5678', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20' },
-  { no: '1926', name: '웬디', tone: 'existing', nickname: '웬디트리', phone: '010-1234-5638', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20' },
-  { no: '1925', name: '크리스탈', tone: 'new', nickname: '수정님', phone: '010-1334-5678', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20' },
-  { no: '1924', name: '공유', tone: 'existing', nickname: '도깨비', phone: '010-1134-5678', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20' },
-  { no: '1923', name: '공명', tone: 'new', nickname: '공블리', phone: '010-1234-5578', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20' },
-  { no: '1922', name: '태민', tone: 'existing', nickname: '카이로스', phone: '010-1236-5678', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20' },
+  { no: '1930', name: '홍길동', tone: 'existing', nickname: '길동이님', phone: '010-1234-5678', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2024-09-24 16:02:24', lastPurchase: '2026-08-18', marketingAgree: true },
+  { no: '1929', name: '당웨이', tone: 'new', nickname: '웨이웨이', phone: '010-1234-9999', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 14:33:20', lastPurchase: '2026-08-21', marketingAgree: true },
+  { no: '1927', name: '카리나', tone: 'new', nickname: '겨울요정', phone: '010-1234-5678', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20', lastPurchase: '2026-08-15', marketingAgree: false },
+  { no: '1926', name: '웬디', tone: 'existing', nickname: '웬디트리', phone: '010-1234-5638', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20', lastPurchase: '2026-08-22', marketingAgree: true },
+  { no: '1925', name: '크리스탈', tone: 'new', nickname: '수정님', phone: '010-1334-5678', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20', lastPurchase: '2026-08-10', marketingAgree: false },
+  { no: '1924', name: '공유', tone: 'existing', nickname: '도깨비', phone: '010-1134-5678', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20', lastPurchase: '2026-08-19', marketingAgree: true },
+  { no: '1923', name: '공명', tone: 'new', nickname: '공블리', phone: '010-1234-5578', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20', lastPurchase: '2026-08-23', marketingAgree: true },
+  { no: '1922', name: '태민', tone: 'existing', nickname: '카이로스', phone: '010-1236-5678', put: '3건', buy: '23건', amount: '489,000원', joinedAt: '2026-10-09 13:33:20', lastPurchase: '2026-08-05', marketingAgree: false },
 ];
 
 function LiveRegulars() {
@@ -499,6 +504,362 @@ function LiveRegulars() {
           <Pagination />
         </Box>
       </Box>
+    </AdminLayout>
+  );
+}
+
+// ── 할인코드 발송(팝업) — 이 화면 전용 표준 외 조립 소품 ──
+// 숫자만 남기는 컨트롤드 입력(원/% 단위 표시용)
+function NumField({ value, onChange, unit, placeholder, width = '160px' }: {
+  value: string; onChange: (v: string) => void; unit: string; placeholder?: string; width?: string;
+}) {
+  return (
+    <Flex align="center" gap="6px">
+      <LInput value={value} onChange={(v) => onChange(v.replace(/[^0-9]/g, ''))} placeholder={placeholder} width={width} />
+      <Text fontFamily={AFONT} fontSize="12px" color={colors.gr72} whiteSpace="nowrap">{unit}</Text>
+    </Flex>
+  );
+}
+// 메모 — 표준 텍스트영역 컴포넌트 없어 화면 내 임시 조립(디자인시스템 요청 대상)
+function MemoInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <textarea
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder="메모를 입력하세요"
+      rows={3}
+      style={{
+        width: '100%', maxWidth: '480px', resize: 'vertical', boxSizing: 'border-box',
+        border: '1px solid #D7D6D6', borderRadius: '4px', padding: '8px',
+        fontFamily: AFONT, fontSize: '12px', color: colors.gr42,
+      }}
+    />
+  );
+}
+// 카카오 알림톡 도착 카드 — 표준 컴포넌트 없어 화면 내 임시 조립(디자인시스템 요청 대상)
+function KakaoGlyph() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+      <path d="M12 3.5C6.98 3.5 3 6.86 3 11c0 2.66 1.7 5 4.28 6.36l-1.02 3.72a.5.5 0 0 0 .75.55l4.2-2.78c.25.02.5.03.79.03 5.02 0 9-3.36 9-7.5S17.02 3.5 12 3.5Z" fill="#3A1D1D" />
+    </svg>
+  );
+}
+type AlimtalkTemplate = { id: string; title: string; body: string };
+const ALIMTALK_TEMPLATES: AlimtalkTemplate[] = [
+  {
+    id: 'welcome',
+    title: '[할인코드 발급 안내]\n라이브 단골 전용 혜택이\n도착했어요!',
+    body: '안녕하세요, 고객님 :)\n라이브 단골 고객님께만 드리는\n특별 할인코드를 보내드려요.\n\n▶ 사용기간 : 발급일로부터 7일\n▶ 사용방법 : 결제 시 코드 입력\n\n지금 바로 확인해보세요!',
+  },
+  {
+    id: 'limited',
+    title: '[한정 할인코드]\n놓치면 아쉬운 혜택,\n지금 확인하세요',
+    body: '고객님을 위한\n한정 수량 할인코드가\n도착했습니다.\n\n▶ 대상 : 라이브 단골 고객\n▶ 유효기간 : 발급일로부터 7일\n\n서두르세요, 한정 수량이에요!',
+  },
+  {
+    id: 'thanks',
+    title: '[단골 고객 감사 쿠폰]\n항상 함께해주셔서\n감사합니다',
+    body: '늘 저희 라이브를\n찾아주시는 고객님께\n감사한 마음을 담았어요.\n\n▶ 전용 할인코드가 발급되었습니다\n▶ 사용기간 : 발급일로부터 7일\n\n소중한 마음, 잊지 않을게요!',
+  },
+];
+function AlimtalkCard({ tpl, selected, onSelect }: { tpl: AlimtalkTemplate; selected: boolean; onSelect: () => void }) {
+  return (
+    <Box as="button" onClick={onSelect} position="relative" w="200px" flexShrink={0} textAlign="left"
+      border={`2px solid ${selected ? colors.blue : 'transparent'}`} borderRadius="14px" p="2px" cursor="pointer">
+      <Flex position="absolute" top="10px" left="10px" w="16px" h="16px" borderRadius="100px" bg="white"
+        border={`1.5px solid ${selected ? colors.blue : colors.grD8}`} align="center" justify="center" zIndex={1}>
+        {selected && <Box w="8px" h="8px" borderRadius="100px" bg={colors.blue} />}
+      </Flex>
+      <Flex direction="column" align="center" bg={colors.grF8} borderRadius="12px" p="18px 12px 12px">
+        <Flex align="center" gap="4px" bg="#FAE100" borderRadius="14px" px="10px" py="4px" mb="12px">
+          <KakaoGlyph />
+          <Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color="#3A1D1D">알림톡 도착</Text>
+        </Flex>
+        <Box w="100%" bg="#2B2B2B" borderRadius="10px" p="14px" mb="10px">
+          {tpl.title.split('\n').map((line, i) => (
+            <Text key={`t${i}`} fontFamily={AFONT} fontWeight="700" fontSize="13px" color="white" lineHeight="1.5">{line}</Text>
+          ))}
+          <Box h="8px" />
+          {tpl.body.split('\n').map((line, i) => (
+            <Text key={`b${i}`} fontFamily={AFONT} fontSize="11.5px" color="rgba(255,255,255,0.82)" lineHeight="1.6">{line || ' '}</Text>
+          ))}
+        </Box>
+        <Box w="100%" bg="white" border="1px solid #E5E7EB" borderRadius="8px" py="8px" textAlign="center">
+          <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.gr42}>바로가기</Text>
+        </Box>
+      </Flex>
+    </Box>
+  );
+}
+
+// 할인코드 등록 + 알림톡 템플릿 선택 + 발송 팝업
+function DiscountCodeModal({ targetCount, onClose, onSend }: { targetCount: number; onClose: () => void; onSend: () => void }) {
+  const [code, setCode] = useState('');
+  const [type, setType] = useState<'amount' | 'rate'>('amount');
+  const [amount, setAmount] = useState('');
+  const [rate, setRate] = useState('');
+  const [maxAmount, setMaxAmount] = useState('');
+  const [minOrder, setMinOrder] = useState('');
+  const [env, setEnv] = useState<'all' | 'app' | 'web'>('all');
+  const [memo, setMemo] = useState('');
+  const [templateId, setTemplateId] = useState<string | null>(null);
+  const [codeError, setCodeError] = useState(false);
+  const [templateError, setTemplateError] = useState(false);
+
+  const send = () => {
+    const noCode = !code.trim();
+    const noTpl = !templateId;
+    setCodeError(noCode);
+    setTemplateError(noTpl);
+    if (noCode || noTpl) return;
+    onSend();
+  };
+
+  return (
+    <Box position="fixed" inset="0" bg="rgba(17,24,39,0.45)" zIndex={1000} display="flex" alignItems="center" justifyContent="center" p="24px" onClick={onClose}>
+      <Box bg="white" borderRadius="12px" w="720px" maxH="88vh" overflowY="auto" boxShadow="0 20px 60px rgba(0,0,0,0.3)" onClick={(e) => e.stopPropagation()}>
+        <Flex px="24px" py="16px" borderBottom="1px solid #F0F1F3" align="center" justify="space-between">
+          <Text fontFamily={AFONT} fontWeight="800" fontSize="17px" color={colors.gr42}>할인코드</Text>
+          <Box as="button" onClick={onClose} cursor="pointer"><Text fontSize="18px" color={colors.gr72}>×</Text></Box>
+        </Flex>
+
+        <Box p="20px 24px 4px" data-doc-mark="modal-form">
+          <Text fontFamily={AFONT} fontSize="12px" color={colors.gr92} pb="14px">선택한 대상 {targetCount}명에게 할인코드를 발급·발송합니다.</Text>
+          <Section title="할인코드 등록" note>
+            <Row label="사용여부">
+              <Box opacity={0.55} pointerEvents="none"><Toggle on={true} onToggle={() => {}} /></Box>
+              <HelperText>신규 등록 시 사용여부는 항상 ON으로 고정됩니다.</HelperText>
+            </Row>
+            <Row label="할인코드">
+              <LInput value={code} onChange={(v) => setCode(v.replace(/[^0-9A-Za-z가-힣]/g, '').slice(0, 16))} placeholder="영문·숫자·한글로 16자 이내 입력" width="280px" />
+              <HelperText>특수기호·공백 입력 불가 · {code.length}/16자</HelperText>
+              {codeError && <HelperText danger>할인코드를 입력해 주세요.</HelperText>}
+            </Row>
+            <Row label="할인종류">
+              <Flex align="center" gap="18px" wrap="wrap">
+                <Radio checked={type === 'amount'} label="금액할인" onClick={() => setType('amount')} />
+                <Radio checked={type === 'rate'} label="비율할인" onClick={() => setType('rate')} />
+                {type === 'amount'
+                  ? <NumField value={amount} onChange={setAmount} unit="원" placeholder="할인 금액" />
+                  : <NumField value={rate} onChange={setRate} unit="%" placeholder="할인율" />}
+              </Flex>
+            </Row>
+            <Row label="최대 할인금액">
+              {type === 'rate'
+                ? <NumField value={maxAmount} onChange={setMaxAmount} unit="원" placeholder="최대 할인금액" />
+                : <HelperText>금액할인은 할인 금액이 곧 상한이라 최대 할인금액이 적용되지 않습니다.</HelperText>}
+            </Row>
+            <Row label="주문금액 제한">
+              <NumField value={minOrder} onChange={setMinOrder} unit="원 이상" placeholder="최소 주문금액" />
+            </Row>
+            <Row label="사용가능 환경">
+              <Flex align="center" gap="18px">
+                <Radio checked={env === 'all'} label="전체" onClick={() => setEnv('all')} />
+                <Radio checked={env === 'app'} label="APP" onClick={() => setEnv('app')} />
+                <Radio checked={env === 'web'} label="Web(PC/Mobile)" onClick={() => setEnv('web')} />
+              </Flex>
+            </Row>
+            <Row label="메모" required={false} last>
+              <MemoInput value={memo} onChange={setMemo} />
+            </Row>
+          </Section>
+        </Box>
+
+        <Box px="24px" pt="24px" pb="8px" data-doc-mark="modal-templates">
+          <SectionTitle title="알림톡 템플릿 선택" note={false} />
+          <Flex gap="14px" wrap="wrap">
+            {ALIMTALK_TEMPLATES.map((t) => (
+              <AlimtalkCard key={t.id} tpl={t} selected={templateId === t.id} onSelect={() => { setTemplateId(t.id); setTemplateError(false); }} />
+            ))}
+          </Flex>
+          {templateError && <Box pt="10px"><HelperText danger>발송할 알림톡 템플릿을 선택해 주세요.</HelperText></Box>}
+        </Box>
+
+        <Flex data-doc-mark="modal-actions" px="24px" py="16px" borderTop="1px solid #F0F1F3" justify="flex-end" gap="8px">
+          <OutlineButton label="취소" onClick={onClose} />
+          <FilledButton label="발송" bg={colors.bcPoint} onClick={send} />
+        </Flex>
+      </Box>
+    </Box>
+  );
+}
+
+type SendHistoryRow = { name: string; phone: string; nickname: string; lastPurchase: string; marketingAgree: boolean; sentAt: string };
+
+// ── 할인코드 (단골 리스트 + 발송내역 탭) ──
+function DiscountCode() {
+  const [tab, setTab] = useState<'단골 리스트' | '발송내역'>('단골 리스트');
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectWarning, setSelectWarning] = useState(false);
+  const [history, setHistory] = useState<SendHistoryRow[]>([]);
+
+  const toggleRow = (no: string) => {
+    setSelectWarning(false);
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(no)) next.delete(no); else next.add(no);
+      return next;
+    });
+  };
+
+  const openDiscountModal = () => {
+    if (selected.size === 0) { setSelectWarning(true); return; }
+    setModalOpen(true);
+  };
+
+  const handleSent = () => {
+    const now = new Date();
+    const sentAt = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const newRows: SendHistoryRow[] = REGULAR_ROWS
+      .filter((r) => selected.has(r.no))
+      .map((r) => ({ name: r.name, phone: r.phone, nickname: r.nickname, lastPurchase: r.lastPurchase, marketingAgree: r.marketingAgree, sentAt }));
+    setHistory((prev) => [...newRows, ...prev]);
+    setModalOpen(false);
+    setSelected(new Set());
+    setTab('발송내역');
+  };
+
+  const LinkText = ({ children }: { children: React.ReactNode }) => (
+    <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.green} cursor="pointer" whiteSpace="nowrap">{children}</Text>
+  );
+
+  return (
+    <AdminLayout navActive="LIVE" sidebar={{ items: REGULARS_SIDEBAR_ITEMS }}>
+      <Box fontFamily={AFONT} color={colors.gr42} minW="1200px">
+        <Box pb="20px">
+          <TabStrip tabs={['단골 리스트', '발송내역']} active={tab} onChange={(t) => setTab(t as '단골 리스트' | '발송내역')} />
+        </Box>
+
+        {tab === '단골 리스트' ? (
+          <>
+            {/* 1. 검색 조건 */}
+            <SectionHead title="라이브 단골 검색" />
+            <Box data-doc-mark="search" bg="white" border={`1px solid ${colors.grE8}`} borderRadius="12px" p="24px" mb="32px">
+              <Flex gap="20px">
+                <Box flex="1"><RequiredLabel label="이름" required={false} /><TextInput placeholder="이름 입력" width="100%" /></Box>
+                <Box flex="1"><RequiredLabel label="닉네임" required={false} /><TextInput placeholder="닉네임 입력" width="100%" /></Box>
+                <Box flex="1"><RequiredLabel label="연락처" required={false} /><TextInput placeholder="연락처 입력" width="100%" /></Box>
+              </Flex>
+              <Flex justify="center" gap="8px" pt="20px">
+                <FilledButton label="초기화" bg={colors.bcSub} />
+                <FilledButton label="검색" bg={colors.bcPoint} />
+              </Flex>
+            </Box>
+
+            {/* 2. 목록 타이틀 */}
+            <Flex align="baseline" gap="8px" pb="14px">
+              <Text fontFamily={AFONT} fontWeight="700" fontSize="18px" color={colors.gr42} letterSpacing="-0.36px">라이브 단골 리스트</Text>
+              <Text fontFamily={AFONT} fontSize="12px" color={colors.gr92}>전체 {REGULAR_ROWS.length}개</Text>
+            </Flex>
+
+            {/* 3. 안내 배너 */}
+            <Box data-doc-mark="promo" mb="24px">
+              <PromoBanner bg="#2A2A2A" h="auto">
+                <Flex align="center" gap="24px" py="6px">
+                  <Flex direction="column" align="flex-start" gap="8px" flexShrink={0}>
+                    <Flex bg={colors.red} borderRadius="4px" px="6px" py="2px"><Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color="white">LIVE</Text></Flex>
+                    <Text fontFamily={AFONT} fontWeight="700" fontSize="17px" color="white" lineHeight="1.3">라이브는 실감나게</Text>
+                    <Flex gap="6px" pt="2px">
+                      <FilledButton label="단골 가입 URL 복사" bg={colors.red} />
+                      <FilledButton label="바로가기 ›" bg={colors.gr72} />
+                    </Flex>
+                  </Flex>
+                  <Box w="1px" alignSelf="stretch" bg="rgba(255,255,255,0.15)" />
+                  <Flex direction="column" gap="4px">
+                    <Text fontFamily={AFONT} fontSize="12px" color="rgba(255,255,255,0.75)">· 라이브 단골 고객에게 할인코드를 발급하고 알림톡으로 발송할 수 있습니다.</Text>
+                    <Text fontFamily={AFONT} fontSize="12px" color="rgba(255,255,255,0.75)">· 표에서 대상을 선택한 뒤 「할인코드 발송」으로 코드를 발급·발송하세요.</Text>
+                  </Flex>
+                </Flex>
+              </PromoBanner>
+            </Box>
+
+            {/* 4. 회원 구분 필터 + 정렬 */}
+            <Flex data-doc-mark="filter" align="center" pb="14px" gap="10px">
+              <FilledButton label="전체" bg={colors.gr42} />
+              <OutlineButton label="기존 회원" />
+              <OutlineButton label="신규 회원" />
+              <HelperText>신규 6 · 기존 5 ⓘ 라이브를 보다가 그 자리에서 가입한 회원을 「신규」로 봅니다.</HelperText>
+              <Box flex="1" />
+              <SelectBox label="가입순" width="120px" options={['가입순', '이름순']} />
+              <SelectBox label="100개씩 보기" width="150px" options={['20개씩 보기', '50개씩 보기', '100개씩 보기']} />
+            </Flex>
+
+            {/* 5. 선택 대상 일괄 발송 */}
+            <Flex data-doc-mark="actions" align="center" gap="8px" pb="6px" wrap="wrap">
+              <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.gr72}>선택한 대상 {selected.size}명</Text>
+              <FilledButton label="알림톡 발송" bg={colors.bcDefault} />
+              <OutlineButton label="전체 고객 발송" />
+              <FilledButton label="할인코드 발송" bg={colors.red} onClick={openDiscountModal} />
+            </Flex>
+            <Box pb="10px">{selectWarning && <HelperText danger>할인코드를 발송할 대상을 먼저 선택해 주세요.</HelperText>}</Box>
+
+            {/* 6. 단골 리스트 표 */}
+            <Box data-doc-mark="table" pb="4px">
+              <DataTable
+                columns={[
+                  { header: ['No'], w: '90px' },
+                  { header: ['이름'], w: '90px' },
+                  { header: ['회원 구분'], w: '96px' },
+                  { header: ['닉네임'], w: '110px' },
+                  { header: ['연락처'], flex: '1.1' },
+                  { header: ['총 담은 횟수', '총 구매횟수', '총 구매금액'], flex: '1.4' },
+                  { header: ['단골 등록일'], w: '190px' },
+                ]}
+                rows={REGULAR_ROWS.map((r) => [
+                  <Flex align="center" gap="8px"><LCheck checked={selected.has(r.no)} onChange={() => toggleRow(r.no)} /><Text>{r.no}</Text></Flex>,
+                  <LinkText>{r.name}</LinkText>,
+                  <RegularBadge tone={r.tone} />,
+                  r.nickname,
+                  <LinkText>{r.phone}</LinkText>,
+                  <Flex direction="column" gap="2px" align="center"><Text>{r.put}</Text><Text>{r.buy}</Text><Text>{r.amount}</Text></Flex>,
+                  r.joinedAt,
+                ])}
+              />
+            </Box>
+
+            {/* 7. 페이지 이동 */}
+            <Box data-doc-mark="pagination">
+              <Pagination />
+            </Box>
+          </>
+        ) : (
+          <Box data-doc-mark="history">
+            <Flex align="baseline" gap="8px" pb="14px">
+              <Text fontFamily={AFONT} fontWeight="700" fontSize="18px" color={colors.gr42} letterSpacing="-0.36px">할인코드 발송내역</Text>
+              <Text fontFamily={AFONT} fontSize="12px" color={colors.gr92}>전체 {history.length}건</Text>
+            </Flex>
+            {history.length === 0 ? (
+              <Box bg="white" border={`1px dashed ${colors.grD8}`} borderRadius="12px" py="48px" textAlign="center">
+                <Text fontFamily={AFONT} fontSize="13px" color={colors.gr92}>아직 발송한 할인코드가 없습니다.</Text>
+              </Box>
+            ) : (
+              <DataTable
+                columns={[
+                  { header: ['이름', '휴대폰번호'], flex: '1.2' },
+                  { header: ['닉네임'], w: '120px' },
+                  { header: ['최근 구매일'], w: '120px' },
+                  { header: ['마케팅 수신동의'], w: '130px' },
+                  { header: ['처리내역'], w: '110px' },
+                  { header: ['발송일'], w: '120px' },
+                ]}
+                rows={history.map((h) => [
+                  <Flex direction="column" gap="2px" align="center"><Text>{h.name}</Text><Text color={colors.gr92}>{h.phone}</Text></Flex>,
+                  h.nickname,
+                  h.lastPurchase,
+                  h.marketingAgree ? '동의' : '미동의',
+                  <Flex bg={colors.green} borderRadius="4px" px="8px" py="3px"><Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color="white">발송완료</Text></Flex>,
+                  h.sentAt,
+                ])}
+              />
+            )}
+          </Box>
+        )}
+      </Box>
+
+      {modalOpen && (
+        <DiscountCodeModal targetCount={selected.size} onClose={() => setModalOpen(false)} onSend={handleSent} />
+      )}
     </AdminLayout>
   );
 }
@@ -833,7 +1194,8 @@ export function DemoScreen() {
     case 'overview': return <Overview />;
     case 'dashboard': return <Dashboard />;
     case 'live-regulars': return <LiveRegulars />;
-    case 'discount-code': return <LiveRegulars />;
+    case 'discount-code': return <DiscountCode />;
+    case 'discount-code-send': return <DiscountCodeModal targetCount={3} onClose={() => {}} onSend={() => {}} />;
     case 'item-detail': return <ItemDetail />;
     default: return <Screen><Text>알 수 없는 프리뷰: {path}</Text></Screen>;
   }

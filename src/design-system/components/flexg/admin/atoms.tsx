@@ -61,12 +61,14 @@ export function MiniButton({ label, onClick }: { label: string; onClick?: () => 
  * Figma 표: 상하 #ddd 선 + 셀/행 사이 1px 회색(grE8) · 헤더 12px 굵게 gr72 · 본문 12px gr72 중앙. */
 export interface TableColumn { header: string[]; flex?: string; w?: string }
 export function DataTable({ columns, rows }: { columns: TableColumn[]; rows: ReactNode[][] }) {
+  // w만 있고 flex가 없는 컬럼은 고정폭(늘어나지 않음) — flex 지정 컬럼만 남는 폭을 나눠 가짐
+  const colFlex = (col?: TableColumn) => col?.flex ?? (col?.w ? '0 0 auto' : '1');
   return (
-    <Box w="fit-content" maxW="100%" overflowX="auto">
+    <Box w="100%" minW="fit-content" maxW="100%" overflowX="auto">
       {/* 헤더 */}
-      <Flex bg={colors.grE8} borderTop="1px solid #ddd" borderBottom="1px solid #ddd" gap="1px" py="1px" minW="fit-content">
+      <Flex bg={colors.grE8} borderTop="1px solid #ddd" borderBottom="1px solid #ddd" gap="1px" py="1px" w="100%" minW="fit-content">
         {columns.map((col, i) => (
-          <Flex key={i} flex={col.flex ?? '1'} w={col.w} minW="0" bg={colors.grF8} p="8px" align="center" justify="center" direction="column" alignSelf="stretch">
+          <Flex key={i} flex={colFlex(col)} w={col.w} minW={col.w ?? '0'} bg={colors.grF8} p="8px" align="center" justify="center" direction="column" alignSelf="stretch">
             {col.header.map((line) => (
               <Text key={line} fontFamily={FONT} fontWeight="700" fontSize="12px" letterSpacing="-0.24px" color={colors.gr72} textAlign="center" lineHeight="1.4" whiteSpace="nowrap">{line}</Text>
             ))}
@@ -75,9 +77,9 @@ export function DataTable({ columns, rows }: { columns: TableColumn[]; rows: Rea
       </Flex>
       {/* 행 */}
       {rows.map((row, ri) => (
-        <Flex key={ri} bg={colors.grE8} gap="1px" pb="1px" align="stretch" minW="fit-content">
+        <Flex key={ri} bg={colors.grE8} gap="1px" pb="1px" align="stretch" w="100%" minW="fit-content">
           {row.map((cell, ci) => (
-            <Flex key={ci} flex={columns[ci]?.flex ?? '1'} w={columns[ci]?.w} minW="0" bg="white" p="12px" direction="column" align="center" justify="center" gap="4px" alignSelf="stretch"
+            <Flex key={ci} flex={colFlex(columns[ci])} w={columns[ci]?.w} minW={columns[ci]?.w ?? '0'} bg="white" p="12px" direction="column" align="center" justify="center" gap="4px" alignSelf="stretch"
               fontFamily={FONT} fontSize="12px" color={colors.gr72} textAlign="center" lineHeight="1.4">
               {cell}
             </Flex>

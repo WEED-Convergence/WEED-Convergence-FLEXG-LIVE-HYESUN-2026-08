@@ -31,3 +31,4 @@ export {
   Section, SectionTitle, Row, TextInput, NumberWithUnit, HelperText,
   Radio, Checkbox, Toggle, Segmented, RightChevron, Lit, SelectInput,
 } from './components/flexg/admin/formParts';
+export { LInput, LCheck } from './components/flexg/admin/discountUi';
