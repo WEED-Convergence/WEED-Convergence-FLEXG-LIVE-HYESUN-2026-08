@@ -409,101 +409,181 @@ const REGULAR_ROWS: RegularRow[] = [
 ];
 
 function LiveRegulars() {
+  const initialTab = new URLSearchParams(window.location.search).get('tab') === '할인코드' ? '할인코드' : '단골 리스트';
+  const [tab, setTab] = useState<'단골 리스트' | '할인코드'>(initialTab);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectWarning, setSelectWarning] = useState(false);
+  const [history, setHistory] = useState<SendHistoryRow[]>([]);
+
+  const toggleRow = (no: string) => {
+    setSelectWarning(false);
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(no)) next.delete(no); else next.add(no);
+      return next;
+    });
+  };
+
+  const openDiscountModal = () => {
+    if (selected.size === 0) { setSelectWarning(true); return; }
+    setModalOpen(true);
+  };
+
+  const handleSent = (template: AlimtalkTemplate) => {
+    const now = new Date();
+    const sentAt = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const newRows: SendHistoryRow[] = REGULAR_ROWS
+      .filter((r) => selected.has(r.no))
+      .map((r) => ({ name: r.name, phone: r.phone, nickname: r.nickname, lastPurchase: r.lastPurchase, marketingAgree: r.marketingAgree, template: template.label, sentAt }));
+    setHistory((prev) => [...newRows, ...prev]);
+    setModalOpen(false);
+    setSelected(new Set());
+    setTab('할인코드');
+  };
+
   const LinkText = ({ children }: { children: React.ReactNode }) => (
     <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.green} cursor="pointer" whiteSpace="nowrap">{children}</Text>
   );
+
   return (
     <AdminLayout navActive="LIVE" sidebar={{ items: REGULARS_SIDEBAR_ITEMS }}>
       <Box fontFamily={AFONT} color={colors.gr42} minW="1200px">
-        {/* 1. 검색 조건 */}
-        <SectionHead title="라이브 단골 검색" />
-        <Box data-doc-mark="search" bg="white" border={`1px solid ${colors.grE8}`} borderRadius="12px" p="24px" mb="32px">
-          <Flex gap="20px">
-            <Box flex="1"><RequiredLabel label="이름" required={false} /><TextInput placeholder="이름 입력" width="100%" /></Box>
-            <Box flex="1"><RequiredLabel label="닉네임" required={false} /><TextInput placeholder="닉네임 입력" width="100%" /></Box>
-            <Box flex="1"><RequiredLabel label="연락처" required={false} /><TextInput placeholder="연락처 입력" width="100%" /></Box>
-          </Flex>
-          <Flex justify="center" gap="8px" pt="20px">
-            <FilledButton label="초기화" bg={colors.bcSub} />
-            <FilledButton label="검색" bg={colors.bcPoint} />
-          </Flex>
+        <Box pb="20px">
+          <TabStrip tabs={['단골 리스트', '할인코드']} active={tab} onChange={(t) => setTab(t as '단골 리스트' | '할인코드')} />
         </Box>
 
-        {/* 2. 목록 타이틀 */}
-        <Flex align="baseline" gap="8px" pb="14px">
-          <Text fontFamily={AFONT} fontWeight="700" fontSize="18px" color={colors.gr42} letterSpacing="-0.36px">라이브 단골 리스트</Text>
-          <Text fontFamily={AFONT} fontSize="12px" color={colors.gr92}>전체 16개 (페이지 1/9)</Text>
-        </Flex>
+        {tab === '단골 리스트' ? (
+          <Box data-doc-tab="단골 리스트">
+            {/* 1. 검색 조건 */}
+            <SectionHead title="라이브 단골 검색" />
+            <Box data-doc-mark="search" bg="white" border={`1px solid ${colors.grE8}`} borderRadius="12px" p="24px" mb="32px">
+              <Flex gap="20px">
+                <Box flex="1"><RequiredLabel label="이름" required={false} /><TextInput placeholder="이름 입력" width="100%" /></Box>
+                <Box flex="1"><RequiredLabel label="닉네임" required={false} /><TextInput placeholder="닉네임 입력" width="100%" /></Box>
+                <Box flex="1"><RequiredLabel label="연락처" required={false} /><TextInput placeholder="연락처 입력" width="100%" /></Box>
+              </Flex>
+              <Flex justify="center" gap="8px" pt="20px">
+                <FilledButton label="초기화" bg={colors.bcSub} />
+                <FilledButton label="검색" bg={colors.bcPoint} />
+              </Flex>
+            </Box>
 
-        {/* 3. 안내 배너 */}
-        <Box data-doc-mark="promo" mb="24px">
-          <PromoBanner bg="#2A2A2A" h="auto">
-            <Flex align="center" gap="24px" py="6px">
-              <Flex direction="column" align="flex-start" gap="8px" flexShrink={0}>
-                <Flex bg={colors.red} borderRadius="4px" px="6px" py="2px"><Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color="white">LIVE</Text></Flex>
-                <Text fontFamily={AFONT} fontWeight="700" fontSize="17px" color="white" lineHeight="1.3">라이브는 실감나게</Text>
-                <Flex gap="6px" pt="2px">
-                  <FilledButton label="단골 가입 URL 복사" bg={colors.red} />
-                  <FilledButton label="바로가기 ›" bg={colors.gr72} />
-                </Flex>
-              </Flex>
-              <Box w="1px" alignSelf="stretch" bg="rgba(255,255,255,0.15)" />
-              <Flex direction="column" gap="4px">
-                <Text fontFamily={AFONT} fontSize="12px" color="rgba(255,255,255,0.75)">· 라이브 단골 기능은 라이브 관련 소식을 받을 수 있는 기능입니다.</Text>
-                <Text fontFamily={AFONT} fontSize="12px" color="rgba(255,255,255,0.75)">· 단골 가입페이지를 공유하거나 인스타그램, 카카오톡 프로필 등에 등록하여 단골을 늘려보세요.</Text>
-                <Text fontFamily={AFONT} fontSize="12px" color="rgba(255,255,255,0.75)">· 단골고객에게 대기/진행중인 방송 알림톡을 발송할 수 있습니다.</Text>
-              </Flex>
+            {/* 2. 목록 타이틀 */}
+            <Flex align="baseline" gap="8px" pb="14px">
+              <Text fontFamily={AFONT} fontWeight="700" fontSize="18px" color={colors.gr42} letterSpacing="-0.36px">라이브 단골 리스트</Text>
+              <Text fontFamily={AFONT} fontSize="12px" color={colors.gr92}>전체 {REGULAR_ROWS.length}개</Text>
             </Flex>
-          </PromoBanner>
-        </Box>
 
-        {/* 4. 회원 구분 필터 + 정렬 */}
-        <Flex data-doc-mark="filter" align="center" pb="14px" gap="10px">
-          <FilledButton label="전체" bg={colors.gr42} />
-          <OutlineButton label="기존 회원" />
-          <OutlineButton label="신규 회원" />
-          <HelperText>신규 6 · 기존 5 ⓘ 라이브를 보다가 그 자리에서 가입한 회원을 「신규」로 봅니다.</HelperText>
-          <Box flex="1" />
-          <SelectBox label="가입순" width="120px" options={['가입순', '이름순']} />
-          <SelectBox label="100개씩 보기" width="150px" options={['20개씩 보기', '50개씩 보기', '100개씩 보기']} />
-        </Flex>
+            {/* 3. 안내 배너 */}
+            <Box data-doc-mark="promo" mb="24px">
+              <PromoBanner bg="#2A2A2A" h="auto">
+                <Flex align="center" gap="24px" py="6px">
+                  <Flex direction="column" align="flex-start" gap="8px" flexShrink={0}>
+                    <Flex bg={colors.red} borderRadius="4px" px="6px" py="2px"><Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color="white">LIVE</Text></Flex>
+                    <Text fontFamily={AFONT} fontWeight="700" fontSize="17px" color="white" lineHeight="1.3">라이브는 실감나게</Text>
+                    <Flex gap="6px" pt="2px">
+                      <FilledButton label="단골 가입 URL 복사" bg={colors.red} />
+                      <FilledButton label="바로가기 ›" bg={colors.gr72} />
+                    </Flex>
+                  </Flex>
+                  <Box w="1px" alignSelf="stretch" bg="rgba(255,255,255,0.15)" />
+                  <Flex direction="column" gap="4px">
+                    <Text fontFamily={AFONT} fontSize="12px" color="rgba(255,255,255,0.75)">· 라이브 단골 고객에게 할인코드를 발급하고 알림톡으로 발송할 수 있습니다.</Text>
+                    <Text fontFamily={AFONT} fontSize="12px" color="rgba(255,255,255,0.75)">· 표에서 대상을 선택한 뒤 「할인코드 발송」으로 코드를 발급·발송하세요.</Text>
+                  </Flex>
+                </Flex>
+              </PromoBanner>
+            </Box>
 
-        {/* 5. 선택 대상 일괄 발송 */}
-        <Flex data-doc-mark="actions" align="center" gap="8px" pb="10px">
-          <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.gr72}>선택한 대상</Text>
-          <FilledButton label="알림톡 발송" bg={colors.bcDefault} />
-          <OutlineButton label="전체 고객 발송" />
-        </Flex>
+            {/* 4. 회원 구분 필터 + 정렬 */}
+            <Flex data-doc-mark="filter" align="center" pb="14px" gap="10px">
+              <FilledButton label="전체" bg={colors.gr42} />
+              <OutlineButton label="기존 회원" />
+              <OutlineButton label="신규 회원" />
+              <HelperText>신규 6 · 기존 5 ⓘ 라이브를 보다가 그 자리에서 가입한 회원을 「신규」로 봅니다.</HelperText>
+              <Box flex="1" />
+              <SelectBox label="가입순" width="120px" options={['가입순', '이름순']} />
+              <SelectBox label="100개씩 보기" width="150px" options={['20개씩 보기', '50개씩 보기', '100개씩 보기']} />
+            </Flex>
 
-        {/* 6. 단골 리스트 표 */}
-        <Box data-doc-mark="table" pb="4px">
-          <DataTable
-            columns={[
-              { header: ['No'], w: '90px' },
-              { header: ['이름'], w: '90px' },
-              { header: ['회원 구분'], w: '96px' },
-              { header: ['닉네임'], w: '110px' },
-              { header: ['연락처'], flex: '1.1' },
-              { header: ['총 담은 횟수', '총 구매횟수', '총 구매금액'], flex: '1.4' },
-              { header: ['단골 등록일'], w: '190px' },
-            ]}
-            rows={REGULAR_ROWS.map((r) => [
-              <Flex align="center" gap="8px"><Box w="14px" h="14px" borderRadius="3px" border={`1px solid ${colors.grD8}`} flexShrink={0} /><Text>{r.no}</Text></Flex>,
-              <LinkText>{r.name}</LinkText>,
-              <RegularBadge tone={r.tone} />,
-              r.nickname,
-              <LinkText>{r.phone}</LinkText>,
-              <Flex direction="column" gap="2px" align="center"><Text>{r.put}</Text><Text>{r.buy}</Text><Text>{r.amount}</Text></Flex>,
-              r.joinedAt,
-            ])}
-          />
-        </Box>
+            {/* 5. 선택 대상 일괄 발송 */}
+            <Flex data-doc-mark="actions" align="center" gap="8px" pb="6px" wrap="wrap">
+              <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.gr72}>선택한 대상 {selected.size}명</Text>
+              <FilledButton label="알림톡 발송" bg={colors.bcDefault} />
+              <OutlineButton label="전체 고객 발송" />
+              <FilledButton label="할인코드 발송" bg={colors.red} onClick={openDiscountModal} />
+            </Flex>
+            <Box pb="10px">{selectWarning && <HelperText danger>할인코드를 발송할 대상을 먼저 선택해 주세요.</HelperText>}</Box>
 
-        {/* 7. 페이지네이션 */}
-        <Box data-doc-mark="pagination">
-          <Pagination />
-        </Box>
+            {/* 6. 단골 리스트 표 */}
+            <Box data-doc-mark="table" pb="4px">
+              <DataTable
+                columns={[
+                  { header: ['No'], w: '90px' },
+                  { header: ['이름'], w: '90px' },
+                  { header: ['회원 구분'], w: '96px' },
+                  { header: ['닉네임'], w: '110px' },
+                  { header: ['연락처'], flex: '1.1' },
+                  { header: ['총 담은 횟수', '총 구매횟수', '총 구매금액'], flex: '1.4' },
+                  { header: ['단골 등록일'], w: '190px' },
+                ]}
+                rows={REGULAR_ROWS.map((r) => [
+                  <Flex align="center" gap="8px"><LCheck checked={selected.has(r.no)} onChange={() => toggleRow(r.no)} /><Text>{r.no}</Text></Flex>,
+                  <LinkText>{r.name}</LinkText>,
+                  <RegularBadge tone={r.tone} />,
+                  r.nickname,
+                  <LinkText>{r.phone}</LinkText>,
+                  <Flex direction="column" gap="2px" align="center"><Text>{r.put}</Text><Text>{r.buy}</Text><Text>{r.amount}</Text></Flex>,
+                  r.joinedAt,
+                ])}
+              />
+            </Box>
+
+            {/* 7. 페이지 이동 */}
+            <Box data-doc-mark="pagination">
+              <Pagination />
+            </Box>
+          </Box>
+        ) : (
+          <Box data-doc-tab="할인코드" data-doc-mark="history">
+            <Flex align="baseline" gap="8px" pb="14px">
+              <Text fontFamily={AFONT} fontWeight="700" fontSize="18px" color={colors.gr42} letterSpacing="-0.36px">할인코드 발송내역</Text>
+              <Text fontFamily={AFONT} fontSize="12px" color={colors.gr92}>전체 {history.length}건</Text>
+            </Flex>
+            {history.length === 0 ? (
+              <Box bg="white" border={`1px dashed ${colors.grD8}`} borderRadius="12px" py="48px" textAlign="center">
+                <Text fontFamily={AFONT} fontSize="13px" color={colors.gr92}>아직 발송한 할인코드가 없습니다.</Text>
+              </Box>
+            ) : (
+              <DataTable
+                columns={[
+                  { header: ['이름', '휴대폰번호'], flex: '1.2' },
+                  { header: ['닉네임'], w: '120px' },
+                  { header: ['최근 구매일'], w: '120px' },
+                  { header: ['마케팅 수신동의'], w: '130px' },
+                  { header: ['발송 알림톡'], flex: '1' },
+                  { header: ['처리내역'], w: '110px' },
+                  { header: ['발송일'], w: '120px' },
+                ]}
+                rows={history.map((h) => [
+                  <Flex direction="column" gap="2px" align="center"><Text>{h.name}</Text><Text color={colors.gr92}>{h.phone}</Text></Flex>,
+                  h.nickname,
+                  h.lastPurchase,
+                  h.marketingAgree ? '동의' : '미동의',
+                  h.template,
+                  <Flex bg={colors.green} borderRadius="4px" px="8px" py="3px"><Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color="white">발송완료</Text></Flex>,
+                  h.sentAt,
+                ])}
+              />
+            )}
+          </Box>
+        )}
       </Box>
+
+      {modalOpen && (
+        <DiscountCodeModal targetCount={selected.size} onClose={() => setModalOpen(false)} onSend={handleSent} />
+      )}
     </AdminLayout>
   );
 }
@@ -695,186 +775,6 @@ function DiscountCodeModal({ targetCount, onClose, onSend }: { targetCount: numb
 }
 
 type SendHistoryRow = { name: string; phone: string; nickname: string; lastPurchase: string; marketingAgree: boolean; template: string; sentAt: string };
-
-// ── 할인코드 (단골 리스트 + 할인코드(발송내역) 탭) ──
-function DiscountCode() {
-  const [tab, setTab] = useState<'단골 리스트' | '할인코드'>('단골 리스트');
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectWarning, setSelectWarning] = useState(false);
-  const [history, setHistory] = useState<SendHistoryRow[]>([]);
-
-  const toggleRow = (no: string) => {
-    setSelectWarning(false);
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(no)) next.delete(no); else next.add(no);
-      return next;
-    });
-  };
-
-  const openDiscountModal = () => {
-    if (selected.size === 0) { setSelectWarning(true); return; }
-    setModalOpen(true);
-  };
-
-  const handleSent = (template: AlimtalkTemplate) => {
-    const now = new Date();
-    const sentAt = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    const newRows: SendHistoryRow[] = REGULAR_ROWS
-      .filter((r) => selected.has(r.no))
-      .map((r) => ({ name: r.name, phone: r.phone, nickname: r.nickname, lastPurchase: r.lastPurchase, marketingAgree: r.marketingAgree, template: template.label, sentAt }));
-    setHistory((prev) => [...newRows, ...prev]);
-    setModalOpen(false);
-    setSelected(new Set());
-    setTab('할인코드');
-  };
-
-  const LinkText = ({ children }: { children: React.ReactNode }) => (
-    <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.green} cursor="pointer" whiteSpace="nowrap">{children}</Text>
-  );
-
-  return (
-    <AdminLayout navActive="LIVE" sidebar={{ items: REGULARS_SIDEBAR_ITEMS }}>
-      <Box fontFamily={AFONT} color={colors.gr42} minW="1200px">
-        <Box pb="20px">
-          <TabStrip tabs={['단골 리스트', '할인코드']} active={tab} onChange={(t) => setTab(t as '단골 리스트' | '할인코드')} />
-        </Box>
-
-        {tab === '단골 리스트' ? (
-          <>
-            {/* 1. 검색 조건 */}
-            <SectionHead title="라이브 단골 검색" />
-            <Box data-doc-mark="search" bg="white" border={`1px solid ${colors.grE8}`} borderRadius="12px" p="24px" mb="32px">
-              <Flex gap="20px">
-                <Box flex="1"><RequiredLabel label="이름" required={false} /><TextInput placeholder="이름 입력" width="100%" /></Box>
-                <Box flex="1"><RequiredLabel label="닉네임" required={false} /><TextInput placeholder="닉네임 입력" width="100%" /></Box>
-                <Box flex="1"><RequiredLabel label="연락처" required={false} /><TextInput placeholder="연락처 입력" width="100%" /></Box>
-              </Flex>
-              <Flex justify="center" gap="8px" pt="20px">
-                <FilledButton label="초기화" bg={colors.bcSub} />
-                <FilledButton label="검색" bg={colors.bcPoint} />
-              </Flex>
-            </Box>
-
-            {/* 2. 목록 타이틀 */}
-            <Flex align="baseline" gap="8px" pb="14px">
-              <Text fontFamily={AFONT} fontWeight="700" fontSize="18px" color={colors.gr42} letterSpacing="-0.36px">라이브 단골 리스트</Text>
-              <Text fontFamily={AFONT} fontSize="12px" color={colors.gr92}>전체 {REGULAR_ROWS.length}개</Text>
-            </Flex>
-
-            {/* 3. 안내 배너 */}
-            <Box data-doc-mark="promo" mb="24px">
-              <PromoBanner bg="#2A2A2A" h="auto">
-                <Flex align="center" gap="24px" py="6px">
-                  <Flex direction="column" align="flex-start" gap="8px" flexShrink={0}>
-                    <Flex bg={colors.red} borderRadius="4px" px="6px" py="2px"><Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color="white">LIVE</Text></Flex>
-                    <Text fontFamily={AFONT} fontWeight="700" fontSize="17px" color="white" lineHeight="1.3">라이브는 실감나게</Text>
-                    <Flex gap="6px" pt="2px">
-                      <FilledButton label="단골 가입 URL 복사" bg={colors.red} />
-                      <FilledButton label="바로가기 ›" bg={colors.gr72} />
-                    </Flex>
-                  </Flex>
-                  <Box w="1px" alignSelf="stretch" bg="rgba(255,255,255,0.15)" />
-                  <Flex direction="column" gap="4px">
-                    <Text fontFamily={AFONT} fontSize="12px" color="rgba(255,255,255,0.75)">· 라이브 단골 고객에게 할인코드를 발급하고 알림톡으로 발송할 수 있습니다.</Text>
-                    <Text fontFamily={AFONT} fontSize="12px" color="rgba(255,255,255,0.75)">· 표에서 대상을 선택한 뒤 「할인코드 발송」으로 코드를 발급·발송하세요.</Text>
-                  </Flex>
-                </Flex>
-              </PromoBanner>
-            </Box>
-
-            {/* 4. 회원 구분 필터 + 정렬 */}
-            <Flex data-doc-mark="filter" align="center" pb="14px" gap="10px">
-              <FilledButton label="전체" bg={colors.gr42} />
-              <OutlineButton label="기존 회원" />
-              <OutlineButton label="신규 회원" />
-              <HelperText>신규 6 · 기존 5 ⓘ 라이브를 보다가 그 자리에서 가입한 회원을 「신규」로 봅니다.</HelperText>
-              <Box flex="1" />
-              <SelectBox label="가입순" width="120px" options={['가입순', '이름순']} />
-              <SelectBox label="100개씩 보기" width="150px" options={['20개씩 보기', '50개씩 보기', '100개씩 보기']} />
-            </Flex>
-
-            {/* 5. 선택 대상 일괄 발송 */}
-            <Flex data-doc-mark="actions" align="center" gap="8px" pb="6px" wrap="wrap">
-              <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.gr72}>선택한 대상 {selected.size}명</Text>
-              <FilledButton label="알림톡 발송" bg={colors.bcDefault} />
-              <OutlineButton label="전체 고객 발송" />
-              <FilledButton label="할인코드 발송" bg={colors.red} onClick={openDiscountModal} />
-            </Flex>
-            <Box pb="10px">{selectWarning && <HelperText danger>할인코드를 발송할 대상을 먼저 선택해 주세요.</HelperText>}</Box>
-
-            {/* 6. 단골 리스트 표 */}
-            <Box data-doc-mark="table" pb="4px">
-              <DataTable
-                columns={[
-                  { header: ['No'], w: '90px' },
-                  { header: ['이름'], w: '90px' },
-                  { header: ['회원 구분'], w: '96px' },
-                  { header: ['닉네임'], w: '110px' },
-                  { header: ['연락처'], flex: '1.1' },
-                  { header: ['총 담은 횟수', '총 구매횟수', '총 구매금액'], flex: '1.4' },
-                  { header: ['단골 등록일'], w: '190px' },
-                ]}
-                rows={REGULAR_ROWS.map((r) => [
-                  <Flex align="center" gap="8px"><LCheck checked={selected.has(r.no)} onChange={() => toggleRow(r.no)} /><Text>{r.no}</Text></Flex>,
-                  <LinkText>{r.name}</LinkText>,
-                  <RegularBadge tone={r.tone} />,
-                  r.nickname,
-                  <LinkText>{r.phone}</LinkText>,
-                  <Flex direction="column" gap="2px" align="center"><Text>{r.put}</Text><Text>{r.buy}</Text><Text>{r.amount}</Text></Flex>,
-                  r.joinedAt,
-                ])}
-              />
-            </Box>
-
-            {/* 7. 페이지 이동 */}
-            <Box data-doc-mark="pagination">
-              <Pagination />
-            </Box>
-          </>
-        ) : (
-          <Box data-doc-mark="history">
-            <Flex align="baseline" gap="8px" pb="14px">
-              <Text fontFamily={AFONT} fontWeight="700" fontSize="18px" color={colors.gr42} letterSpacing="-0.36px">할인코드 발송내역</Text>
-              <Text fontFamily={AFONT} fontSize="12px" color={colors.gr92}>전체 {history.length}건</Text>
-            </Flex>
-            {history.length === 0 ? (
-              <Box bg="white" border={`1px dashed ${colors.grD8}`} borderRadius="12px" py="48px" textAlign="center">
-                <Text fontFamily={AFONT} fontSize="13px" color={colors.gr92}>아직 발송한 할인코드가 없습니다.</Text>
-              </Box>
-            ) : (
-              <DataTable
-                columns={[
-                  { header: ['이름', '휴대폰번호'], flex: '1.2' },
-                  { header: ['닉네임'], w: '120px' },
-                  { header: ['최근 구매일'], w: '120px' },
-                  { header: ['마케팅 수신동의'], w: '130px' },
-                  { header: ['발송 알림톡'], flex: '1' },
-                  { header: ['처리내역'], w: '110px' },
-                  { header: ['발송일'], w: '120px' },
-                ]}
-                rows={history.map((h) => [
-                  <Flex direction="column" gap="2px" align="center"><Text>{h.name}</Text><Text color={colors.gr92}>{h.phone}</Text></Flex>,
-                  h.nickname,
-                  h.lastPurchase,
-                  h.marketingAgree ? '동의' : '미동의',
-                  h.template,
-                  <Flex bg={colors.green} borderRadius="4px" px="8px" py="3px"><Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color="white">발송완료</Text></Flex>,
-                  h.sentAt,
-                ])}
-              />
-            )}
-          </Box>
-        )}
-      </Box>
-
-      {modalOpen && (
-        <DiscountCodeModal targetCount={selected.size} onClose={() => setModalOpen(false)} onSend={handleSent} />
-      )}
-    </AdminLayout>
-  );
-}
 
 // ── 항목 상세(팝업) ──
 function ItemDetail() {
@@ -1206,7 +1106,6 @@ export function DemoScreen() {
     case 'overview': return <Overview />;
     case 'dashboard': return <Dashboard />;
     case 'live-regulars': return <LiveRegulars />;
-    case 'discount-code': return <DiscountCode />;
     case 'discount-code-send': return <DiscountCodeModal targetCount={3} onClose={() => {}} onSend={() => {}} />;
     case 'item-detail': return <ItemDetail />;
     default: return <Screen><Text>알 수 없는 프리뷰: {path}</Text></Screen>;
