@@ -42,9 +42,9 @@ const CODE_ROWS: CodeRow[] = [
 // 라벨 + 입력을 한 줄에 나란히 놓는 검색 필드(이 화면 전용 레이아웃)
 function FieldRow({ label, labelWidth = '64px', children }: { label: string; labelWidth?: string; children: React.ReactNode }) {
   return (
-    <Flex align="center" gap="10px" flex="1" minW="0">
+    <Flex align="center" gap="10px" flexShrink={0}>
       <Text fontFamily={FONT} fontWeight="700" fontSize="13px" color={colors.gr42} whiteSpace="nowrap" w={labelWidth} flexShrink={0}>{label}</Text>
-      <Box flex="1" minW="0">{children}</Box>
+      {children}
     </Flex>
   );
 }
@@ -100,10 +100,10 @@ export function DiscountCode2() {
         <Box data-doc-mark="search" border={`1px solid ${colors.grE8}`} borderRadius="12px" p="24px" mb="24px">
           <Flex align="center" gap="24px" pb="20px">
             <FieldRow label="할인코드">
-              <LInput value={codeQ} onChange={setCodeQ} placeholder="할인코드 입력" width="100%" />
+              <LInput value={codeQ} onChange={setCodeQ} placeholder="할인코드 입력" width="260px" />
             </FieldRow>
             <FieldRow label="메모">
-              <LInput value={memoQ} onChange={setMemoQ} placeholder="관리자 메모 입력" width="100%" />
+              <LInput value={memoQ} onChange={setMemoQ} placeholder="관리자 메모 입력" width="260px" />
             </FieldRow>
             <Flex align="center" gap="14px" flexShrink={0}>
               <Text fontFamily={FONT} fontWeight="700" fontSize="13px" color={colors.gr42} whiteSpace="nowrap">구분</Text>
@@ -125,7 +125,6 @@ export function DiscountCode2() {
                   <QuickRangeButton key={q} label={q} active={quick === q} onClick={() => setQuick(q)} />
                 ))}
               </Flex>
-              <Box flex="1" />
               <Flex align="center" gap="14px" flexShrink={0}>
                 <Text fontFamily={FONT} fontWeight="700" fontSize="13px" color={colors.gr42} whiteSpace="nowrap">사용여부</Text>
                 <Radio checked={usedFilter === '전체'} label="전체" onClick={() => setUsedFilter('전체')} />
