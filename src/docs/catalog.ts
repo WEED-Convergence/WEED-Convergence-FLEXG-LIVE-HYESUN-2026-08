@@ -65,81 +65,8 @@ export const DOC_TITLE = 'CONVERGENCE Docs.';
 // ─────────────────────────────────────────────────────────────────────────
 export const DOC_GROUPS: DocGroup[] = [
   {
-    title: '개요',
-    entries: [
-      {
-        id: 'overview',
-        name: '프로토타입 개요',
-        docPath: '/overview',
-        route: '/preview/overview',
-        breadcrumb: '개요',
-        type: 'page',
-        updatedAt: '2026-07-10',
-        status: '검토중',
-        hideDesc: true, // 프리뷰(표지) 자체가 문서 → 우측 설명 패널 숨김
-        summary: '이 프로토타입이 어떤 서비스의 어떤 기능을 위해 만들어졌는지 개요·목적·범위를 협업 개발자·디자이너에게 전달하는 표지 페이지.',
-        sections: [],
-      },
-    ],
-  },
-  {
     title: '어드민',
     entries: [
-      {
-        id: 'dashboard',
-        code: 'ADM-P001',
-        name: '대시보드',
-        docPath: '/admin/dashboard',
-        route: '/preview/dashboard',
-        breadcrumb: '어드민 › 대시보드',
-        type: 'page',
-        updatedAt: '2026-07-09',
-        status: '검토중',
-        summary: '운영 현황을 한 화면에서 파악하는 어드민 진입(홈) 페이지.',
-        common:
-          '1) 표준 셸(상단 네비 + 좌측 사이드바 + 푸터) 위에 지표 위주로 구성함\n2) 각 영역에 번호 마커가 붙어 우측 설명과 1:1로 매칭됨\n3) 각 영역에서 쓴 표준 컴포넌트는 아래 「구성」의 영역별 "사용된 컴포넌트"에 표기',
-        sections: [
-          { title: '인사 + 프로모 배너', badge: 'PROMO', mark: 'promo',
-            body: '1) 좌측: 운영자 인사 문구 + 오늘 날짜\n2) 우측: 진행 중 홍보 배너 노출, 클릭 시 지정 링크로 이동\n예외) 진행 중 배너가 없으면 우측 배너 영역을 비움',
-            components: ['AdBanner'] },
-          { title: '오늘의 할 일', badge: 'STATS', mark: 'todo',
-            body: '1) 최근 30일 기준 주문 상태별 처리 필요 건수를 요약\n2) 취소·반품·교환 등 즉시 대응 항목은 강조 표기\n3) 건수 클릭 시 해당 주문 목록으로 이동\n예외) 처리할 건이 없으면 0으로 표기(숨기지 않음)',
-            components: ['SectionHead', 'StatCard'] },
-          { title: 'CRM 현황', badge: 'CRM', mark: 'crm',
-            body: '1) 캠페인 진행 현황을 진행중/종료/중지로 구분해 집계\n2) 적립·사용 캐시 현황 요약\n3) 전일 기준 CRM 지표 제공\n예외) 당일 집계 전에는 전일 값 기준으로 표기',
-            components: ['SectionHead', 'InfoCard', 'PillStatCard', 'KVColumns'] },
-          { title: '쇼핑몰 현황', badge: 'TABLE', mark: 'shop',
-            body: '1) DAU·방문·페이지뷰·실시간 유입/인기 페이지를 표로 제공\n2) 우측에 오늘·어제·이번달 매출 요약\n3) 실시간 항목과 집계 항목은 갱신 주기가 다름\n예외) 값이 없는 항목은 "–"로 표기',
-            components: ['SectionHead', 'KVColumns', 'InfoCard'] },
-          { title: '유료서비스 현황', badge: 'TABLE', mark: 'paid',
-            body: '1) 이번 달 청구 예정 유료서비스(SMS·LMS·알림톡·트래픽·총 이용금액) 현황을 표로 제공\n2) 우측에 관련 안내 배너\n예외) 미사용 서비스는 0으로 표기',
-            components: ['SectionHead', 'KVColumns', 'AdBanner'] },
-          { title: '구매후기 · 상품문의 · 공지', badge: 'LIST', mark: 'reviews',
-            body: '1) 최근 30일 기준 별점 분포별 구매후기 수\n2) 상품문의 답변/미답변 현황\n3) 공지사항 최신 목록\n예외) 미답변 문의가 있으면 개수를 강조',
-            components: ['SectionHead', 'KVColumns', 'Stars', 'NoticeList'] },
-        ],
-        children: [
-          {
-            id: 'item-detail',
-            code: 'ADM-M001',
-            name: '항목 상세',
-            docPath: '/admin/dashboard/item',
-            route: '/preview/item-detail',
-            breadcrumb: '대시보드 › 항목 상세',
-            type: 'popup',
-            updatedAt: '2026-07-08',
-            status: '작성중',
-            summary: '테이블 행을 클릭하면 열리는 상세 팝업. 기본 정보 확인 + 저장/삭제 액션.',
-            sections: [
-              { title: '기본 정보', badge: 'FORM', mark: 'form',
-                body: '1) 항목명·상태·담당자를 확인·편집\n예외) 필수값 미입력 시 저장을 막음',
-                components: ['Field'] },
-              { title: '하단 액션', badge: 'ACTION', mark: 'actions',
-                body: '1) 저장 / 삭제 / 닫기 제공\n예외) 삭제는 확인 후 실행\n※ 표준 버튼 컴포넌트 미적용(프로토타입 임시 조립) — 디자인시스템 정식 버튼으로 교체 예정' },
-            ],
-          },
-        ],
-      },
       {
         id: 'live-regulars',
         code: 'ADM-P002',
