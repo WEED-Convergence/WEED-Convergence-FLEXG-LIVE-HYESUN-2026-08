@@ -418,6 +418,11 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
           <Box as="button" onClick={onClose} cursor="pointer"><Text fontSize="18px" color={colors.gr72}>×</Text></Box>
         </Flex>
 
+        <Box px="24px" pt="16px" data-doc-mark="modal-notice">
+          <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.red}>할인코드는 발급일로 부터 3일동안만 유효합니다.</Text>
+          <Text fontFamily={AFONT} fontSize="12px" color={colors.gr72}>할인코드 사용내역은 [회원&gt;할인코드 사용내역] 화면에서 확인하실 수 있습니다.</Text>
+        </Box>
+
         <Box px="24px" pt="16px">
           <TabStrip tabs={['할인코드 발송', '발송내역']} active={tab} onChange={(t) => setTab(t as '할인코드 발송' | '발송내역')} />
         </Box>
