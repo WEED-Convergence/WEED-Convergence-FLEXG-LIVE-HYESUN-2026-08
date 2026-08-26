@@ -412,11 +412,9 @@ const REGULAR_ROWS: RegularRow[] = [
 function LiveRegulars() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectWarning, setSelectWarning] = useState(false);
   const [history, setHistory] = useState<SendHistoryRow[]>(SEED_SEND_HISTORY);
 
   const toggleRow = (no: string) => {
-    setSelectWarning(false);
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(no)) next.delete(no); else next.add(no);
@@ -425,7 +423,7 @@ function LiveRegulars() {
   };
 
   const openDiscountModal = () => {
-    if (selected.size === 0) { setSelectWarning(true); return; }
+    if (selected.size === 0) { window.alert('할인코드를 발송할 대상을 먼저 선택해 주세요.'); return; }
     setModalOpen(true);
   };
 
@@ -509,7 +507,6 @@ function LiveRegulars() {
           <OutlineButton label="전체 고객 발송" />
           <FilledButton label="할인코드 발송" bg={colors.red} onClick={openDiscountModal} />
         </Flex>
-        <Box pb="10px">{selectWarning && <HelperText danger>할인코드를 발송할 대상을 먼저 선택해 주세요.</HelperText>}</Box>
 
         {/* 6. 단골 리스트 표 */}
         <Box data-doc-mark="table" pb="4px">
