@@ -1,5 +1,5 @@
 import { Box, Flex, Text, Image, Link } from '@chakra-ui/react';
-import { sidebar, FONT, asset } from '../../../tokens';
+import { colors, sidebar, FONT, asset } from '../../../tokens';
 
 function Separator() {
   return <Box h="2px" w="100%" bg={sidebar.separator} borderTop="1px solid #000" />;
@@ -30,19 +30,31 @@ function RoundButton({ label }: { label: string }) {
   );
 }
 
+// 신규 기능 안내용 「N」 뱃지 — 메뉴 라벨 옆에 붙는 작은 원형 태그(TopNav의 NewBadge와 동일 스타일)
+function NewBadge() {
+  return (
+    <Flex w="14px" h="14px" borderRadius="100px" bg={colors.red} align="center" justify="center" flexShrink={0}>
+      <Text fontFamily="Roboto, sans-serif" fontWeight="700" fontSize="11px" color="white" lineHeight="1">N</Text>
+    </Flex>
+  );
+}
+
 // href 없으면 비링크 행(시안용 메뉴)으로 렌더 — 스타일은 동일
-function TwoDepthMenu({ label, href, active }: { label: string; href?: string; active?: boolean }) {
+function TwoDepthMenu({ label, href, active, badge }: { label: string; href?: string; active?: boolean; badge?: boolean }) {
   const inner = (
     <>
       {active && <Box position="absolute" left="0" top="0" w="4px" h="32px" bg={sidebar.accentGreen} />}
-      <Text
-        fontFamily={FONT}
-        fontWeight="700"
-        fontSize="12px"
-        color={active ? sidebar.menuActiveText : sidebar.menuInactiveText}
-      >
-        {label}
-      </Text>
+      <Flex align="center" gap="6px">
+        <Text
+          fontFamily={FONT}
+          fontWeight="700"
+          fontSize="12px"
+          color={active ? sidebar.menuActiveText : sidebar.menuInactiveText}
+        >
+          {label}
+        </Text>
+        {badge && <NewBadge />}
+      </Flex>
     </>
   );
   const sx = {
@@ -64,7 +76,7 @@ function TwoDepthMenu({ label, href, active }: { label: string; href?: string; a
   );
 }
 
-export type SidebarItem = { label: string; href?: string; active?: boolean; sub?: SidebarItem[] };
+export type SidebarItem = { label: string; href?: string; active?: boolean; sub?: SidebarItem[]; badge?: boolean };
 
 // 3-depth 서브메뉴(들여쓰기) — 단골 관리 하위(단골 리스트 / 단골 허브 꾸미기) 등
 function ThreeDepthMenu({ label, href, active }: { label: string; href?: string; active?: boolean }) {
@@ -235,11 +247,11 @@ export function Sidebar({ title, items }: { title?: string; items?: SidebarItem[
           it.sub
             ? (
               <Box key={it.label}>
-                <TwoDepthMenu label={it.label} href={it.href} active={it.active} />
+                <TwoDepthMenu label={it.label} href={it.href} active={it.active} badge={it.badge} />
                 {it.sub.map((s) => <ThreeDepthMenu key={s.label} label={s.label} href={s.href} active={s.active} />)}
               </Box>
             )
-            : <TwoDepthMenu key={it.label} label={it.label} href={it.href} active={it.active} />
+            : <TwoDepthMenu key={it.label} label={it.label} href={it.href} active={it.active} badge={it.badge} />
         ))}
       </Box>
     </Flex>

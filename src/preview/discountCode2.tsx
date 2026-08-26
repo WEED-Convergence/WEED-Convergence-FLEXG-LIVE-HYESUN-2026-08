@@ -11,7 +11,23 @@ import {
 
 const FONT = "'Pretendard', system-ui, sans-serif";
 
-const SIDEBAR_ITEMS = [{ label: '할인코드', active: true }];
+// 실제 서비스(어드민 › 회원) LNB 구성을 참고해 재현
+const SIDEBAR_ITEMS = [
+  { label: '회원목록' },
+  { label: '회원등급' },
+  { label: '회원가입 현황', sub: [{ label: '회원가입 현황' }, { label: '채널별 회원가입 현황' }] },
+  { label: '포인트 및 리워드' },
+  { label: '포인트 사용내역' },
+  { label: '리워드 현황', sub: [{ label: '리워드 매출 현황' }, { label: '리워드 회원가입 현황' }, { label: '리워드 App설치 현황' }] },
+  { label: '할인코드', active: true },
+  { label: '할인코드 사용내역' },
+  { label: '쿠폰목록' },
+  { label: '대량 쿠폰 자동 발급', badge: true },
+  { label: '쿠폰코드', sub: [{ label: '쿠폰코드 목록' }, { label: '쿠폰코드 대량발급' }] },
+  { label: '쿠폰 사용내역' },
+  { label: '추첨 이벤트' },
+  { label: '개인정보보호 배상책임보험' },
+];
 
 type CodeRow = { division: string; used: boolean; code: string; kind: string; date: string; env: string; memo: string };
 const CODE_ROWS: CodeRow[] = [
@@ -62,7 +78,7 @@ export function DiscountCode2() {
   };
 
   return (
-    <AdminLayout navActive="LIVE" sidebar={{ items: SIDEBAR_ITEMS }}>
+    <AdminLayout navActive="회원" sidebar={{ title: '회원', items: SIDEBAR_ITEMS }}>
       <Box fontFamily={FONT} color={colors.gr42} minW="1200px">
         {/* 1. 할인코드 사용여부 설정 */}
         <Text fontFamily={FONT} fontWeight="700" fontSize="20px" color={colors.gr42} pb="10px">할인코드 사용여부 설정</Text>
