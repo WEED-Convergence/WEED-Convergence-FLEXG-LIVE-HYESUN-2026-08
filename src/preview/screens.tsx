@@ -389,7 +389,7 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
     setHistoryTemplate('전체'); setHistoryStatus('전체');
     setHistoryFilterKey((k) => k + 1);
   };
-  // 기본값(기간 전체)이라 날짜 조건 없이도 기존 발송 이력이 모두 노출됨. AND 결합.
+  // 기본값(발송일 전체)이라 날짜 조건 없이도 기존 발송 이력이 모두 노출됨. AND 결합.
   const filteredHistory = history.filter((h) => {
     const q = historyQ;
     const matchesQuery = !q || h.name.includes(q) || h.nickname.includes(q) || h.phone.includes(q);
@@ -494,7 +494,7 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
                       <LInput value={historyQDraft} onChange={setHistoryQDraft} placeholder="이름, 닉네임, 연락처로 검색" width="100%" onEnter={searchHistory} />
                     </Box>
                     <Box>
-                      <RequiredLabel label="기간" required={false} />
+                      <RequiredLabel label="발송일" required={false} />
                       <Flex align="center" gap="6px">
                         <LInput type="date" value={historyStartDraft} onChange={setHistoryStartDraft} width="150px" />
                         <Text color={colors.gr72}>~</Text>
