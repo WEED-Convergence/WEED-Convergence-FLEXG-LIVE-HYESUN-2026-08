@@ -510,11 +510,11 @@ function LiveRegulars() {
 
 // ── 할인코드 발송(팝업) — 이 화면 전용 표준 외 조립 소품 ──
 // 숫자만 남기는 컨트롤드 입력(원/% 단위 표시용)
-function NumField({ value, onChange, unit, placeholder, width = '160px' }: {
-  value: string; onChange: (v: string) => void; unit: string; placeholder?: string; width?: string;
+function NumField({ value, onChange, unit, placeholder, width = '160px', disabled = false }: {
+  value: string; onChange: (v: string) => void; unit: string; placeholder?: string; width?: string; disabled?: boolean;
 }) {
   return (
-    <Flex align="center" gap="6px">
+    <Flex align="center" gap="6px" opacity={disabled ? 0.5 : 1} pointerEvents={disabled ? 'none' : 'auto'}>
       <LInput value={value} onChange={(v) => onChange(v.replace(/[^0-9]/g, ''))} placeholder={placeholder} width={width} />
       <Text fontFamily={AFONT} fontSize="12px" color={colors.gr72} whiteSpace="nowrap">{unit}</Text>
     </Flex>
@@ -544,22 +544,36 @@ function KakaoGlyph() {
     </svg>
   );
 }
-type AlimtalkTemplate = { id: string; title: string; body: string };
+// 이미지 영역 장식용 아이콘 — 실제 등록 시엔 업로드 이미지로 대체되는 자리 표시
+function RibbonGlyph() {
+  return (
+    <svg width="34" height="34" viewBox="0 0 40 40" fill="none" style={{ position: 'absolute', right: 8, bottom: 6, opacity: 0.35 }}>
+      <path d="M20 4l3.6 7.4 8.1 1.2-5.9 5.7 1.4 8.1L20 22.6l-7.2 3.8 1.4-8.1-5.9-5.7 8.1-1.2Z" fill="white" />
+    </svg>
+  );
+}
+type AlimtalkTemplate = { id: string; label: string; title: string; body: string; imageGradient: string };
 const ALIMTALK_TEMPLATES: AlimtalkTemplate[] = [
   {
     id: 'welcome',
+    label: '할인코드 발급 안내',
     title: '[할인코드 발급 안내]\n라이브 단골 전용 혜택이\n도착했어요!',
     body: '안녕하세요, 고객님 :)\n라이브 단골 고객님께만 드리는\n특별 할인코드를 보내드려요.\n\n▶ 사용기간 : 발급일로부터 7일\n▶ 사용방법 : 결제 시 코드 입력\n\n지금 바로 확인해보세요!',
+    imageGradient: 'linear(135deg, #7C3AED, #DB2777)',
   },
   {
     id: 'limited',
+    label: '한정 할인코드',
     title: '[한정 할인코드]\n놓치면 아쉬운 혜택,\n지금 확인하세요',
     body: '고객님을 위한\n한정 수량 할인코드가\n도착했습니다.\n\n▶ 대상 : 라이브 단골 고객\n▶ 유효기간 : 발급일로부터 7일\n\n서두르세요, 한정 수량이에요!',
+    imageGradient: 'linear(135deg, #F59E0B, #EF4444)',
   },
   {
     id: 'thanks',
+    label: '단골 고객 감사 쿠폰',
     title: '[단골 고객 감사 쿠폰]\n항상 함께해주셔서\n감사합니다',
     body: '늘 저희 라이브를\n찾아주시는 고객님께\n감사한 마음을 담았어요.\n\n▶ 전용 할인코드가 발급되었습니다\n▶ 사용기간 : 발급일로부터 7일\n\n소중한 마음, 잊지 않을게요!',
+    imageGradient: 'linear(135deg, #10B981, #059669)',
   },
 ];
 function AlimtalkCard({ tpl, selected, onSelect }: { tpl: AlimtalkTemplate; selected: boolean; onSelect: () => void }) {
@@ -575,17 +589,16 @@ function AlimtalkCard({ tpl, selected, onSelect }: { tpl: AlimtalkTemplate; sele
           <KakaoGlyph />
           <Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color="#3A1D1D">알림톡 도착</Text>
         </Flex>
-        <Box w="100%" bg="#2B2B2B" borderRadius="10px" p="14px" mb="10px">
+        <Box w="100%" position="relative" bgGradient={tpl.imageGradient} borderRadius="10px 10px 0 0" overflow="hidden" p="12px" minH="86px">
+          <RibbonGlyph />
           {tpl.title.split('\n').map((line, i) => (
-            <Text key={`t${i}`} fontFamily={AFONT} fontWeight="700" fontSize="13px" color="white" lineHeight="1.5">{line}</Text>
+            <Text key={`t${i}`} position="relative" fontFamily={AFONT} fontWeight="700" fontSize="13px" color="white" lineHeight="1.5">{line}</Text>
           ))}
-          <Box h="8px" />
+        </Box>
+        <Box w="100%" bg="#2B2B2B" borderRadius="0 0 10px 10px" p="14px">
           {tpl.body.split('\n').map((line, i) => (
             <Text key={`b${i}`} fontFamily={AFONT} fontSize="11.5px" color="rgba(255,255,255,0.82)" lineHeight="1.6">{line || ' '}</Text>
           ))}
-        </Box>
-        <Box w="100%" bg="white" border="1px solid #E5E7EB" borderRadius="8px" py="8px" textAlign="center">
-          <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.gr42}>바로가기</Text>
         </Box>
       </Flex>
     </Box>
@@ -593,7 +606,7 @@ function AlimtalkCard({ tpl, selected, onSelect }: { tpl: AlimtalkTemplate; sele
 }
 
 // 할인코드 등록 + 알림톡 템플릿 선택 + 발송 팝업
-function DiscountCodeModal({ targetCount, onClose, onSend }: { targetCount: number; onClose: () => void; onSend: () => void }) {
+function DiscountCodeModal({ targetCount, onClose, onSend }: { targetCount: number; onClose: () => void; onSend: (template: AlimtalkTemplate) => void }) {
   const [code, setCode] = useState('');
   const [type, setType] = useState<'amount' | 'rate'>('amount');
   const [amount, setAmount] = useState('');
@@ -608,11 +621,11 @@ function DiscountCodeModal({ targetCount, onClose, onSend }: { targetCount: numb
 
   const send = () => {
     const noCode = !code.trim();
-    const noTpl = !templateId;
+    const selected = ALIMTALK_TEMPLATES.find((t) => t.id === templateId);
     setCodeError(noCode);
-    setTemplateError(noTpl);
-    if (noCode || noTpl) return;
-    onSend();
+    setTemplateError(!selected);
+    if (noCode || !selected) return;
+    onSend(selected);
   };
 
   return (
@@ -636,18 +649,15 @@ function DiscountCodeModal({ targetCount, onClose, onSend }: { targetCount: numb
               {codeError && <HelperText danger>할인코드를 입력해 주세요.</HelperText>}
             </Row>
             <Row label="할인종류">
-              <Flex align="center" gap="18px" wrap="wrap">
-                <Radio checked={type === 'amount'} label="금액할인" onClick={() => setType('amount')} />
-                <Radio checked={type === 'rate'} label="비율할인" onClick={() => setType('rate')} />
-                {type === 'amount'
-                  ? <NumField value={amount} onChange={setAmount} unit="원" placeholder="할인 금액" />
-                  : <NumField value={rate} onChange={setRate} unit="%" placeholder="할인율" />}
+              <Flex align="center" gap="10px" wrap="wrap">
+                <Radio checked={type === 'amount'} label="금액 할인" onClick={() => setType('amount')} />
+                <NumField value={amount} onChange={setAmount} unit="원" placeholder="금액 입력" width="110px" disabled={type !== 'amount'} />
+                <Radio checked={type === 'rate'} label="비율 할인" onClick={() => setType('rate')} />
+                <NumField value={rate} onChange={setRate} unit="%" placeholder="비율을 입력해주세요" width="150px" disabled={type !== 'rate'} />
+                <Text fontFamily={AFONT} fontSize="12px" color={colors.gr72} whiteSpace="nowrap">최대 할인 금액</Text>
+                <NumField value={maxAmount} onChange={setMaxAmount} unit="원" placeholder="0" width="100px" disabled={type !== 'rate'} />
               </Flex>
-            </Row>
-            <Row label="최대 할인금액">
-              {type === 'rate'
-                ? <NumField value={maxAmount} onChange={setMaxAmount} unit="원" placeholder="최대 할인금액" />
-                : <HelperText>금액할인은 할인 금액이 곧 상한이라 최대 할인금액이 적용되지 않습니다.</HelperText>}
+              <HelperText>ⓘ 비율 할인은 배송비를 제외한 총 상품 금액 기준입니다.</HelperText>
             </Row>
             <Row label="주문금액 제한">
               <NumField value={minOrder} onChange={setMinOrder} unit="원 이상" placeholder="최소 주문금액" />
@@ -684,11 +694,11 @@ function DiscountCodeModal({ targetCount, onClose, onSend }: { targetCount: numb
   );
 }
 
-type SendHistoryRow = { name: string; phone: string; nickname: string; lastPurchase: string; marketingAgree: boolean; sentAt: string };
+type SendHistoryRow = { name: string; phone: string; nickname: string; lastPurchase: string; marketingAgree: boolean; template: string; sentAt: string };
 
-// ── 할인코드 (단골 리스트 + 발송내역 탭) ──
+// ── 할인코드 (단골 리스트 + 할인코드(발송내역) 탭) ──
 function DiscountCode() {
-  const [tab, setTab] = useState<'단골 리스트' | '발송내역'>('단골 리스트');
+  const [tab, setTab] = useState<'단골 리스트' | '할인코드'>('단골 리스트');
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [modalOpen, setModalOpen] = useState(false);
   const [selectWarning, setSelectWarning] = useState(false);
@@ -708,16 +718,16 @@ function DiscountCode() {
     setModalOpen(true);
   };
 
-  const handleSent = () => {
+  const handleSent = (template: AlimtalkTemplate) => {
     const now = new Date();
     const sentAt = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const newRows: SendHistoryRow[] = REGULAR_ROWS
       .filter((r) => selected.has(r.no))
-      .map((r) => ({ name: r.name, phone: r.phone, nickname: r.nickname, lastPurchase: r.lastPurchase, marketingAgree: r.marketingAgree, sentAt }));
+      .map((r) => ({ name: r.name, phone: r.phone, nickname: r.nickname, lastPurchase: r.lastPurchase, marketingAgree: r.marketingAgree, template: template.label, sentAt }));
     setHistory((prev) => [...newRows, ...prev]);
     setModalOpen(false);
     setSelected(new Set());
-    setTab('발송내역');
+    setTab('할인코드');
   };
 
   const LinkText = ({ children }: { children: React.ReactNode }) => (
@@ -728,7 +738,7 @@ function DiscountCode() {
     <AdminLayout navActive="LIVE" sidebar={{ items: REGULARS_SIDEBAR_ITEMS }}>
       <Box fontFamily={AFONT} color={colors.gr42} minW="1200px">
         <Box pb="20px">
-          <TabStrip tabs={['단골 리스트', '발송내역']} active={tab} onChange={(t) => setTab(t as '단골 리스트' | '발송내역')} />
+          <TabStrip tabs={['단골 리스트', '할인코드']} active={tab} onChange={(t) => setTab(t as '단골 리스트' | '할인코드')} />
         </Box>
 
         {tab === '단골 리스트' ? (
@@ -840,6 +850,7 @@ function DiscountCode() {
                   { header: ['닉네임'], w: '120px' },
                   { header: ['최근 구매일'], w: '120px' },
                   { header: ['마케팅 수신동의'], w: '130px' },
+                  { header: ['발송 알림톡'], flex: '1' },
                   { header: ['처리내역'], w: '110px' },
                   { header: ['발송일'], w: '120px' },
                 ]}
@@ -848,6 +859,7 @@ function DiscountCode() {
                   h.nickname,
                   h.lastPurchase,
                   h.marketingAgree ? '동의' : '미동의',
+                  h.template,
                   <Flex bg={colors.green} borderRadius="4px" px="8px" py="3px"><Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color="white">발송완료</Text></Flex>,
                   h.sentAt,
                 ])}
