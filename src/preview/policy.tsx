@@ -9,7 +9,7 @@ const FONT = "'Pretendard', system-ui, sans-serif";
 const POLICY_ROWS: { no: number; item: string; content: string }[] = [
   { no: 1, item: '유효기간', content: '발급일로부터 3일간만 유효' },
   { no: 2, item: '회원별 회수', content: '회원별로 할인코드 회수(강제 무효화) 가능해야 함' },
-  { no: 3, item: '사용 완료 코드', content: '이미 사용한 코드는 회수 안 되고, 취소만 가능(주문이랑 얽혀있어서)' },
+  { no: 3, item: '사용 완료 코드', content: '이미 사용한 코드는 회수 안됨' },
   { no: 4, item: '삭제 처리 방식', content: '완전 삭제는 하지 말고 "사용안함" 상태로만 바꾸기(CS 대응 시 이력 확인 필요)' },
   { no: 5, item: '자동 만료', content: '3일 지나면 자동으로 만료 처리되게(사람이 매번 확인 안 해도 되도록)' },
   { no: 6, item: '수신거부 회원 제외', content: '마케팅 수신 거부한 사람한테는 자동으로 발송 안 되게' },
