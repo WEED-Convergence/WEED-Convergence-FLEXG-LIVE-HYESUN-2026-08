@@ -251,16 +251,6 @@ function RibbonGlyph() {
     </svg>
   );
 }
-// 이미지 영역 「단골고객 안내」 문구 위 간단한 안내 아이콘 — 실제 등록 시엔 업로드 이미지로 대체되는 자리 표시
-function NoticeGlyph() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="11" fill="rgba(255,255,255,0.22)" />
-      <path d="M12 6.5v7" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
-      <circle cx="12" cy="16.5" r="1.1" fill="white" />
-    </svg>
-  );
-}
 type AlimtalkTemplate = { id: string; type: 'A' | 'B' | 'C'; label: string; title: string; body: string; imageFrom: string; imageTo: string };
 const ALIMTALK_TEMPLATES: AlimtalkTemplate[] = [
   {
@@ -317,7 +307,6 @@ function AlimtalkCard({ tpl, selected, onSelect }: { tpl: AlimtalkTemplate; sele
         <Box w="100%" position="relative" bgGradient="to-br" gradientFrom={tpl.imageFrom} gradientTo={tpl.imageTo} borderRadius="10px 10px 0 0" overflow="hidden" p="12px" minH="86px"
           display="flex" flexDirection="column" alignItems="center" justifyContent="center" gap="6px">
           <RibbonGlyph />
-          <NoticeGlyph />
           {tpl.title.split('\n').map((line, i) => (
             <Text key={`t${i}`} position="relative" fontFamily={AFONT} fontWeight="700" fontSize="13px" color="white" lineHeight="1.5">{line}</Text>
           ))}
@@ -460,8 +449,9 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
                   </Flex>
                   <HelperText>ⓘ 비율 할인은 배송비를 제외한 총 상품 금액 기준입니다.</HelperText>
                 </Row>
-                <Row label="주문금액 제한">
+                <Row label="주문금액 제한" required={false}>
                   <NumField value={minOrder} onChange={setMinOrder} unit="원 이상" placeholder="최소 주문금액" />
+                  <HelperText>ⓘ 주문 금액 제한은 배송비를 제외한 총 상품 금액 기준입니다.</HelperText>
                 </Row>
                 <Row label="사용가능 환경">
                   <Flex align="center" gap="18px">
