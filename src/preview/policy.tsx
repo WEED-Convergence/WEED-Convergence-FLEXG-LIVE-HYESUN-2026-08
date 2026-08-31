@@ -8,7 +8,7 @@ const FONT = "'Pretendard', system-ui, sans-serif";
 
 const POLICY_ROWS: { no: number; item: string; content: string }[] = [
   { no: 1, item: '유효기간', content: '발급일로부터 3일간만 유효' },
-  { no: 2, item: '사용안함', content: '관리자가 할인코드를 "사용안함"으로 설정하면, 고객이 해당 코드를 입력했을 때 쇼핑몰(주문/결제 페이지)에 "사용할 수 없는 코드입니다" 안내 메시지 노출. 할인코드 수정 및 삭제는 [회원>할인코드] 화면에서 가능. 단, 이미 발송되었거나 고객이 사용한 할인코드는 수정 및 삭제 불가능' },
+  { no: 2, item: '사용안함', content: '관리자가 할인코드를 "사용안함"으로 설정하면, 고객이 해당 코드를 입력했을 때 쇼핑몰(주문/결제 페이지)에 "사용할 수 없는 코드입니다" 안내 메시지 노출\n할인코드 수정 및 삭제는 [회원>할인코드] 화면에서 가능. 단, 이미 발송되었거나 고객이 사용한 할인코드는 수정 및 삭제 불가능' },
   { no: 3, item: '사용 완료 코드', content: '이미 사용한 코드는 삭제 안됨' },
   { no: 4, item: '삭제 처리 방식', content: '삭제 경우 리스트에서는 사라지지만 DB에서는 로그남기기(CS대응)' },
   { no: 5, item: '자동 만료', content: '3일 지나면 자동으로 만료 처리되게' },
@@ -32,7 +32,7 @@ export function Policy() {
           rows={POLICY_ROWS.map((r) => [
             r.no,
             <Text fontWeight="700" color={colors.gr42}>{r.item}</Text>,
-            r.content,
+            r.content.split('\n').map((line, i) => <Text key={i}>{line}</Text>),
           ])}
         />
       </Box>
