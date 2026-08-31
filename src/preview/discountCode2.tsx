@@ -158,7 +158,7 @@ export function DiscountCode2() {
             { header: ['등록일'], w: '120px' },
             { header: ['사용 환경'], w: '100px' },
             { header: ['메모'], flex: '2' },
-            { header: ['관리'], w: '90px' },
+            { header: ['관리'], w: '150px' },
           ]}
           rows={CODE_ROWS.map((r) => [
             <LCheck checked={selected.has(r.code)} onChange={() => toggleRow(r.code)} />,
@@ -169,7 +169,10 @@ export function DiscountCode2() {
             r.date,
             r.env,
             r.memo,
-            <FilledButton label="수정" bg={colors.bcDefault} />,
+            <Flex gap="6px">
+              <FilledButton label="수정" bg={colors.bcDefault} />
+              <FilledButton label="삭제" bg={colors.red} />
+            </Flex>,
           ])}
         />
         </Box>
