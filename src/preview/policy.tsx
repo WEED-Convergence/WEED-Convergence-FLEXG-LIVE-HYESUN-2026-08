@@ -15,7 +15,7 @@ const POLICY_ROWS: { no: number; item: string; content: string }[] = [
   { no: 6, item: '수신거부 회원 제외', content: '마케팅 수신 거부한 사람한테는 자동으로 발송 안 되게' },
   { no: 7, item: '야간 발송 제한', content: '밤 9시~아침 8시에는 발송 안 되게(브랜드메시지 기준)' },
   { no: 8, item: '발송 결과 기록', content: '발송 성공/실패 여부 회원별로 남겨야 함' },
-  { no: 9, item: '처리 로그', content: '누가 언제 코드 발급했는지, 회수했는지 로그 남기기' },
+  { no: 9, item: '처리 로그', content: '누가 언제 코드 발급했는지, 삭제했는지 로그 남기기' },
 ];
 
 export function Policy() {
