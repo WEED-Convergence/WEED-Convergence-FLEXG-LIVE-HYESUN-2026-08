@@ -8,7 +8,7 @@ const FONT = "'Pretendard', system-ui, sans-serif";
 
 const POLICY_ROWS: { no: number; item: string; content: string }[] = [
   { no: 1, item: '유효기간', content: '발급일로부터 3일간만 유효' },
-  { no: 2, item: '삭제 및 회수', content: '할인코드 회수(강제 무효화) 처리 가능할지 논의 필요. 현재 회수 및 삭제 불가능' },
+  { no: 2, item: '사용안함', content: '관리자가 할인코드를 "사용안함"으로 설정하면, 고객이 해당 코드를 입력했을 때 쇼핑몰(주문/결제 페이지)에 "사용할 수 없는 코드입니다" 안내 메시지 노출' },
   { no: 3, item: '사용 완료 코드', content: '이미 사용한 코드는 회수 안됨' },
   { no: 4, item: '삭제 처리 방식', content: '완전 삭제는 하지 말고 "사용안함" 상태로만 바꾸기(CS 대응 시 이력 확인 필요)' },
   { no: 5, item: '자동 만료', content: '3일 지나면 자동으로 만료 처리되게(사람이 매번 확인 안 해도 되도록)' },
