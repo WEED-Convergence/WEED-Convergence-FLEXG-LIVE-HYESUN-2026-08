@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Box, Flex, Text } from '@chakra-ui/react';
 import {
   AdminLayout, DataTable, FilledButton, OutlineButton, SelectBox, Radio, Toggle, LInput, LCheck,
-  Section, Row, HelperText,
+  Row, HelperText,
   colors,
 } from '../design-system';
 
@@ -66,9 +66,21 @@ function parseKind(kind: string): { type: 'amount' | 'rate'; amount: string; rat
 }
 const ENV_MAP: Record<string, 'all' | 'app' | 'web'> = { '전체': 'all', 'APP': 'app', 'Web(PC/Mobile)': 'web' };
 
-// 조회 전용 값 래퍼 — 등록 폼과 동일한 입력형 컴포넌트를 그대로 두되 상호작용만 막는다
-function ReadOnly({ children }: { children: React.ReactNode }) {
-  return <Box opacity={0.5} pointerEvents="none">{children}</Box>;
+// 수정 불가 값 — 입력창 자리에 회색 배경의 조회 전용 박스로 표시(흐리게 처리하지 않음)
+function DisabledField({ value, unit, width = '160px' }: { value: string; unit?: string; width?: string }) {
+  return (
+    <Flex align="center" gap="6px">
+      <Box w={width} px="8px" pt="6px" pb="7px" bg={colors.grE8} border={`1px solid ${colors.grD8}`} borderRadius="4px">
+        <Text fontFamily={FONT} fontSize="12px" color={colors.gr72}>{value || ' '}</Text>
+      </Box>
+      {unit && <Text fontFamily={FONT} fontSize="12px" color={colors.gr72} whiteSpace="nowrap">{unit}</Text>}
+    </Flex>
+  );
+}
+
+// 라디오 등 값 자체는 그대로 보이되 선택만 막아야 하는 항목 — 상호작용만 잠그고 흐리게 처리하지 않는다
+function Locked({ children }: { children: React.ReactNode }) {
+  return <Box pointerEvents="none">{children}</Box>;
 }
 
 // 할인코드 수정 팝업 — 등록 팝업(screens.tsx)의 「할인코드 등록」 폼과 동일한 항목 구성을 그대로 재현하되
@@ -87,47 +99,39 @@ function DiscountCodeEditModal({ row, onClose, onApply }: { row: CodeRow; onClos
         </Flex>
 
         <Box p="20px 24px 4px" data-doc-mark="edit-form">
-          <Section title="할인코드 등록" note={false}>
+          <Box w="100%" borderTop="1px solid #E8E8E8" borderBottom="1px solid #E8E8E8">
             <Row label="사용여부">
               <Toggle on={used} onToggle={() => setUsed((v) => !v)} />
             </Row>
             <Row label="할인코드">
-              <ReadOnly><LInput value={row.code} onChange={() => {}} width="280px" /></ReadOnly>
+              <DisabledField value={row.code} width="280px" />
             </Row>
             <Row label="할인종류">
-              <ReadOnly>
-                <Flex align="center" gap="10px" wrap="wrap">
-                  <Radio checked={type === 'amount'} label="금액 할인" onClick={() => {}} />
-                  <Flex align="center" gap="6px"><LInput value={amount} onChange={() => {}} width="110px" /><Text fontFamily={FONT} fontSize="12px" color={colors.gr72}>원</Text></Flex>
-                  <Radio checked={type === 'rate'} label="비율 할인" onClick={() => {}} />
-                  <Flex align="center" gap="6px"><LInput value={rate} onChange={() => {}} width="150px" /><Text fontFamily={FONT} fontSize="12px" color={colors.gr72}>%</Text></Flex>
-                </Flex>
-              </ReadOnly>
+              <Flex align="center" gap="10px" wrap="wrap">
+                <Locked><Radio checked={type === 'amount'} label="금액 할인" onClick={() => {}} /></Locked>
+                <DisabledField value={amount} unit="원" width="110px" />
+                <Locked><Radio checked={type === 'rate'} label="비율 할인" onClick={() => {}} /></Locked>
+                <DisabledField value={rate} unit="%" width="150px" />
+              </Flex>
               <HelperText>ⓘ 비율 할인은 배송비를 제외한 총 상품 금액 기준입니다.</HelperText>
             </Row>
             <Row label="주문금액 제한" required={false}>
-              <ReadOnly><Flex align="center" gap="6px"><LInput value="0" onChange={() => {}} width="160px" /><Text fontFamily={FONT} fontSize="12px" color={colors.gr72}>원 이상</Text></Flex></ReadOnly>
+              <DisabledField value="0" unit="원 이상" width="160px" />
               <HelperText>ⓘ 주문 금액 제한은 배송비를 제외한 총 상품 금액 기준입니다.</HelperText>
             </Row>
             <Row label="사용가능 환경">
-              <ReadOnly>
-                <Flex align="center" gap="18px">
-                  <Radio checked={env === 'all'} label="전체" onClick={() => {}} />
-                  <Radio checked={env === 'app'} label="APP" onClick={() => {}} />
-                  <Radio checked={env === 'web'} label="Web(PC/Mobile)" onClick={() => {}} />
-                </Flex>
-              </ReadOnly>
+              <Flex align="center" gap="18px">
+                <Locked><Radio checked={env === 'all'} label="전체" onClick={() => {}} /></Locked>
+                <Locked><Radio checked={env === 'app'} label="APP" onClick={() => {}} /></Locked>
+                <Locked><Radio checked={env === 'web'} label="Web(PC/Mobile)" onClick={() => {}} /></Locked>
+              </Flex>
             </Row>
             <Row label="메모" required={false} last>
-              <ReadOnly>
-                <textarea value={row.memo} readOnly rows={3} style={{
-                  width: '100%', maxWidth: '480px', resize: 'vertical', boxSizing: 'border-box',
-                  border: '1px solid #D7D6D6', borderRadius: '4px', padding: '8px',
-                  fontFamily: FONT, fontSize: '12px', color: colors.gr42,
-                }} />
-              </ReadOnly>
+              <Box w="100%" maxW="480px" bg={colors.grE8} border={`1px solid ${colors.grD8}`} borderRadius="4px" p="8px" minH="70px">
+                <Text fontFamily={FONT} fontSize="12px" color={colors.gr72} whiteSpace="pre-wrap">{row.memo}</Text>
+              </Box>
             </Row>
-          </Section>
+          </Box>
         </Box>
 
         <Flex data-doc-mark="edit-actions" px="24px" py="16px" borderTop="1px solid #F0F1F3" align="center" justify="flex-end" gap="8px">
