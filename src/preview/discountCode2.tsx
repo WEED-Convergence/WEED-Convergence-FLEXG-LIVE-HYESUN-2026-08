@@ -5,7 +5,8 @@
 import { useState } from 'react';
 import { Box, Flex, Text } from '@chakra-ui/react';
 import {
-  AdminLayout, DataTable, FilledButton, SelectBox, Radio, Toggle, LInput, LCheck,
+  AdminLayout, DataTable, FilledButton, OutlineButton, SelectBox, Radio, Toggle, LInput, LCheck,
+  Section, Row, HelperText,
   colors,
 } from '../design-system';
 
@@ -58,6 +59,86 @@ function QuickRangeButton({ label, active, onClick }: { label: string; active: b
   );
 }
 
+// 할인코드 리스트의 "할인종류" 표기("1,000원"/"12%")를 등록 폼과 같은 금액/비율 값으로 역산
+function parseKind(kind: string): { type: 'amount' | 'rate'; amount: string; rate: string } {
+  if (kind.includes('%')) return { type: 'rate', amount: '', rate: kind.replace('%', '') };
+  return { type: 'amount', amount: kind.replace(/[^0-9]/g, ''), rate: '' };
+}
+const ENV_MAP: Record<string, 'all' | 'app' | 'web'> = { '전체': 'all', 'APP': 'app', 'Web(PC/Mobile)': 'web' };
+
+// 조회 전용 값 래퍼 — 등록 폼과 동일한 입력형 컴포넌트를 그대로 두되 상호작용만 막는다
+function ReadOnly({ children }: { children: React.ReactNode }) {
+  return <Box opacity={0.5} pointerEvents="none">{children}</Box>;
+}
+
+// 할인코드 수정 팝업 — 등록 팝업(screens.tsx)의 「할인코드 등록」 폼과 동일한 항목 구성을 그대로 재현하되
+// 「사용여부」만 실제로 바꿀 수 있는 토글로 노출하고, 나머지 항목은 전부 조회만 가능하게 잠근다.
+function DiscountCodeEditModal({ row, onClose, onApply }: { row: CodeRow; onClose: () => void; onApply: (used: boolean) => void }) {
+  const [used, setUsed] = useState(row.used);
+  const { type, amount, rate } = parseKind(row.kind);
+  const env = ENV_MAP[row.env] ?? 'all';
+
+  return (
+    <Box position="fixed" inset="0" bg="rgba(17,24,39,0.45)" zIndex={1000} display="flex" alignItems="center" justifyContent="center" p="24px" onClick={onClose}>
+      <Box bg="white" borderRadius="12px" w="720px" maxW="96vw" maxH="88vh" overflowY="auto" boxShadow="0 20px 60px rgba(0,0,0,0.3)" onClick={(e) => e.stopPropagation()}>
+        <Flex px="24px" py="16px" borderBottom="1px solid #F0F1F3" align="center" justify="space-between">
+          <Text fontFamily={FONT} fontWeight="800" fontSize="17px" color={colors.gr42}>할인코드 수정</Text>
+          <Box as="button" onClick={onClose} cursor="pointer"><Text fontSize="18px" color={colors.gr72}>×</Text></Box>
+        </Flex>
+
+        <Box p="20px 24px 4px" data-doc-mark="edit-form">
+          <Section title="할인코드 등록" note={false}>
+            <Row label="사용여부">
+              <Toggle on={used} onToggle={() => setUsed((v) => !v)} />
+            </Row>
+            <Row label="할인코드">
+              <ReadOnly><LInput value={row.code} onChange={() => {}} width="280px" /></ReadOnly>
+            </Row>
+            <Row label="할인종류">
+              <ReadOnly>
+                <Flex align="center" gap="10px" wrap="wrap">
+                  <Radio checked={type === 'amount'} label="금액 할인" onClick={() => {}} />
+                  <Flex align="center" gap="6px"><LInput value={amount} onChange={() => {}} width="110px" /><Text fontFamily={FONT} fontSize="12px" color={colors.gr72}>원</Text></Flex>
+                  <Radio checked={type === 'rate'} label="비율 할인" onClick={() => {}} />
+                  <Flex align="center" gap="6px"><LInput value={rate} onChange={() => {}} width="150px" /><Text fontFamily={FONT} fontSize="12px" color={colors.gr72}>%</Text></Flex>
+                </Flex>
+              </ReadOnly>
+              <HelperText>ⓘ 비율 할인은 배송비를 제외한 총 상품 금액 기준입니다.</HelperText>
+            </Row>
+            <Row label="주문금액 제한" required={false}>
+              <ReadOnly><Flex align="center" gap="6px"><LInput value="0" onChange={() => {}} width="160px" /><Text fontFamily={FONT} fontSize="12px" color={colors.gr72}>원 이상</Text></Flex></ReadOnly>
+              <HelperText>ⓘ 주문 금액 제한은 배송비를 제외한 총 상품 금액 기준입니다.</HelperText>
+            </Row>
+            <Row label="사용가능 환경">
+              <ReadOnly>
+                <Flex align="center" gap="18px">
+                  <Radio checked={env === 'all'} label="전체" onClick={() => {}} />
+                  <Radio checked={env === 'app'} label="APP" onClick={() => {}} />
+                  <Radio checked={env === 'web'} label="Web(PC/Mobile)" onClick={() => {}} />
+                </Flex>
+              </ReadOnly>
+            </Row>
+            <Row label="메모" required={false} last>
+              <ReadOnly>
+                <textarea value={row.memo} readOnly rows={3} style={{
+                  width: '100%', maxWidth: '480px', resize: 'vertical', boxSizing: 'border-box',
+                  border: '1px solid #D7D6D6', borderRadius: '4px', padding: '8px',
+                  fontFamily: FONT, fontSize: '12px', color: colors.gr42,
+                }} />
+              </ReadOnly>
+            </Row>
+          </Section>
+        </Box>
+
+        <Flex data-doc-mark="edit-actions" px="24px" py="16px" borderTop="1px solid #F0F1F3" align="center" justify="flex-end" gap="8px">
+          <OutlineButton label="취소" onClick={onClose} />
+          <FilledButton label="적용" bg={colors.bcPoint} onClick={() => onApply(used)} />
+        </Flex>
+      </Box>
+    </Box>
+  );
+}
+
 export function DiscountCode2() {
   const [useCode, setUseCode] = useState(false);
   const [codeQ, setCodeQ] = useState('');
@@ -68,6 +149,8 @@ export function DiscountCode2() {
   const [quick, setQuick] = useState<string | null>(null);
   const [usedFilter, setUsedFilter] = useState<'전체' | '사용' | '사용안함'>('전체');
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [rows, setRows] = useState<CodeRow[]>(CODE_ROWS);
+  const [editing, setEditing] = useState<CodeRow | null>(null);
 
   const toggleRow = (code: string) => {
     setSelected((prev) => {
@@ -160,7 +243,7 @@ export function DiscountCode2() {
             { header: ['메모'], flex: '2' },
             { header: ['관리'], w: '150px' },
           ]}
-          rows={CODE_ROWS.map((r) => [
+          rows={rows.map((r) => [
             <LCheck checked={selected.has(r.code)} onChange={() => toggleRow(r.code)} />,
             r.division,
             r.used ? '사용함' : '사용안함',
@@ -170,13 +253,23 @@ export function DiscountCode2() {
             r.env,
             r.memo,
             <Flex gap="6px">
-              <FilledButton label="수정" bg={colors.bcDefault} />
+              <FilledButton label="수정" bg={colors.bcDefault} onClick={() => setEditing(r)} />
               <FilledButton label="삭제" bg={colors.red} />
             </Flex>,
           ])}
         />
         </Box>
       </Box>
+      {editing && (
+        <DiscountCodeEditModal
+          row={editing}
+          onClose={() => setEditing(null)}
+          onApply={(used) => {
+            setRows((prev) => prev.map((x) => (x.code === editing.code ? { ...x, used } : x)));
+            setEditing(null);
+          }}
+        />
+      )}
     </AdminLayout>
   );
 }
