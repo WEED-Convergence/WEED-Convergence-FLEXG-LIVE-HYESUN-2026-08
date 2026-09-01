@@ -368,9 +368,10 @@ const SEED_SEND_HISTORY: SendHistoryRow[] = [
 function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
   targetCount: number; history: SendHistoryRow[]; onClose: () => void; onSend: (template: AlimtalkTemplate) => void;
 }) {
-  const [tab, setTab] = useState<'기본 설정' | '할인코드 발송' | '발송내역'>('할인코드 발송');
+  const [tab, setTab] = useState<'기본 설정' | '할인코드 발송' | '발송내역'>('기본 설정');
   const [rejectNumberMode, setRejectNumberMode] = useState<'new' | 'manual'>('manual');
   const [rejectNumber, setRejectNumber] = useState('');
+  const [basicSettingsDone, setBasicSettingsDone] = useState(false);
   const [code, setCode] = useState('');
   const [type, setType] = useState<'amount' | 'rate'>('amount');
   const [amount, setAmount] = useState('');
@@ -459,6 +460,14 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
           </Box>
         )}
 
+        {tab !== '기본 설정' && !basicSettingsDone && (
+          <Box px="24px" pt="16px" data-doc-mark="basic-required-alert">
+            <Flex align="center" gap="6px" bg={colors.grF8} border={`1px solid ${colors.red}`} borderRadius="6px" px="14px" py="10px" w="fit-content">
+              <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.red}>기본 설정을 완료해 주세요.</Text>
+            </Flex>
+          </Box>
+        )}
+
         {tab === '기본 설정' ? (
           <Box data-doc-tab="기본 설정" p="20px 24px 24px">
             <Box pb="16px" data-doc-mark="basic-notice">
@@ -492,7 +501,7 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
             </Box>
 
             <Flex justify="center" pt="24px">
-              <FilledButton label="변경사항 적용" bg={colors.bcPoint} />
+              <FilledButton label="변경사항 적용" bg={colors.bcPoint} onClick={() => setBasicSettingsDone(true)} />
             </Flex>
           </Box>
         ) : tab === '할인코드 발송' ? (
