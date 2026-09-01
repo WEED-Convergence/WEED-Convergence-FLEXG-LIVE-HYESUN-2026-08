@@ -266,14 +266,6 @@ function MemoInput({ value, onChange }: { value: string; onChange: (v: string) =
     />
   );
 }
-// 카카오 알림톡 도착 카드 — 표준 컴포넌트 없어 화면 내 임시 조립(디자인시스템 요청 대상)
-function KakaoGlyph() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-      <path d="M12 3.5C6.98 3.5 3 6.86 3 11c0 2.66 1.7 5 4.28 6.36l-1.02 3.72a.5.5 0 0 0 .75.55l4.2-2.78c.25.02.5.03.79.03 5.02 0 9-3.36 9-7.5S17.02 3.5 12 3.5Z" fill="#3A1D1D" />
-    </svg>
-  );
-}
 // 이미지 영역 장식용 아이콘 — 실제 등록 시엔 업로드 이미지로 대체되는 자리 표시
 function RibbonGlyph() {
   return (
@@ -331,10 +323,7 @@ function AlimtalkCard({ tpl, selected, onSelect }: { tpl: AlimtalkTemplate; sele
         <Text fontFamily={AFONT} fontWeight="800" fontSize="11px" color="white" whiteSpace="nowrap">{tpl.type}타입</Text>
       </Flex>
       <Flex direction="column" align="center" bg={colors.grF8} borderRadius="12px" p="18px 12px 12px">
-        <Flex align="center" gap="4px" bg="#FAE100" borderRadius="14px" px="10px" py="4px" mb="12px">
-          <KakaoGlyph />
-          <Text fontFamily={AFONT} fontWeight="700" fontSize="11px" color="#3A1D1D">알림톡 도착</Text>
-        </Flex>
+        <Text w="100%" fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.gr42} mb="10px">(광고)</Text>
         <Box w="100%" position="relative" bgGradient="to-br" gradientFrom={tpl.imageFrom} gradientTo={tpl.imageTo} borderRadius="10px 10px 0 0" overflow="hidden" p="12px" minH="86px"
           display="flex" flexDirection="column" alignItems="center" justifyContent="center" gap="6px">
           <RibbonGlyph />
@@ -346,6 +335,7 @@ function AlimtalkCard({ tpl, selected, onSelect }: { tpl: AlimtalkTemplate; sele
           {tpl.body.split('\n').map((line, i) => (
             <Text key={`b${i}`} fontFamily={AFONT} fontSize="11.5px" color={colors.gr42} lineHeight="1.6">{line || ' '}</Text>
           ))}
+          <Text fontFamily={AFONT} fontSize="11px" color={colors.gr92} lineHeight="1.6" mt="8px">무료수신거부 0801234567</Text>
         </Box>
       </Flex>
     </Box>
@@ -591,7 +581,7 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
                       </Flex>
                     </Box>
                     <Box>
-                      <RequiredLabel label="알림톡 템플릿" required={false} />
+                      <RequiredLabel label="템플릿" required={false} />
                       <SelectBox key={`tpl-${historyFilterKey}`} label="전체" width="140px" options={HISTORY_TEMPLATE_FILTER_OPTIONS} onSelect={setHistoryTemplateDraft} />
                     </Box>
                     <Box>
@@ -618,7 +608,7 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
                     { header: ['최종 로그인 일자', '최근 구매일'], w: '120px' },
                     { header: ['로그인 횟수'], w: '80px' },
                     { header: ['마케팅 수신 동의'], w: '100px' },
-                    { header: ['알림톡 템플릿'], w: '120px' },
+                    { header: ['템플릿'], w: '120px' },
                     { header: ['처리내역', '발송일'], w: '100px' },
                   ]}
                   rows={filteredHistory.map((h) => [
