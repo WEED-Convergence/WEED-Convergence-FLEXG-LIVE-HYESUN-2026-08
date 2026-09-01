@@ -31,8 +31,10 @@ export function KakaoChannelApproved() {
 
         <Box bg={colors.grF8} borderRadius="12px" overflow="hidden">
           <Box p="18px 16px">
-            <Text fontFamily={FONT} fontSize="13px" color={colors.gr42} lineHeight="1.6">안녕하세요. 플렉스지입니다.</Text>
+            <Text fontFamily={FONT} fontSize="13px" color={colors.gr42} lineHeight="1.6">안녕하세요, 플렉스지입니다.</Text>
             <Text fontFamily={FONT} fontSize="13px" color={colors.gr42} lineHeight="1.6">카카오톡 채널톡 등록이 완료되었습니다.</Text>
+            <Text fontFamily={FONT} fontSize="13px" color={colors.gr42} lineHeight="1.6" mt="14px">무료수신거부번호를 등록하셨나요?</Text>
+            <Text fontFamily={FONT} fontSize="13px" color={colors.gr42} lineHeight="1.6">등록을 완료하시면 메시지 발송이 가능합니다.</Text>
           </Box>
           <Box as="button" w="100%" bg={KAKAO_BUTTON_BG} py="12px" borderTop="1px solid rgba(0,0,0,0.06)" cursor="pointer">
             <Text fontFamily={FONT} fontWeight="700" fontSize="13px" color={KAKAO_TEXT}>채널 추가</Text>
