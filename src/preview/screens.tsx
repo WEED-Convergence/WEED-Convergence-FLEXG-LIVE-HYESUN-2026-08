@@ -478,7 +478,7 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
                   </Flex>
                   <Flex align="center" gap="10px" wrap="wrap">
                     <LInput value={rejectNumber} onChange={setRejectNumber} placeholder="무료 수신거부번호 입력" width="220px" />
-                    <HelperText>ⓘ 직접 입력은 고객의 수신 거부 요청이 자동으로 연동되지 않습니다.</HelperText>
+                    <HelperText danger>ⓘ 직접 입력은 고객의 수신 거부 요청이 자동으로 연동되지 않습니다.</HelperText>
                   </Flex>
                 </Row>
                 <Row label="카카오톡 채널" last>
