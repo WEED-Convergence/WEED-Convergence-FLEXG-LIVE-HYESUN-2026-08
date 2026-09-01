@@ -5,7 +5,7 @@
 // 핵심: 설명 패널과 매칭할 영역에 data-doc-mark="키" 를 달면 번호 마커가 자동으로 얹힌다.
 //       탭 있는 화면은 data-doc-tab 으로 탭 컨텍스트를 표시한다.
 import { useState } from 'react';
-import { Box, Flex, Text } from '@chakra-ui/react';
+import { Box, Flex, Text, Input as ChakraInput } from '@chakra-ui/react';
 // 표준 컴포넌트 조합. deep import 금지, 디자인시스템 공개 배럴로만 소비.
 import {
   AdminLayout, SectionHead,
@@ -219,6 +219,37 @@ function NumField({ value, onChange, unit, placeholder, width = '160px', disable
     </Flex>
   );
 }
+// 할인코드 입력 — 입력창 안쪽에 글자수 카운터가 들어가는 형태라 LInput 대신 화면 내 임시 조립(디자인시스템 요청 대상)
+function CodeInput({ value, onChange, max, width = '280px' }: {
+  value: string; onChange: (v: string) => void; max: number; width?: string;
+}) {
+  return (
+    <Box position="relative" w={width}>
+      <ChakraInput
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="할인코드 입력"
+        w="100%"
+        h="auto"
+        bg="white"
+        border="1px solid #D7D6D6"
+        borderRadius="4px"
+        pl="8px"
+        pr="48px"
+        pt="6px"
+        pb="7px"
+        fontFamily={AFONT}
+        fontSize="12px"
+        color={colors.gr42}
+        _placeholder={{ color: colors.grB8 }}
+        _focus={{ boxShadow: 'none', borderColor: colors.bcPoint }}
+      />
+      <Text position="absolute" right="10px" top="50%" transform="translateY(-50%)" fontFamily={AFONT} fontSize="11px" color={colors.grB8} pointerEvents="none">
+        {value.length}/{max}
+      </Text>
+    </Box>
+  );
+}
 // 메모 — 표준 텍스트영역 컴포넌트 없어 화면 내 임시 조립(디자인시스템 요청 대상)
 function MemoInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
@@ -420,7 +451,7 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
             할인코드 수정 및 삭제는 <Text as="span" color={colors.green} textDecoration="underline">[회원 &gt; 할인코드]</Text>에서 가능합니다. 단, 발송·사용된 코드는 수정 및 삭제가 불가능합니다.
           </Text>
           <Text fontFamily={AFONT} fontSize="12px" color={colors.gr72}>
-            할인코드 사용내역은 <Text as="span" color={colors.green} textDecoration="underline">[회원&gt;할인코드 사용내역]</Text> 화면에서 확인하실 수 있습니다.
+            <Text as="span" color={colors.green} textDecoration="underline">[회원&gt;할인코드 사용내역]</Text> 화면에서 사용내역을 확인할 수 있습니다.
           </Text>
         </Box>
 
@@ -434,8 +465,10 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
                   </Flex>
                 </Row>
                 <Row label="할인코드">
-                  <LInput value={code} onChange={(v) => setCode(v.replace(/[^0-9A-Za-z가-힣]/g, '').slice(0, 16))} placeholder="영문·숫자·한글로 16자 이내 입력" width="280px" />
-                  <HelperText>특수기호·공백 입력 불가 · {code.length}/16자</HelperText>
+                  <Flex align="center" gap="10px" wrap="wrap">
+                    <CodeInput value={code} onChange={(v) => setCode(v.replace(/[^0-9A-Za-z가-힣]/g, '').slice(0, 16))} max={16} />
+                    <HelperText>ⓘ 특수기호와 공백을 포함할 수 없습니다.</HelperText>
+                  </Flex>
                   {codeError && <HelperText danger>할인코드를 입력해 주세요.</HelperText>}
                 </Row>
                 <Row label="할인종류">
@@ -477,7 +510,9 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
             </Box>
 
             <Flex data-doc-mark="modal-actions" px="24px" py="16px" borderTop="1px solid #F0F1F3" align="center" justify="space-between" gap="8px">
-              <Text fontFamily={AFONT} fontSize="12px" color={colors.gr92}>선택한 대상 {targetCount}명에게 할인코드를 발급·발송합니다.</Text>
+              <Flex align="center" gap="6px" bg={colors.grF2} borderRadius="6px" px="12px" py="8px" w="fit-content">
+                <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.gr42}>선택한 대상 <Text as="span" fontWeight="800" color={colors.blue}>{targetCount}명</Text>에게 할인코드를 발급·발송합니다.</Text>
+              </Flex>
               <Flex gap="8px">
                 <OutlineButton label="취소" onClick={onClose} />
                 <FilledButton label="발송" bg={colors.bcPoint} onClick={send} />
