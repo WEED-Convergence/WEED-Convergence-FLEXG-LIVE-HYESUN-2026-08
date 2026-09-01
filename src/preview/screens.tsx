@@ -485,7 +485,7 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
                 <Row label="카카오톡 채널" last>
                   <Flex align="center" gap="10px" wrap="wrap">
                     <FilledButton label="등록 ›" bg={colors.bcSub} />
-                    <HelperText>ⓘ 카카오톡 채널 등록이 완료되면 자동으로 알림톡 템플릿 승인 요청이 진행됩니다. 승인 절차가 완료된 후에 메시지 캠페인을 발행할 수 있습니다. (영업일 기준 최대 3일 소요)</HelperText>
+                    <HelperText>ⓘ 카카오톡 채널 등록이 완료되면 자동으로 알림톡 템플릿 승인 요청이 진행됩니다. 승인 절차가 완료된 후에 메시지를 발행할 수 있습니다. (영업일 기준 최대 3일 소요)</HelperText>
                   </Flex>
                 </Row>
               </Section>
