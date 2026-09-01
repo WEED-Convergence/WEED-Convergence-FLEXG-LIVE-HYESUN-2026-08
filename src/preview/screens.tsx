@@ -297,7 +297,7 @@ const ALIMTALK_TEMPLATES: AlimtalkTemplate[] = [
     id: 'limited',
     type: 'B',
     label: '한정 할인코드',
-    title: '단골고객 안내',
+    title: '한정 할인 안내',
     body: '고객님을 위한\n한정 수량 할인코드가\n도착했습니다.\n\n▶ 대상 : 라이브 단골 고객\n▶ 유효기간 : 발급일로부터 3일\n\n서두르세요, 한정 수량이에요!',
     imageFrom: '#F59E0B',
     imageTo: '#EF4444',
@@ -306,7 +306,7 @@ const ALIMTALK_TEMPLATES: AlimtalkTemplate[] = [
     id: 'thanks',
     type: 'C',
     label: '단골 고객 감사 쿠폰',
-    title: '단골고객 안내',
+    title: '감사 쿠폰 안내',
     body: '늘 저희 라이브를\n찾아주시는 고객님께\n감사한 마음을 담았어요.\n\n▶ 전용 할인코드가 발급되었습니다\n▶ 사용기간 : 발급일로부터 3일\n\n소중한 마음, 잊지 않을게요!',
     imageFrom: '#10B981',
     imageTo: '#059669',
@@ -368,7 +368,9 @@ const SEED_SEND_HISTORY: SendHistoryRow[] = [
 function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
   targetCount: number; history: SendHistoryRow[]; onClose: () => void; onSend: (template: AlimtalkTemplate) => void;
 }) {
-  const [tab, setTab] = useState<'할인코드 발송' | '발송내역'>('할인코드 발송');
+  const [tab, setTab] = useState<'기본 설정' | '할인코드 발송' | '발송내역'>('할인코드 발송');
+  const [rejectNumberMode, setRejectNumberMode] = useState<'new' | 'manual'>('manual');
+  const [rejectNumber, setRejectNumber] = useState('');
   const [code, setCode] = useState('');
   const [type, setType] = useState<'amount' | 'rate'>('amount');
   const [amount, setAmount] = useState('');
@@ -439,23 +441,61 @@ function DiscountCodeModal({ targetCount, history, onClose, onSend }: {
         </Flex>
 
         <Box px="24px" pt="16px">
-          <TabStrip tabs={['할인코드 발송', '발송내역']} active={tab} onChange={(t) => setTab(t as '할인코드 발송' | '발송내역')} />
+          <TabStrip tabs={['기본 설정', '할인코드 발송', '발송내역']} active={tab} onChange={(t) => setTab(t as '기본 설정' | '할인코드 발송' | '발송내역')} />
         </Box>
 
-        <Box px="24px" pt="16px" data-doc-mark="modal-notice">
-          <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.red}>할인코드는 발급일로 부터 3일동안만 유효합니다.</Text>
-          <Text fontFamily={AFONT} fontSize="12px" color={colors.gr72}>
-            마케팅 수신을 거부한 회원에게는 할인코드가 자동으로 발송되지 않습니다.
-          </Text>
-          <Text fontFamily={AFONT} fontSize="12px" color={colors.gr72}>
-            할인코드 수정 및 삭제는 <Text as="span" color={colors.green} textDecoration="underline">[회원 &gt; 할인코드]</Text>에서 가능합니다. 단, 발송·사용된 코드는 수정 및 삭제가 불가능합니다.
-          </Text>
-          <Text fontFamily={AFONT} fontSize="12px" color={colors.gr72}>
-            <Text as="span" color={colors.green} textDecoration="underline">[회원&gt;할인코드 사용내역]</Text> 화면에서 사용내역을 확인할 수 있습니다.
-          </Text>
-        </Box>
+        {tab !== '기본 설정' && (
+          <Box px="24px" pt="16px" data-doc-mark="modal-notice">
+            <Text fontFamily={AFONT} fontWeight="700" fontSize="12px" color={colors.red}>할인코드는 발급일로 부터 3일동안만 유효합니다.</Text>
+            <Text fontFamily={AFONT} fontSize="12px" color={colors.gr72}>
+              마케팅 수신을 거부한 회원에게는 할인코드가 자동으로 발송되지 않습니다.
+            </Text>
+            <Text fontFamily={AFONT} fontSize="12px" color={colors.gr72}>
+              할인코드 수정 및 삭제는 <Text as="span" color={colors.green} textDecoration="underline">[회원 &gt; 할인코드]</Text>에서 가능합니다. 단, 발송·사용된 코드는 수정 및 삭제가 불가능합니다.
+            </Text>
+            <Text fontFamily={AFONT} fontSize="12px" color={colors.gr72}>
+              <Text as="span" color={colors.green} textDecoration="underline">[회원&gt;할인코드 사용내역]</Text> 화면에서 사용내역을 확인할 수 있습니다.
+            </Text>
+          </Box>
+        )}
 
-        {tab === '할인코드 발송' ? (
+        {tab === '기본 설정' ? (
+          <Box data-doc-tab="기본 설정" p="20px 24px 24px">
+            <Box pb="16px" data-doc-mark="basic-notice">
+              <Text fontFamily={AFONT} fontSize="12px" color={colors.gr72}>
+                · 기존에 쇼핑몰 운영을 위한 SMS/알림톡 설정을 완료하셨더라도 할인코드 발송 기능을 이용하시려면 무료 수신거부번호와 카카오톡 채널을 반드시 등록해 주세요.
+              </Text>
+              <Text fontFamily={AFONT} fontSize="12px" color={colors.gr72}>
+                · 수신거부를 신청한 고객의 휴대폰 번호는 신청 일의 다음 날부터 수신거부 처리가 적용됩니다.
+              </Text>
+            </Box>
+
+            <Box data-doc-mark="basic-form">
+              <Section title="기본 설정" note>
+                <Row label="무료 수신거부번호">
+                  <Flex align="center" gap="10px" wrap="wrap">
+                    <Radio checked={rejectNumberMode === 'new'} label="신규" onClick={() => setRejectNumberMode('new')} />
+                    <Radio checked={rejectNumberMode === 'manual'} label="직접 입력" onClick={() => setRejectNumberMode('manual')} />
+                  </Flex>
+                  <Flex align="center" gap="10px" wrap="wrap">
+                    <LInput value={rejectNumber} onChange={setRejectNumber} placeholder="무료 수신거부번호 입력" width="220px" />
+                    <HelperText>ⓘ 직접 입력은 고객의 수신 거부 요청이 자동으로 연동되지 않습니다.</HelperText>
+                  </Flex>
+                </Row>
+                <Row label="카카오톡 채널" last>
+                  <Flex align="center" gap="10px" wrap="wrap">
+                    <FilledButton label="등록 ›" bg={colors.bcSub} />
+                    <HelperText>ⓘ 카카오톡 채널 등록이 완료되면 자동으로 알림톡 템플릿 승인 요청이 진행됩니다. 승인 절차가 완료된 후에 메시지 캠페인을 발행할 수 있습니다. (영업일 기준 최대 3일 소요)</HelperText>
+                  </Flex>
+                </Row>
+              </Section>
+            </Box>
+
+            <Flex justify="center" pt="24px">
+              <FilledButton label="변경사항 적용" bg={colors.bcPoint} />
+            </Flex>
+          </Box>
+        ) : tab === '할인코드 발송' ? (
           <Box data-doc-tab="할인코드 발송">
             <Box p="20px 24px 4px" data-doc-mark="modal-form">
               <Section title="할인코드 등록" note>
